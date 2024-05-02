@@ -1,0 +1,155 @@
+% Place this file in the base directory of your LaTeX project, then
+%   \usepackage{gkcommands}
+% to apply it.
+\ProvidesPackage{gkcommands}
+
+% Variable-width horizontal rule (static thickness).
+\newcommand{\hr}[1]{
+  \vspace{1em}
+  \begin{center}
+    \noindent\rule{#1}{0.4pt}
+  \end{center}
+  \vspace{1em}
+}
+
+\newcommand{\nth}[1]{$^{\text{#1}}$}
+\newcommand{\smtt}[1]{\textsmaller{\texttt{#1}}}
+\newcommand{\regi}[1]{\smtt{\$\uppercase{#1}}}
+
+% Inline "syntax highlighting."
+\newcommand{\ctype}[1]{\textbf{\smtt{\textcolor{maroon}{#1}}}}
+\newcommand{\capi}[1]{\smtt{\textcolor{blue}{#1}}}
+\newcommand{\cvar}[1]{\capi{#1}}
+
+\newcommand{\unix}[1]{\textsc{Unix}}
+\newcommand{\itembf}[1]{\item\textbf{#1}}
+
+\newcommand\crule[3][black]{\textcolor{#1}{\rule{#2}{#3}}}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+\makeatletter
+\newcommand{\pushright}[1]{\ifmeasuring@#1\else\omit\hfill$\displaystyle#1$\fi\ignorespaces}
+\newcommand{\pushleft}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\hfill\fi\ignorespaces}
+\newcommand{\specialcell}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\ignorespaces\fi}
+\makeatother
+
+% Pretty URLs.
+\newcommand{\link}[2]{\href{#1}{\ul{#2}}}
+
+% Math-y macros.
+\newcommand{\conv}{\circledast}
+\newcommand{\pluseq}{\mathrel{+}=}
+\newcommand{\minuseq}{\mathrel{-}=}
+\newcommand{\grad}[1]{\nabla#1}
+\newcommand{\col}[1]{\textcolor{#1}{#1}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\bvec}[1]{\mathbf{\bm{#1}}}
+\newcommand{\uvec}[1]{\hat{\vec{#1}}}
+\newcommand{\bomega}{\bm{\omega}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\bmat}[1]{\mathbf{\bm{#1}}}
+\newcommand{\vmag}[1]{\left\Vert#1\right\Vert}
+\newcommand{\vproj}[1]{\underset{#1}{\text{proj}}\;}
+\newcommand{\tp}{^{\text{\textsmaller{\normalfont\!T}}}}
+\newcommand{\inv}{^{\!-1}}
+\newcommand{\dotp}{\boldsymbol{\cdot}}
+\newcommand{\crossp}[1]{\left[#1_{\times}\right]}
+\newcommand{\cc}{\;\Vert\;}
+\newcommand{\qv}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\fourier}[2]{\int_{-\infty}^{\infty}{#1(#2) e^{-i2\pi u #2} \, d#2}}
+% \usepackage{xifthen}
+% \makeatletter\ifthenelse{\f@size>10}{\!}{}\makeatother
+
+\newcommand{\dprob}[2]{\underset{#1}{\text{Pr}}\mspace{-1mu}\left[#2\right]}
+\newcommand{\dcprob}[3]{\underset{#1}{\text{Pr}}\mspace{-1mu}\left[#2 \mspace{2mu}\vert\mspace{2mu} #3\right]}
+\newcommand{\prob}[1]{\dprob{}{#1}}
+\newcommand{\cprob}[2]{\dcprob{}{#1}{#2}}
+
+\newcommand{\abs}[1]{\left\vert#1\right\vert}
+\newcommand{\rnd}{\overset{\$}{\longleftarrow}}
+\newcommand{\tot}[1]{\varphi\left(#1\right)}
+
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+\DeclareMathOperator*{\var}{var}
+\DeclareMathOperator*{\sign}{sign}
+
+\newcommand{\Normal}[1][]{\mathcal{N}\ifthenelse{\equal{#1}{}}{}{\!\left(#1\right)}}
+
+\newcommand{\set}[1]{\ensuremath{\mathcal{#1}}}
+\newcommand{\bigO}[1]{\mathcal{O}\!\left(#1\right)}
+\newcommand{\bigT}[1]{\Theta\!\left(#1\right)}
+\renewcommand{\st}{\left.\mathrel{}\middle|\mathrel{}\right.}
+
+\pgfmathdeclarefunction{gauss}{2}{%
+  \pgfmathparse{1/(#2*sqrt(2*pi))*exp(-((x-#1)^2)/(2*#2^2))}%
+}
+
+% Plot 2D inequalities easily.
+% https://tex.stackexchange.com/a/76014
+\newcommand{\drawge}{-- (rel axis cs:1,0) -- (rel axis cs:1,1) -- (rel axis cs:0,1) \closedcycle}
+\newcommand{\drawle}{-- (rel axis cs:1,1) -- (rel axis cs:1,0) -- (rel axis cs:0,0) \closedcycle}
+
+\makeatletter
+\newcommand\mathcircled[1]{\mathpalette\@mathcircled{#1}}
+\newcommand\@mathcircled[2]{%
+  \tikz[baseline=(math.base)] \node[draw,ellipse,inner sep=1pt] (math) {$\m@th#1#2$};%
+}
+\@ifundefined{qed}
+  {\newcommand{\qed}{\hfill\ensuremath{\blacksquare}}}
+  {\renewcommand{\qedsymbol}{$\blacksquare$}}
+\makeatother
+
+\newcommand{\sideblock}[2]{%
+  \tag*{\parbox{#1}{%
+    \raggedleft\setlength\baselineskip{0.75em}
+    \textsmaller[2]{#2}}}}
+
+%
+% Cryptography-related stuff below:
+%
+\newcommand{\msgsp}{\mathcal{M}\text{sgSp}}
+\newcommand{\msg}{\mathcal{M}}
+\newcommand{\keygen}{\mathcal{K}}
+\newcommand{\keysp}{\mathcal{K}\text{eySp}}
+\newcommand{\encalgo}{\mathcal{E}}
+\newcommand{\decalgo}{\mathcal{D}}
+\newcommand{\dec}[1]{\ensuremath{\decalgo\!\left(#1\right)}}
+\newcommand{\decs}[2]{\ensuremath{\decalgo_{#1}\!\left(#2\right)}}
+\newcommand{\enc}[1]{\ensuremath{\encalgo\!\left(#1\right)}}
+\newcommand{\encs}[2]{\ensuremath{\encalgo_{#1}\!\left(#2\right)}}
+
+\newcommand{\bits}[1]{\ensuremath{\{0, 1\}^{#1}}}
+\newcommand{\sch}[1]{\ensuremath{\mathcal{#1}}}
+\newcommand{\adv}[3]{\ensuremath{%
+  \textsf{Adv}^{\text{\sffamily#1}}_{\text{#2}}%
+  \left(#3\right)%
+}}
+\newcommand{\ex}[2]{%
+  \textsf{Exp}^{\text{\sffamily#1}}_{\text{#2}}%
+}
+
+\newcommand{\sgn}[1][]{\mathcal{S}\textsc{ign}\ifthenelse{\equal{#1}{}}{}{\left(#1\right)}}
+
+\newcommand{\mac}[1][]{\mathcal{M}\textsc{ac}\ifthenelse{\equal{#1}{}}{}{\left(#1\right)}}
+\newcommand{\kmac}[2][]{\mathcal{M}\textsc{ac}_{#2}\ifthenelse{\equal{#1}{}}{}{\left(#1\right)}}
+\newcommand{\vf}[1][]{\mathcal{V}\textsc{f}\ifthenelse{\equal{#1}{}}{}{\left(#1\right)}}
+\newcommand{\fdef}{\triangleq}
+
+\newcommand{\hmac}[2][k]{\textsf{Hmac}_{#1}\ifthenelse{\equal{#2}{}}{}{\!\left(#1\right)}}
+
+\newcommand{\khash}[2][k]{\khashn[#1]\left(#2\right)}
+\newcommand{\khashn}[1][k]{\hash_{#1}}
+\newcommand{\hash}{\ensuremath{\mathcal{H}}}
+
+\newcommand{\llet}{\text{$\mathscr{L}\!$\emph{et}}}
+\newcommand{\asint}[2]{\left<#2\right>_{#1}}
+\newcommand{\gen}[2][S_0]{G\left(#1, #2\right)}
+
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}}
+\newcommand{\Zs}[1]{\ensuremath{\mathbb{Z}^{*}_{#1}}}
+\newcommand{\dlog}[2]{\ensuremath{\mathrm{dlog}_{#1}\!\left(#2\right)}}
+
+\newcommand{\qr}[1]{\mathrm{QR}\!\left(#1\right)}
+
+\newcommand{\rsa}[2][N,e]{\mathrm{RSA}_{#1}\!\left(#2\right)}

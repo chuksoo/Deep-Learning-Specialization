@@ -1,0 +1,168 @@
+\documentclass[letterpaper,12pt,notitlepage,twoside]{report}
+
+\newcommand{\watermark}{hello there}
+\newcommand{\booktopic}{A Topic}
+\newcommand{\lastname}{An Author}
+\usepackage{NoteStyle}
+
+\title{A Nice Title}
+\author{Me, Myself, and I}
+\date{\footnotesize Last Updated: \today}
+
+\hypersetup{
+  pdftitle={A Topic},
+  pdfauthor={Me, Myself, and I},
+  pdfsubject={},
+}
+
+% ToC on the title page:
+% https://tex.stackexchange.com/a/45863
+\makeatletter
+\newcommand*{\toccontents}{\@starttoc{toc}}
+\makeatother
+
+\begin{document}
+
+\begin{titlepage}
+  \pagestyle{plain}
+  \maketitle
+  \setcounter{tocdepth}{2}
+
+  \pdfbookmark[section]{\contentsname}{toc}
+  \toccontents
+  % Separate page:
+  % \tableofcontents
+\end{titlepage}
+
+\chapter{Welcome} \label{ch:1}
+\inspiration{This is a quote from someone}{Author}{Optional Source}
+
+\firstletter{Hello there}, and welcome to \booktopic. This is literally just an
+example with random content that demonstrates how the template will look when
+used in book form.
+
+
+\section{On Colorful Boxes}
+There are lots of different boxes you can make:
+%
+\begin{itemize}
+  \item Like this one,
+    \begin{notebox}
+      which is wrapped in gray. I use it for notes.\ldots
+    \end{notebox}
+
+  \item Or this one,
+    \begin{funfact}
+      which is wrapped in red. I use it for fun facts or other asides\ldots
+    \end{funfact}
+
+  \item Or this one,
+    \begin{mathaside}
+      which is wrapped in blue and used for mathy stuff.
+    \end{mathaside}
+
+  \item Or this last one,
+    \begin{example}
+      which is wrapped in green. With a title, it's used for enumerated examples
+      (see \smtt{\textbackslash extitle} and \smtt{\textbackslash excounter}).
+      Observe:
+    \end{example}
+
+    \begin{example}[frametitle=\extitle{Test}]
+      This is an example. What's the answer to $2+2$?
+      \answer{Obviously 4, lol.}
+    \end{example}
+
+    \begin{example}[frametitle=\extitle{Test Again}]
+      This one will increment the counter automatically, resetting for each
+      chapter.
+    \end{example}
+
+
+  \item For red and blue boxes, there are custom commands for titles, too:
+    \begin{mathaside}[frametitle=\mathtitle{One Title}]
+      Like this
+    \end{mathaside}
+    \begin{mathaside}[frametitle=\mathtitlep{Two Titles}{A Subtitle}]
+      Or this
+    \end{mathaside}
+\end{itemize}
+
+\hr{5in}
+
+These styles also automatically apply to theorems and claims.
+
+\begin{theorem}[Pythagorean Theorem]
+  \label{thm:pyth}
+  For any right triangle with legs $a,b$ and hypotenuse $c$:
+  %
+  \begin{equation}
+    \label{eq:pyth}
+    a^2+b^2=c^2
+  \end{equation}
+\end{theorem}
+\begin{proof}
+  This is left as an exercise to the reader.
+\end{proof}
+
+\begin{claim}
+  This is the greatest note template in the world.
+\end{claim}
+
+\hr{5in}
+
+There are different ways to quote things, too, depending on how you want to
+emphasize:
+
+\begin{quoting}
+  This is a simple, indented quote with small letters and italics usually
+  suitable for in-text quotations when you just want a block.
+\end{quoting}
+
+Alternatively, you can use the \smtt{\textbackslash inspiration} command from
+the chapter heading, which leverages the \smtt{thickleftborder} frame
+internally, but adds a little more padding and styling (there's also just
+\smtt{leftborder} for a thinner variant):
+
+\begin{thickleftborder}
+  Hello there!
+\end{thickleftborder}
+
+
+
+\section{On Cross-Referencing}
+\marginnote{\footnotesize\softtext This is the standard way to include margin
+notes. There are also commands to link to source papers directly (see
+\smtt{\textbackslash lesson}).} You can reference most things---see
+\autoref{thm:pyth} or \eqref{eq:pyth} or the \nameref{ch:1} chapter---directly
+and easily as long as you give them labels. These are ``built-ins.'' However,
+you can also create a \term{custom term} that will be included in the index,
+then include references to it that link back to the original definition. Try
+clicking: \refterm{custom term}. Building the index is on you, though. You can
+also reference by using a different term for the text: \reftermx{custom
+term}{like this}. Sometimes it doesn't fit the \termx{grammar}{grammatical
+structure} of the sentence so you can define the term one way and visualize it
+another way (this creates a \aterm{grammar} entry in the index). There's also
+\prop{math terms} and a way to reference them: \refprop{math terms} (clickable),
+but they do \textbf{not} show up in the index.
+
+
+
+\section{On Math}
+Most of the math stuff is just macros for specific things like the convolution
+operator, $\conv$, probabilities, $\cprob{A}{B=C}$, or big-$O$ notation,
+$\bigO{n^2\log{n}}$ but there's also a convenient way to include explanations on
+the side of an equation:
+%
+\begin{align*}
+  1 + 1 &\overset{?}{=} 2    \sideblock{2in}{first we do this} \\
+      2 &\overset{?}{=} 2    \sideblock{2in}{then we do this} \\
+      2 &= 2 \qed
+\end{align*}
+
+These are all in the \smtt{CustomCommands.sty} file.
+
+
+
+\end{document}
+
