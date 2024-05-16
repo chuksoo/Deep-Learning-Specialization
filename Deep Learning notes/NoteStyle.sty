@@ -1,0 +1,481 @@
+% Place this file in the base directory of your LaTeX project, then
+%   \usepackage{NoteStyle}
+% to apply it.
+
+\ProvidesPackage{NoteStyle}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\@ifpackageloaded{geometry}{}{
+  \usepackage[margin=1.25in, bottom=1in, marginparwidth=1in]{geometry}
+}
+
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage[super,square,comma]{natbib}
+\usepackage[toc]{appendix}
+\usepackage{marginnote}
+
+\usepackage{lettrine}
+\usepackage{changepage}
+\usepackage{enumitem}
+\usepackage{courier}
+\usepackage{relsize}
+\usepackage{xstring}
+
+% \usepackage{qtree}
+\usepackage{wrapfig}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{array}
+
+\usepackage[
+  % tableposition=top,
+  % figureposition=bottom,
+  font=footnotesize,
+  labelfont=bf
+]{caption}
+% \captionsetup{justification=centering}
+\captionsetup{width=0.9\linewidth}
+\captionsetup[wrapfigure]{margin=0.2cm}
+
+\usepackage{fancyhdr}
+\usepackage{abstract}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage[bottom, hang, multiple]{footmisc}
+\usepackage{parskip}
+
+% Set a few paragraph properties.
+\setlength\parskip{8pt}
+\setlength\parindent{0pt}
+\setlist{itemsep=0.25\parskip, parsep=0.75\parskip}
+
+\usepackage{imakeidx}
+\indexsetup{othercode=\small}
+
+\usepackage{etoolbox}
+\patchcmd{\theindex}{\thispagestyle{plain}}
+  {\thispagestyle{plain}\phantomsection\label{index}}{}{}
+
+\usepackage{footnotebackref}
+\usepackage{bookmark}
+
+\usepackage{tikz}
+\usepackage{tikzsymbols}
+\usepackage{tikz-qtree}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+  \pgfplotsset{compat=1.16}
+
+  \usetikzlibrary{decorations.text}
+  \usetikzlibrary{positioning}
+  \usetikzlibrary{tikzmark}
+  \usetikzlibrary{patterns}
+  \usetikzlibrary{shapes}
+  \usetikzlibrary{calc}
+  \usetikzlibrary{fit}
+  \usetikzlibrary{3d}
+
+  \usepgfplotslibrary{fillbetween}
+  \usepgflibrary{patterns}
+
+% \usepgfplotslibrary{external}
+% \usetikzlibrary{pgfplots.external}
+% \tikzexternalize
+
+\usepackage{mdframed}
+\usepackage[algoruled,algochapter,nofillcomment]{algorithm2e}
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{upquote}
+
+% Style the algorithm environment.
+% http://mirror.utexas.edu/ctan/macros/latex/contrib/algorithm2e/doc/algorithm2e.pdf
+\DontPrintSemicolon
+\SetAlgoSkip{bigskip}
+\SetAlgoInsideSkip{medskip}
+\SetAlgoHangIndent{1cm}
+\SetCommentSty{smtt}
+\SetKw{Break}{break}
+\SetKw{Continue}{continue}
+\setlength\interspacetitleruled{8pt}
+\setlength\algomargin{\parindent}%0.5in}
+
+% Not sure if this is worth it...
+% This changes the "Algorithm x.y" heading to bold small caps
+\usepackage[T1]{fontenc}
+\newcommand{\bfcap}[1]{\scshape\bfseries#1}
+\SetAlCapSty{bfcap}
+
+\usepackage{soul}
+\usepackage[
+  leftmargin=1cm,
+  rightmargin=1cm,
+]{quoting}
+\renewcommand*{\quotingfont}{\small\itshape}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{dingbat}
+\usepackage{wasysym}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{latexsym}
+\usepackage{leftidx}
+\usepackage{amsthm}
+\usepackage[mathscr]{euscript}
+\usepackage{bm}
+
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+\setcounter{MaxMatrixCols}{20}
+
+\definecolor{maroon}{rgb}{0.5, 0, 0}
+\definecolor{green}{rgb}{0, 0.7, 0}
+\definecolor{blue}{rgb}{0, 0, 0.8}
+\definecolor{ballblue}{HTML}{2ea3f2}
+\definecolor{lettergreen}{HTML}{167000}
+% \definecolor{block-gray}{gray}{0.85}
+
+\newcommand{\boxtitle}[1]{\textsc{\textcolor{maroon}{#1}}\vspace{0.5em}\\}
+\newcommand{\pboxtitle}[2]{\textsc{\textcolor{maroon}{#1}}: \textbf{#2}\vspace{0.5em}\\}
+
+
+\mdfdefinestyle{boxstyle}{
+  usetwoside=false,
+  skipabove=2\parskip,
+  skipbelow=2\parskip,
+  linewidth=1pt,
+  leftmargin=1cm,
+  rightmargin=1cm,
+  frametitlerule=true,
+  frametitlerulewidth=0.5pt,
+  frametitlebelowskip=\parskip,
+  frametitleaboveskip=\parskip,
+  innertopmargin=\parskip,
+  % frametitlefont=\normalfont,
+  frametitlefont=\fontsize{12pt}{1.1em}\selectfont,
+  font=\small,
+  frametitlerulewidth=0pt,
+  linewidth=0pt,
+}
+
+\newmdenv[
+  style=boxstyle,
+  linecolor=red,
+]{fullbox}
+
+\newmdenv[
+  usetwoside=false,
+  skipabove=2\parskip,
+  skipbelow=2\parskip,
+  leftmargin=1cm,
+  rightmargin=1cm,
+  linewidth=1pt,
+]{nicebocks}
+
+\newmdenv[
+  usetwoside=false,
+  skipabove=\parskip,
+  skipbelow=\parskip,
+  linewidth=1.5pt,
+  linecolor=gray!60!white,
+  backgroundcolor=gray!10!white,
+]{notebox}
+
+\newmdenv[
+  usetwoside=false,
+  skipabove=2em,
+  skipbelow=2em,
+  linewidth=1.5pt,
+  leftmargin=0.75in,
+  rightmargin=0.75in,
+  linecolor=pink!80!black,
+  backgroundcolor=pink!10!white
+]{donobox}
+
+\newmdenv[
+  usetwoside=false,
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  skipabove=\topsep,
+  skipbelow=\topsep,
+  linewidth=1.5pt,
+  linecolor=maroon
+]{leftborder}
+
+\newmdenv[
+  usetwoside=false,
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  skipabove=\topsep,
+  skipbelow=\topsep,
+  linewidth=6pt,
+  linecolor=maroon
+]{thickleftborder}
+
+\newmdenv[
+  style=boxstyle,
+  frametitlebackgroundcolor=maroon!20!white,
+  backgroundcolor=maroon!7!white,
+  linecolor=maroon,
+]{funfact}
+
+\newmdenv[
+  style=boxstyle,
+  frametitlebackgroundcolor=blue!20!white,
+  backgroundcolor=blue!7!white,
+  linecolor=blue,
+]{mathaside}
+
+\newmdenv[
+  style=boxstyle,
+  % frametitlealignment=\centering,
+  frametitlebackgroundcolor=lettergreen!20!white,
+  backgroundcolor=lettergreen!7!white,
+  linecolor=lettergreen,
+]{example}
+
+% \makeatletter
+% \ifcsname c@chapter\endcsname\else
+%   \newcounter{chapter}[section]
+% \fi
+% \makeatother
+
+\newcounter{excounter}[chapter]
+
+\newcommand{\extitle}   [1]{\textsc{\textcolor{lettergreen}{%
+  Example \stepcounter{excounter}\thechapter.\theexcounter}}: \textbf{#1}}
+\newcommand{\facttitlep}[2]{\facttitle{#1}: \textbf{#2}}
+\newcommand{\mathtitlep}[2]{\mathtitle{#1}: \textbf{#2}}
+\newcommand{\facttitle} [1]{\textcolor{maroon}{\textsc{#1}}}
+\newcommand{\mathtitle} [1]{\textcolor{blue}{\textsc{#1}}}
+
+
+\mdfdefinestyle{thmstyle}{
+  usetwoside=false,
+  linewidth=0.5pt,
+  skipabove=\baselineskip,
+  skipbelow=\baselineskip,
+  frametitle={},
+  % backgroundcolor={white},
+  backgroundcolor={white!98!maroon},
+  nobreak=true,
+}
+
+\newmdtheoremenv[style=thmstyle]{theorem}{Theorem}[chapter]
+\newmdtheoremenv[style=thmstyle]{claim}{Claim}[chapter]
+\newmdtheoremenv[style=thmstyle, nobreak=false]{longclaim}{Claim}[chapter]
+\newmdtheoremenv[style=thmstyle]{property}{Property}[chapter]
+
+\newenvironment{myquote}{
+  \vspace{0.5em}
+  \begin{thickleftborder}[rightmargin=0in]
+  \vspace{0.5em}
+  \begin{quoting}[rightmargin=0in]
+}{
+  \end{quoting}
+  \vspace{0.5em}
+  \end{thickleftborder}
+  \vspace{0.5em}
+}
+
+\newenvironment{bluequote}{
+  \vspace{0.5em}
+  \begin{thickleftborder}[linewidth=3pt,linecolor=blue]
+}{
+  \end{thickleftborder}
+  \vspace{0.5em}
+}
+
+\newcommand{\todo}{\textbf{\texttt{TODO}}}
+
+% Used for definitions
+\newcommand{\aterm}[1]{\textcolor{blue}{\textbf{#1}}}
+\newcommand{\arefterm}[1]{\hyperlink{term:#1}{\textcolor{blue!60!black}{#1}}}
+\newcommand{\termx}[2]{\hypertarget{term:#1}{}\index{#1@\textsl{#1}|textbf}\aterm{#2}}
+\newcommand{\term}[1]{\termx{#1}{#1}}
+\newcommand{\refterm}[1]{\index{#1@\textsl{#1}}\arefterm{#1}}
+\newcommand{\reftermx}[2]{\hyperlink{term:#1}{\refterme{#1}\textcolor{blue!60!black}{#2}}}
+\newcommand{\refterme}[1]{\index{#1@\textsl{#1}}}
+\newcommand{\faketerm}[1]{\aterm{#1}}
+
+% Used for mathematical properties or terms
+\newcommand{\prop}[1]{\hypertarget{prop:#1}{\textcolor{maroon}{\textbf{#1}}}}
+\newcommand{\refprop}[1]{\hyperlink{prop:#1}{\textcolor{maroon!40!black}{#1}}}
+
+% This HAS to go here, lol.... rename accordingly!
+\usepackage{CustomCommands}
+
+% Strike-out text inside \[*]section{} text.
+\DeclareRobustCommand{\hsout}[1]{\texorpdfstring{\sout{#1}}{#1}}
+
+% Create a circle-masked image.
+\newcommand{\roundpic}[4][]{
+  \tikz\node [circle, minimum width = #2,
+    path picture = {
+      \node [#1] at (path picture bounding box.center) {
+        \includegraphics[width=#3]{#4}};
+    }] {};}
+
+% A nicely-formatted quote to start chapters
+\newcommand{\inspiration}[3]{%
+\begin{myquote}\large%
+  \setlength\parskip{0.75em}%
+  \setlength\parindent{0pt}%
+  #1
+
+  \begin{adjustwidth}{1cm}{0pt}\small%
+    --- \emph{#2}\ifthenelse{\equal{#3}{}}{}{, #3}
+  \end{adjustwidth}
+\end{myquote}}
+
+% A fancy first letter for chapters.
+\newcommand{\firstletter}[1]{%
+  \StrLeft{#1}{1}[\first]%
+  \StrGobbleLeft{#1}{1}[\rest]%
+  \lettrine[
+    lines=2,
+    lraise=0,
+    nindent=0pt,
+    findent=3pt
+  ]{\textcolor{lettergreen}{\bfseries\first}}
+   {\textcolor{lettergreen}{\rest}}}
+
+% The answer to a "quiz" question in a {example} environment.
+\newcommand{\answer}[1]{%
+  \begin{adjustwidth}{0pt}{2cm}
+    \rotatebox{180}{\vbox{\smaller%
+      \textsc{Answer}: \softtext#1}
+    }
+  \end{adjustwidth}
+}
+
+% A clean, stdized way to present a scenario that we'll be tackling.
+\newcommand{\scenario}[3]{
+  \ul{#1}:
+  \begin{adjustwidth}{1cm}{0pt}
+    % Respect paragraph spacing in last column.
+    % From: https://tex.stackexchange.com/a/26763
+    \begin{tabular}{@{} p{1.5cm} >{\parskip=4pt} p{\linewidth-2.5cm}}
+      \textbf{Input:} & #2 \vspace{2\parskip} \\
+      \textbf{Output:} & #3
+    \end{tabular}
+  \end{adjustwidth}
+}
+
+% make part like a chapter
+\titleclass{\part}{top}
+\titlespacing*{\part}{0pt}{0pt}{30pt}
+\titleformat{\part}[display]
+  {\raggedright\fontsize{56pt}{12pt}\selectfont\bfseries}
+  {\vspace{2em} \MakeUppercase{\partname} \thepart}
+  {0pt}
+  {\normalfont\huge\scshape \titlerule[2pt]}
+
+\titleformat{\chapter}[hang]
+  {}
+  {}
+  {0pt}
+  {\normalfont\huge\scshape}
+
+\titlespacing*{\subparagraph}{0em}{\parsep}{0.5\parsep}[0em]
+\titleformat{\subparagraph}[runin]
+  {\normalfont\itshape}
+  {\thesubparagraph}{0em}
+  {}[\,---]
+
+\newcommand{\softtext}{\color{gray}\sffamily}
+
+% Set up header style (bottom-left page number)
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \rfoot{\softtext\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+\fancypagestyle{index}{%
+  \fancyhf{}
+  \lhead{\softtext\indexname}
+  \rfoot{\softtext\thepage}
+}
+
+% If you define \lastname and/or \subject before including this package, this
+% will get filled in accordingly.
+\AtBeginDocument{%
+  \pagestyle{fancy}
+    \fancyhf{}
+    \renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+    \fancyhead[LE]{\softtext%
+      {%
+        {\expandafter\MakeUppercase\expandafter{\chaptertitlename}}\
+        \thechapter%
+      }: \leftmark%
+    }
+    \fancyfoot[R]{\softtext\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+    \@ifundefined{lastname}{}{%
+      \fancyfoot[L]{\softtext\smaller\lastname}
+      \fancyhead[LO]{\softtext%
+        \expandafter\MakeUppercase\expandafter{\booktopic}}
+    }
+}
+
+\setlength\headheight{15pt}
+
+\hypersetup{
+  pdfpagemode=UseOutlines,
+  colorlinks,
+  citecolor=blue,
+  urlcolor=ballblue,
+  linkcolor=blue
+}
+
+% Prevent footnotes from splitting across pages.
+\interfootnotelinepenalty=10000
+
+% Make footnotes flush left a little tighter.
+\setlength\footnotemargin{0.8em}
+
+% Remove border between columns
+\setlength{\columnsep}{1.5em}
+\setlength{\columnseprule}{0pt}
+
+% lmao
+\newcommand{\camera}{%
+  \draw[fill=black] (0, 1) rectangle (1.75, 0);
+  \draw[fill=black] (0.2, 1.1) rectangle (0.5, 1);
+  \draw[fill=white] (1, 0.5) circle (0.4);
+  \draw (1, 0.5) circle (0.275);
+}
+
+% a lesson link in the margin
+% \reversemarginpar
+\newcommand{\lesson}[3][\parskip]{%
+  \marginnote{\footnotesize \link{#2}{#3}}[#1]
+}
+\newcommand{\secondnote}{1.5\baselineskip}
+\newcommand{\thirdnote}{2.5\baselineskip}
+
+\@ifundefined{watermark}{}{
+  \usepackage{accsupp}
+  \usepackage{draftwatermark}
+  \SetWatermarkScale{5}
+  \SetWatermarkLightness{0.99}
+  \SetWatermarkText{%
+    \BeginAccSupp{method=escape,ActualText={}}\watermark\EndAccSupp{}%
+  }
+}
+
+\endinput

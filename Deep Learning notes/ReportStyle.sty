@@ -1,0 +1,229 @@
+% Place this file in the base directory of your LaTeX project, then
+%   \usepackage{ReportStyle}
+% to apply it.
+\ProvidesPackage{ReportStyle}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\@ifpackageloaded{geometry}{}{
+  \usepackage[margin=1in, bottom=0.75in]{geometry}
+}
+
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage[square,comma,numbers]{natbib}
+
+\usepackage{pagecolor}
+\pagecolor{yellow!5!white}
+
+\usepackage{lettrine}
+\usepackage{changepage}
+\usepackage{enumitem}
+\usepackage{courier}
+\usepackage{relsize}
+\usepackage{xstring}
+
+\usepackage{wrapfig}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{array}
+
+\usepackage[
+  % tableposition=top,
+  % figureposition=bottom,
+  font=footnotesize,
+  labelfont=bf
+]{caption}
+
+\captionsetup{width=0.85\textwidth, font=footnotesize}
+\captionsetup[wrapfigure]{margin=0.2cm}
+
+% runin: make the abstract heading be part of the paragraph.
+\usepackage[runin]{abstract}
+\renewcommand{\abstractname}{Abstract}
+\abslabeldelim{\;\textemdash\;}
+\setlength{\abstitleskip}{-\absparindent}
+
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage[bottom, hang, multiple]{footmisc}
+\usepackage{parskip}
+
+% Set a few paragraph properties.
+\setlength\parskip{8pt}
+\setlength\parindent{0pt}
+\setlist{itemsep=0.25\parskip, parsep=0.75\parskip}
+
+\usepackage{footnotebackref}
+\usepackage[titles]{tocloft}
+\renewcommand*\cftsecnumwidth{3em}
+
+\usepackage{tikz}
+\usepackage{tikzsymbols}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+  \pgfplotsset{compat=1.15}
+
+  \usetikzlibrary{positioning}
+  \usetikzlibrary{tikzmark}
+  \usetikzlibrary{patterns}
+  \usetikzlibrary{shapes}
+  \usetikzlibrary{calc}
+  \usetikzlibrary{3d}
+
+  \usepgfplotslibrary{fillbetween}
+  \usepgflibrary{patterns}
+
+% \usepgfplotslibrary{external}
+% \usetikzlibrary{pgfplots.external}
+% \tikzexternalize
+
+\usepackage{mdframed}
+\usepackage[algoruled,nofillcomment]{algorithm2e}
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{upquote}
+
+% Style the algorithm environment.
+% http://mirror.utexas.edu/ctan/macros/latex/contrib/algorithm2e/doc/algorithm2e.pdf
+\DontPrintSemicolon
+\SetAlgoSkip{bigskip}
+\SetAlgoInsideSkip{medskip}
+\SetAlgoHangIndent{1cm}
+\SetCommentSty{smtt}
+\SetKw{Break}{break}
+\setlength\interspacetitleruled{8pt}
+\setlength\algomargin{\parindent}%0.5in}
+
+\usepackage{soul}
+\usepackage[vskip=\partopsep,leftmargin=0.5in,rightmargin=0in]{quoting}
+\usepackage[normalem]{ulem}
+
+\usepackage{dingbat}
+\usepackage{wasysym}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{leftidx}
+\usepackage{bm}
+
+\usepackage[]{hyperref}
+\usepackage{cleveref}
+
+\setcounter{MaxMatrixCols}{20}
+
+\definecolor{maroon}{rgb}{0.5, 0, 0}
+\definecolor{green}{rgb}{0, 0.7, 0}
+\definecolor{blue}{rgb}{0, 0, 0.8}
+\colorlet{gablue}{blue!50!black}
+
+\definecolor{ballblue}{HTML}{2ea3f2}
+\definecolor{lettergreen}{HTML}{167000}
+\definecolor{grayish}{gray}{0.45}
+
+
+\newenvironment{noteblock}[1][\unskip]{%
+  \begin{tnoteblock}
+  \if#1\unskip
+  \else
+    \textbf{#1}\vspace{0.5em}\\
+  \fi
+}{
+  \end{tnoteblock}
+  \vspace{1.25em}
+}
+
+\newmdenv[
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  skipabove=\topsep,
+  skipbelow=\topsep,
+  linewidth=1.5pt,
+  linecolor=maroon
+]{leftsiderule}
+
+\newmdenv[
+  skipabove=2\parskip,
+  skipbelow=\parskip,
+  linewidth=1pt,
+  linecolor=maroon
+]{fullbox}
+
+\usepackage{CustomCommands}
+
+\setlength\headheight{15pt}
+
+% Prevent footnotes from splitting across pages.
+\interfootnotelinepenalty=10000
+
+% Make footnotes flush left a little tighter.
+\setlength\footnotemargin{0.8em}
+
+\hypersetup{
+  pdftitle={},
+  pdfauthor={},
+  pdfsubject={},
+  pdfpagemode=UseOutlines,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=ballblue,
+  colorlinks
+}
+
+\fancypagestyle{title}{%
+  \fancyhf{}
+  \rfoot{\textcolor{grayish}{\textsf{\thepage}}}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+\titleformat{\section}[block]
+  {\bfseries\Large\color{gablue}}%\filcenter}
+  {\Roman{section}.}{1em}
+  {}
+
+\renewcommand{\thesubsection}{}
+\titleformat{\subsection}[block]
+  {\large\bfseries}
+  {\arabic{section}.\arabic{subsection}}{0.75em}
+  {}
+
+\renewcommand{\thesubsubsection}{}
+\titleformat{\subsubsection}[block]
+  {\normalfont\bfseries}
+  {\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}{0.75em}
+  {}
+
+\titleformat{\paragraph}[runin]
+  {\normalfont\bfseries}
+  {\theparagraph}{0em}
+  {}[\,\textemdash]
+
+% \titlespacing{command}{left spacing}{before spacing}{after spacing}[right]
+\titlespacing*{\section}{0em}{1em}{0.5em}
+\titlespacing*{\subsection}{0em}{0.75em}{0.25em}
+\titlespacing*{\subsubsection}{0em}{1em}{0.25em}
+\titlespacing*{\paragraph}{0em}{\parsep}{0.5\parsep}[0em]
+% \titlespacing*{\subsubsection}{-1em}{1.5em}{0.2em}
+
+
+% Custom title format
+\makeatletter
+\renewcommand{\maketitle}{\bgroup
+  \begin{flushright}
+    \textbf{\textsf{\Large\@title}}\\
+    \@author\\
+    {\itshape\footnotesize\@date}
+  \end{flushright}\egroup
+}
+\makeatother
+
+\endinput
