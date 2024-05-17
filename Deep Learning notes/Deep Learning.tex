@@ -5,7 +5,6 @@
 \newcommand{\lastname}{Okoli}
 \usepackage{NoteStyle}
 \usepackage{placeins}
-\usepackage{enumitem}
 \usepackage{listings}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -148,7 +147,7 @@ In Logistic regression, the goal is to minimize the error between the prediction
 \text{Given}~ x , \hat{y} = P(y=1|x), \text{where}~0 \leq \hat{y} \leq 1
 \end{equation}
 The parameters used in Logistic regression are:
-\begin{itemize}
+\begin{itemize}[nosep]
 \item The input features vector: $x \in \mathbb{R}^{n_x}$, where $n_x$ is the number of features
 \item The training label: $y \in 0,1$
 \item The weights: $w \in \mathbb{R}^{n_x}$, where $n_x$ is the number of features
@@ -158,15 +157,23 @@ The parameters used in Logistic regression are:
 \end{itemize}
 $w^T*x+b$ is a linear function $(ax+b)$, but since we are looking for a probability constraint between $[0,1]$, the sigmoid function is used. The function is bounded between $[0,1]$ as shown in the graph above.
 Some observations from the graph:
-\begin{itemize}
+\begin{enumerate}[nosep]
 \item If $z$ is a large positive number, then $\sigma(z) = 1$
 \item If $z$ is small or large negative number, then $\sigma(z) = 0$
 \item If $z=0$, then $\sigma(z) = 0.5$
-\end{itemize}
+\end{enumerate}
 
+\begin{example}
+     The difference between the cost function and the loss function for logistic regression is that the loss function computes the error for a single training example while the cost function is the average of the loss functions of the entire training set. 
+\end{example}
 
-
-
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Cost function.png}
+	\caption{Logistic Regression Cost function}
+	\label{fig:7}
+\end{figure}
+\FloatBarrier
 
 %
 \begin{itemize}
