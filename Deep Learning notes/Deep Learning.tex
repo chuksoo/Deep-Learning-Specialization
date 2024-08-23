@@ -132,6 +132,10 @@ Logistic regression is an algorithm for binary classification problem.  In a bin
 An image is stored in the computer in three separate matrices corresponding to the Red, Green, and Blue color channels of the image. The three matrices have the same size as the image, for example, the resolution of the cat image is 64 pixels x 64 pixels, the three matrices (RGB) are 64 x 64 each. The value in a cell represents the pixel intensity which will be used to create a feature vector of $n$ dimension. In pattern recognition and machine learning, a feature vector represents an image, Then the classifier's job is to determine whether it contain a picture of a cat or not.
 To create a feature vector, $x$, the pixel intensity values will be ``unrolled'' or ``reshaped'' for each color. The dimension of the input feature vector $x$ is $n = 64* 64* 3 = 12288$. Hence, we use $n_x = 12288$ to represent the dimensions of the feature vectors. 
 
+\begin{example}
+     In binary classification, our goal is to learn a classifier that can input an image represented by this feature vector $x$ and predict whether the corresponding label $y$ is 1 or 0, that is, whether this is a cat image or a non-cat image. 
+\end{example}
+
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.35\textwidth]{Images/Reshaped feature vector.png}
