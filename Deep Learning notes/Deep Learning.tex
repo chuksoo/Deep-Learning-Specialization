@@ -5,7 +5,14 @@
 \newcommand{\lastname}{Okoli}
 \usepackage{NoteStyle}
 \usepackage{placeins}
-\usepackage{listings}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+\usepackage{pifont} % to use the ding itemize
+\usepackage[dvipsnames]{xcolor}
+
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -159,7 +166,7 @@ The parameters used in Logistic regression are:
 \item The output: $\hat{y} = \sigma*(w^T*x+b)$
 \item Sigmoid function: $s = \sigma(w^T*x+b) = \sigma(z)= \frac{1}{1+e^{-z}}$
 \end{itemize}
-$w^T*x+b$ is a linear function $(ax+b)$, but since we are looking for a probability constraint between $[0,1]$, the sigmoid function is used. The function is bounded between $[0,1]$ as shown in the graph above.
+$w^Tx+b$ is a linear function $(ax+b)$, but since we are looking for a probability constraint between $[0,1]$, the sigmoid function is used. The function is bounded between $[0,1]$ as shown in the graph above.
 Some observations from the graph:
 \begin{enumerate}[nosep]
 \item If $z$ is a large positive number, then $\sigma(z) = 1$
@@ -171,13 +178,234 @@ Some observations from the graph:
      The difference between the cost function and the loss function for logistic regression is that the loss function computes the error for a single training example while the cost function is the average of the loss functions of the entire training set. 
 \end{example}
 
+Logistic regression makes use of the sigmoid function which outputs a probability between 0 and 1. The sigmoid function with some weight parameter $\theta$ or $w$ and some input $x^{(i)}$ is defined as follows. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Logistic with sigmoid fxn.png}
+	\caption{Logistic Regression Overview}
+	\label{fig:7}
+\end{figure}
+
+Note that as $\theta^T x^{(i)}$ i.e.  $w^Tx$ gets closer and closer to $-\infty$ the denominator of the sigmoid function gets larger and larger and as a result, the sigmoid gets closer to 0.  On the other hand, as $\theta^T x^{(i)}$ i.e.  $w^Tx$ gets closer and closer to $\infty$ the denominator of the sigmoid function gets closer to 1 and as a result the sigmoid also gets closer to 1. 
+
+\begin{example}
+    When we implement logistic regression,  our job is to try to learn parameters $w$ and $b$ so that $\hat{y}$ becomes a good estimate of the chance of $y$ being equal to one. 
+\end{example}
+
+\subsubsection{Logistic Regression Cost function}
+
+The \emph{loss function} ($\mathcal{L}$) is a function we need to define to measure how good our output $\hat{y}$ is when the true label is $y$. The loss function measures how well we are doing on a single training example. \\
+\textcolor{RoyalBlue}{$\text{Loss function}~ \Rightarrow~ \mathcal{L}(\hat{y}, y) = - y*log~\hat{y} + (1 - y)*log(1 - \hat{y})$}
+
+The \emph{cost function} ($\mathcal{J}$), which measures how we are doing on the entire training set. So the cost function, which is applied to your parameters $w$ and $b$, is going to be the average, really one of the $m$ of the sum of the loss function apply to each of the training examples.  \\
+\textcolor{RoyalBlue}{$\text{Cost function}~  \Rightarrow~ \mathcal{J}(w, b) = \frac{1}{m} \sum_{i=1}^m \mathcal{L}(\hat{y}, y) = - \frac{1}{m}  \sum_{i=1}^m[y^{(i)}*log~\hat{y}^{(i)} + (1 - y^{(i)})*log(1 - \hat{y}^{(i)})]$}
+
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.85\textwidth]{Images/Cost function.png}
 	\caption{Logistic Regression Cost function}
-	\label{fig:7}
+	\label{fig:8}
 \end{figure}
 \FloatBarrier
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Gradient descent plot.png}
+	\caption{Gradient Descent}
+	\label{fig:9}
+\end{figure}
+\FloatBarrier
+
+In logistic regression, you use the cost function $\mathcal{J}(w, b)$ to measure how well your parameters perform on the entire training set. The goal is to minimize $ \mathcal{J}(w, b)$ using gradient descent, which iteratively updates the parameters by moving in the direction of steepest descent. Because the cost function is convex, gradient descent will converge to the global minimum, regardless of initialization.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Gradient descent.png}
+	\caption{Gradient descent Optimization}
+	\label{fig:10}
+\end{figure}
+\FloatBarrier
+
+\subsection{Gradient Descent}
+\begin{funfact}
+Imagine you're on top of a big hill where the goal is to get to the lowest point.
+Here's how you would do it:
+
+\begin{itemize}[nosep]
+\item Look around you to see which way the ground slopes down the most. 
+\item Take a step in that direction. 
+\item Now that you're in a new spot, look around again to see which way is downhill.
+\item Take another step in that direction. 
+\item Keep doing this over and over: look for the downhill direction, then take a step. 
+\item Eventually, you'll reach a point where there's no more downhill to go. You're at the bottom!
+\end{itemize}
+
+This is basically what gradient descent does. The ``hill'' is like a mathematical function we're trying to minimize. ``Looking around'' is like calculating the gradient (which tells us which direction is downhill).``Taking a step'' is like updating our parameters (our position on the hill). We keep doing this until we can't go any lower (we've reached the minimum of the function).
+
+The trick is to not take steps that are too big (or you might overshoot the bottom) or too small (or it will take forever to get there). In the algorithm, we control this with something called the ``learning rate''. That's gradient descent! It's a way of finding the lowest point by always moving downhill, little by little.
+\end{funfact}
+
+\newpage
+\textbf{Gradient descent} is an optimization technique used to minimize a function, often applied in machine learning for model training. The algorithm starts with an initial guess for the parameters and iteratively updates them by moving in the direction of the negative gradient (the direction of steepest descent) of the function, until it reaches a local minimum. The step size, or learning rate, controls how big each move is.
+
+The gradient descent update rule is:
+
+\[
+\theta_{\text{new}} = \theta_{\text{old}} - \alpha \nabla J(\theta)
+\]
+where:
+\begin{itemize}
+    \item \( \theta \) are the parameters we want to optimize.
+    \item \( \alpha \) is the learning rate (step size).
+    \item \( \nabla J(\theta) \) is the gradient of the cost function \( J(\theta) \) with respect to \( \theta \).
+\end{itemize}
+This rule ensures that we move in the direction of the steepest descent, reducing the value of \( J(\theta) \) with each iteration.
+
+\subsubsection{Why It Works}
+The gradient of a function points in the direction of the steepest ascent. By moving in the opposite direction of the gradient, the function value decreases, eventually reaching a local or global minimum. As the gradient approaches zero, the parameter values converge toward the minimum.
+
+\subsubsection{Pseudocode}
+Below is the pseudocode for gradient descent in simple terms:
+
+\begin{lstlisting}
+initialize $\theta$ (e.g., random values) 
+choose learning rate $\alpha$
+repeat until convergence:
+    $\quad$ compute gradient $\nabla J(\theta)$
+    $\quad$ update $\theta: \theta = \theta - \alpha * \nabla J(\theta)$
+\end{lstlisting}
+
+\begin{algorithm}
+\caption{Gradient Descent}
+\begin{flushleft}
+\textbf{Input:} Initial parameter $\theta^0$, gradient of loss function $\nabla J(\theta)$, learning rate $\alpha$, tolerance $\epsilon$, maximum iterations $max\_iter$\\
+\textbf{Output:} Optimized parameter $\theta$\\
+
+$iter \leftarrow 0$\\
+\textbf{while} $iter < max\_iter$ \textbf{do}\\
+\hspace{1em}Compute $\nabla J(\theta)$\\
+\hspace{1em}\textbf{if} $\|\nabla J(\theta)\| < \epsilon$ \textbf{then}\\
+\hspace{2em}\textbf{break}\\
+\hspace{1em}\textbf{end if}\\
+\hspace{1em}$\theta \leftarrow \theta - \alpha \nabla J(\theta)$\\
+\hspace{1em}$iter \leftarrow iter + 1$\\
+\textbf{end while}\\
+\textbf{return} $\theta$
+\end{flushleft}
+\end{algorithm}
+
+The process repeats until the gradient is close to zero, indicating the function has been minimized.
+
+\begin{example}
+Gradient descent is an optimization algorithm used to minimize the cost function of a model by iteratively adjusting the model's parameters. The goal is to find the values of the parameters (like weights in a machine learning model) that minimize the cost function, which measures how well the model fits the data.
+\end{example}
+
+\subsubsection*{How Gradient Descent Works:}
+\begin{enumerate}
+    \item \textbf{Initialize Parameters:} Start with an initial guess for the parameters (e.g., weights). This can be a set of random values or zeros.
+    
+    \item \textbf{Calculate the Gradient:} Compute the gradient (i.e., the partial derivative) of the cost function with respect to each parameter. The gradient indicates the direction of the steepest increase in the cost function.
+    
+    \item \textbf{Update the Parameters:} Adjust the parameters in the opposite direction of the gradient (i.e., the direction that reduces the cost function). The size of the step taken is controlled by a learning rate, a hyperparameter that determines how big the steps are.
+    
+    \[
+    \text{new parameter} = \text{current parameter} - \text{learning rate} \times \text{gradient}
+    \]
+    
+    \item \textbf{Repeat:} Continue recalculating the gradient and updating the parameters until the algorithm converges, meaning the changes in the cost function become very small, indicating that a minimum has been reached.
+\end{enumerate}
+
+\begin{funfact}[frametitle=\facttitlep{FunFact}{Computation Graph}]
+The computation graph organizes a computation from left-to-right computation. Through a left-to-right pass, we can compute the value of $\mathcal{J}$. In order to compute derivatives there'll be a right-to-left pass, kind of going in the opposite direction called backwards propagation. That would be most natural for computing the derivatives. 
+\end{funfact}
+
+\textbf{Forward Propagation}: Computes the output $y$ from the input $X$ by passing through the network layers. \\
+\textbf{Backward propagation} adjusts the network's parameters (weights and biases) by propagating the error backward from the output to the input, using the gradients to minimize the loss.
+
+\section{Shallow Neural Network}
+\subsection{Neural Network Representation}
+A neural network is a machine learning model inspired by the human brain. It consists of layers of interconnected nodes (neurons) where each connection has a weight, representing its importance. Neural networks process input data by passing it through these layers, applying activation functions to transform the data, and adjusting the weights based on the output error during training. The goal is to minimize the error and improve the model's predictions. Neural networks are widely used in tasks like image recognition, language processing, and complex data modeling.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.65\textwidth]{Images/Shallow Neural Network.png}
+	\caption{Shallow Neural Network}
+	\label{fig:11}
+\end{figure}
+
+\subsection{Neural Network Structure}
+A simple neural network has similar structure as a linear classifier:
+\begin{itemize}[nosep]
+\item A neuron takes inputs from other neurons (-> input into linear classifier)
+\item The inputs are summed in a weighted manner (-> weighted sum)
+	\begin{itemize}[label={\ding{224}}]
+		\item Learning is through a modification of the weights (gradient descent in the case of NN)
+	\end{itemize}
+\item If it receives enough inputs, it “fires” (if it exceeds the threshold or weighted sum plus bias is high enough)
+\item The output of a neuron can be modulated by a non linear function (e.g sigmoid).
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{Images/Activation function.png}
+	\caption{Structure of a simple neural network}
+	\label{fig:12}
+\end{figure}
+
+A neural network consists of three primary layers: input, hidden, and output layers as shown in \textbf{Fig. \ref{fig:13}}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{Images/Layers in a neural network.png}
+	\caption{Layers in a neural network}
+	\label{fig:13}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Neural Network Representation.png}
+	\caption{Neural Network Representation}
+	\label{fig:14}
+\end{figure}
+\FloatBarrier
+
+\subsubsection{Input Layer}
+The \textbf{input layer} is responsible for taking in the features of the data. For example, features \( x_1, x_2, x_3 \) are passed into the network in \textbf{Fig. \ref{fig:14}}, and these values are referred to as the \textit{activations} of the input layer, denoted \( A^{[0]} \).
+
+\subsubsection{Hidden Layer}
+The \textbf{hidden layer} processes the input features. It is called \textit{hidden} because, during training, the true values for these nodes are not seen in the training data. The activations of this layer are denoted \( A^{[1]} \), where each node \( A^{[1]}_i \) represents an activation value computed using a weight matrix \( W^{[1]} \) and bias vector \( b^{[1]} \). For example, if there are four hidden units, \( A^{[1]} \) will be a 4-dimensional vector.
+
+\subsubsection{Output Layer}
+The \textbf{output layer} produces the final prediction \( \hat{y} \), based on the activations from the hidden layer. The output is represented as \( A^{[2]} \), a single scalar value in this example.
+
+\subsubsection{Notation}
+We use the following notations to represent the activations in different layers:
+\begin{itemize}
+    \item \( A^{[0]} \): Activations of the input layer.
+    \item \( A^{[1]} \): Activations of the hidden layer.
+    \item \( A^{[2]} \): Output, representing \( \hat{y} \).
+\end{itemize}
+
+In the neural network in \textbf{Fig. \ref{fig:14}}, each layer has associated weight matrices and biases:
+\begin{itemize}
+    \item \( W^{[1]} \) is a \( 4 \times 3 \) matrix (4 hidden units, 3 input features).
+    \item \( b^{[1]} \) is a \( 4 \times 1 \) vector (for 4 hidden units).
+    \item \( W^{[2]} \) is a \( 1 \times 4 \) matrix (1 output unit, 4 hidden units).
+    \item \( b^{[2]} \) is a \( 1 \times 1 \) scalar (for the output unit).
+\end{itemize}
+
+While this neural network has three layers (input, hidden, output), it is commonly referred to as a \textbf{two-layer network} because the input layer is not counted. Therefore, the hidden layer is called \textit{layer 1} and the output layer \textit{layer 2}.
+
+\subsubsection{Training}
+The parameters \( W \) and \( b \) are optimized during training to minimize the error between the predicted output \( \hat{y} \) and the actual output \( y \). In this process, the neural network learns the best weights and biases for making accurate predictions.
+
+
+
+
+
+
+
 
 %
 \begin{itemize}
