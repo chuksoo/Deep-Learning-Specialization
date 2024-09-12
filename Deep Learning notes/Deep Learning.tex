@@ -400,9 +400,61 @@ While this neural network has three layers (input, hidden, output), it is common
 \subsubsection{Training}
 The parameters \( W \) and \( b \) are optimized during training to minimize the error between the predicted output \( \hat{y} \) and the actual output \( y \). In this process, the neural network learns the best weights and biases for making accurate predictions.
 
+\subsection{Activation Functions}
+Activation functions are mathematical equations that determine the output of a neural network node. They introduce non-linearity into the model, enabling the network to learn complex patterns. Below are some common activation functions used in neural networks:
 
+\subsubsection{1. Sigmoid Function}
+The \textbf{sigmoid} activation function is defined as:
+\[
+a = \sigma(x) = \frac{1}{1 + e^{-z}}
+\]
+It compresses input values to a range between 0 and 1, making it useful for models that need probabilities as output or binary classification. However, it suffers from the \textit{vanishing gradient problem}, where gradients become very small, slowing down learning.
 
+\subsubsection{2. Tanh Function}
+The \textbf{tanh} activation function is defined as:
+\[
+a = \text{tanh}(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
+\]
+It outputs values between -1 and 1, centered around zero, making learning more efficient in some cases. Like sigmoid, it also suffers from vanishing gradients but it is superior to the sigmoid function for hidden layers.
 
+\subsubsection{3. ReLU (Rectified Linear Unit)}
+The \textbf{ReLU} activation function is defined as:
+\[
+a = \text{ReLU}(z) = \max(0, z)
+\]
+ReLU is simple and efficient, especially in deep networks, because it allows faster convergence. The downside is that it can cause ``dead neurons'' (neurons that output 0 for all inputs), which may stop learning in certain neurons.
+
+\subsubsection{4. Leaky ReLU}
+The \textbf{Leaky ReLU} activation function is defined as:
+\[
+a = \max(0.01z, z)
+\]
+The Leaky ReLU adresses the ReLU's zero-gradient issue by allowing small negative values. Generally works better than ReLU but is used less frequently.
+
+\subsubsection{5. Softmax Function}
+The \textbf{softmax} function is commonly used in the output layer for classification tasks. It converts raw outputs (logits) into probabilities:
+\[
+\text{Softmax}(z_i) = \frac{e^{z_i}}{\sum_{j}e^{z_j}}
+\]
+This is useful for multi-class classification, ensuring the sum of output probabilities equals 1.
+
+\subsubsection{Choosing an Activation Function}
+\textbf{ReLU} is popular for hidden layers in deep neural networks due to its simplicity and efficiency.  \textbf{Sigmoid} and \textbf{tanh} are useful in smaller networks or specific scenarios but less common in modern deep networks.  \textbf{Softmax} is used in the output layer for multi-class classification tasks.
+\begin{itemize}
+    \item \textbf{Output Layer}: Use \textbf{Sigmoid} for binary classification.
+    \item \textbf{Hidden layers}: \textbf{ReLU} is the default choice, though \textbf{tanh} can also be used effectively.
+    \item \textbf{Learning Efficiency}: \textbf{ReLU} and \textbf{Leaky ReLU} often result in faster learning compared to sigmoid or tanh, as their gradients do not saturate easily.
+\end{itemize}
+
+Each activation function has its specific use cases depending on the task and network architecture.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Activation functions.png}
+	\caption{Activation Functions in Neural Networks}
+	\label{fig:15}
+\end{figure}
+\FloatBarrier
 
 
 
