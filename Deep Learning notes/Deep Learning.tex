@@ -70,12 +70,14 @@
   % \tableofcontents
 \end{titlepage}
 
+% ---------------- Chapter 1. Welcome to Deep learning ----------------------%
 \chapter{Welcome to Deep Learning} \label{ch:1}
 \inspiration{Just as electricity transformed almost everything 100 years ago, today I actually have a hard time thinking of an industry that I don’t think AI (Artificial Intelligence) will transform in the next several years.}{Andrew Ng}{DeepLearning.AI}
 
 \firstletter{Hello there}, and welcome to \booktopic. This work is a culmination of hours of effort to create my reference for deep learning. All the explanations are in my own words but majority of the contents are based on DeepLearning.AI's specialization in \href{https://www.deeplearning.ai/courses/deep-learning-specialization/}{Deep Learning}.
 
 
+% ------------------ Introduction to Deep learning -----------------------------%
 \section{Introduction to Deep learning}
 The term, Deep Learning, refers to training Neural Networks, sometimes very large Neural Networks.  In order to predict the price of a house based on its size for example, we can apply linear regression as a method for fitting a function to predict house prices. An alternative approach would be to use a simple neural network to model the relationship between house size and price. 
 
@@ -124,6 +126,7 @@ Deep Learning took off in the last few years and not before mainly because of gr
 \end{figure}
 \FloatBarrier
 
+% ------------------ Neural Network Basics -----------------------------%
 \section{Neural Network Basics}
 \subsection{Logistic Regression as a Neural Network}
 Logistic regression is an algorithm for binary classification problem.  In a binary classification problem,  the goal is to train a classifier for which the input is an image represented by a feature vector, $x$, and predicts whether the corresponding label $y$ is 1 or 0. In this case, whether this is a cat image (1) or a non-cat image (0). 
@@ -323,6 +326,7 @@ The computation graph organizes a computation from left-to-right computation. Th
 \textbf{Forward Propagation}: Computes the output $y$ from the input $X$ by passing through the network layers. \\
 \textbf{Backward propagation} adjusts the network's parameters (weights and biases) by propagating the error backward from the output to the input, using the gradients to minimize the loss.
 
+% ------------------ Shallow Neural Network -----------------------------%
 \section{Shallow Neural Network}
 \subsection{Neural Network Representation}
 A neural network is a machine learning model inspired by the human brain. It consists of layers of interconnected nodes (neurons) where each connection has a weight, representing its importance. Neural networks process input data by passing it through these layers, applying activation functions to transform the data, and adjusting the weights based on the output error during training. The goal is to minimize the error and improve the model's predictions. Neural networks are widely used in tasks like image recognition, language processing, and complex data modeling.
@@ -456,6 +460,7 @@ Each activation function has its specific use cases depending on the task and ne
 \end{figure}
 \FloatBarrier
 
+% ------------------ Deep Neural Network ---------------------------%
 \section{Deep Neural Network}
 \subsection{Deep L-layer Neural Network}
 A \textbf{Deep Neural Network (DNN)} is a type of artificial neural network that contains multiple layers between the input and output layers. These intermediate layers, known as \textit{hidden layers}, allow the network to learn more complex patterns and representations from the data.
@@ -632,7 +637,7 @@ Forward propagation involves:
     \item Forms the basis for backward propagation, which updates weights and biases during training.
 \end{itemize}
 
-\subsection{Understanding the Vectorization Method in Deep Neural Networks}
+\subsection{Understanding Vectorization Method in Deep Neural Networks}
 
 In the previous discussion, we described what constitutes a deep \( L \)-layer neural network and introduced the notation to represent such networks. This note elaborates on performing forward propagation in a deep network, first for a single training example \( x \), and later for the entire training set using vectorization.
 
@@ -738,7 +743,7 @@ This method ensures bug-free implementation and aids in understanding the flow o
 
 
 
-
+% ---------------- Chapter 2. Improving Deep Neural Networks ----------------------%
 \chapter{Improving Deep Neural Networks: Hyperparameter Tuning, Regularization and Optimization} \label{ch:2}
 
 
