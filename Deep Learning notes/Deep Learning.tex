@@ -462,6 +462,7 @@ Each activation function has its specific use cases depending on the task and ne
 
 % ------------------ Deep Neural Network ---------------------------%
 \section{Deep Neural Network}
+% ------------ Deep L-layer Neural Network -----------------%
 \subsection{Deep L-layer Neural Network}
 A \textbf{Deep Neural Network (DNN)} is a type of artificial neural network that contains multiple layers between the input and output layers. These intermediate layers, known as \textit{hidden layers}, allow the network to learn more complex patterns and representations from the data.
 
@@ -547,6 +548,7 @@ where \( g \) is the activation function, and \( z^{[l]} \) depends on \( W^{[l]
     \item Each layer computes \( z^{[l]} \) using weights (\( W^{[l]} \)) and biases (\( b^{[l]} \)).
 \end{itemize}
 
+% ------------ Forward propagation in Deep Neural Network -----------------%
 \subsection{Forward propagation in a Deep Neural Network}
 Forward propagation in a deep neural network involves passing the input data through the network, layer by layer, to compute the output prediction. Below are the steps to carry out forward propagation:
 
@@ -637,6 +639,7 @@ Forward propagation involves:
     \item Forms the basis for backward propagation, which updates weights and biases during training.
 \end{itemize}
 
+% ------------ Vectorization Method in Deep Neural Network -----------------%
 \subsection{Understanding Vectorization Method in Deep Neural Networks}
 
 In the previous discussion, we described what constitutes a deep \( L \)-layer neural network and introduced the notation to represent such networks. This note elaborates on performing forward propagation in a deep network, first for a single training example \( x \), and later for the entire training set using vectorization.
@@ -741,7 +744,157 @@ A systematic approach to debugging involves verifying the matrix dimensions at e
 
 This method ensures bug-free implementation and aids in understanding the flow of forward propagation in neural networks.
 
+% ------------ Forward and Backward Propagation in Deep Neural Network -----------------%
 
+\subsection{Implementing Forward and Backward Propagation in Deep Neural Networks}
+
+\subsubsection{1. Forward Propagation for layer $l$}
+In forward propagation, we input \(a^{[l-1]}\) and outputs \(a^{[l]}\) and the cache \(z^{[l]}\). \\
+\textbf{Purpose:} Takes input \(a^{[l-1]}\), outputs \(a^{[l]}\), and cache \(z^{[l]}\).  \\
+- Cache can include \(W^{[l]}\) and \(b^{[l]}\) to simplify function calls.
+
+\textbf{Equations:}
+\[
+z^{[l]} = W^{[l]} \cdot a^{[l-1]} + b^{[l]}
+\]
+\[
+a^{[l]} = g^{[l]}(z^{[l]})
+\]
+where \(g\) is the activation function.
+
+\textbf{Vectorized Implementation:}
+\[
+Z^{[l]} = W^{[l]} \cdot A^{[l-1]} + b^{[l]} \quad \text{(Python broadcasting for}~b^{[l]})
+\]
+\[
+A^{[l]} = g^{[l]}(Z^{[l]}) \quad \text{(element-wise product)}
+\]
+
+\textbf{Process:}
+\begin{itemize}[nosep]
+\item Initialize with \(A^{[0]} = X\) (input features for one example or the entire training set).
+\item Sequentially compute forward propagation for each layer from left to right.
+\end{itemize}
+
+\subsubsection{2. Backward Propagation for layer $l$}
+\textbf{Purpose:} Inputs \(da^{[l]}\), outputs \(da^{[l-1]}\), \(dW^{[l]}\), and \(db^{[l]}\).
+
+\textbf{Steps:}
+\begin{align*}
+dz^{[l]} &= da^{[l]} \circ g'^{[l]}(z^{[l]}) \quad \text{(element-wise product)} \\
+dW^{[l]} &= dz^{[l]} \cdot a^{[l-1]^T} \\
+db^{[l]} &= dz^{[l]} \\
+da^{[l-1]} &= W^{[l]^T} \cdot dz^{[l]} \\
+dz^{[l]} &= W^{[l+1]^T} \cdot dz^{[l+1]} \circ g'^{[l]}(z^{[l]})
+\end{align*}
+
+\textbf{Vectorized Implementation:}
+\begin{align*}
+dZ^{[l]} &= dA^{[l]} \circ g'^{[l]}(Z^{[l]}) \quad \text{(element-wise product)} \\
+dW^{[l]} &= \frac{1}{m} dZ^{[l]} \cdot A^{[l-1]^T} \\
+db^{[l]} &= \frac{1}{m} \sum dZ^{[l]} \quad \{ \text{vectorized: } \texttt{\(\frac{1}{\text{m}} \text{np.sum(dZ}^{[l]}, \text{axis}=1, \text{keepdims}=\text{True})\)} \} \\
+dA^{[l-1]} &= W^{[l]^T} \cdot dZ^{[l]} \\
+dZ^{[l-1]} &= W^{[l]^T} \cdot dZ^{[l]} * g'^{[l-1]}(Z^{[l-1]}) \quad \text{(element-wise multiplication)}
+\end{align*}
+
+\textbf{Initialization for Backward Propagation:} \\
+To initialize backpropagation, we compute the derivative of the loss function with respect to the activation output of the final layer, \( A^{[L]} \), denoted as \( dA^{[L]} \).  \\ 
+For \textbf{binary classification} using logistic regression, where the loss function is the cross-entropy loss, this initialization is given by:
+
+\[
+dA^{[L]} = - \left( \frac{Y}{A^{[L]}} - \frac{1 - Y}{1 - A^{[L]}} \right)
+\]
+
+\noindent where:
+\begin{itemize}[nosep]
+    \item \( Y \) is the true label (ground truth).
+    \item \( A^{[L]} \) is the predicted output (\( \hat{Y} \)) from the forward propagation step.
+\end{itemize}
+This formula is derived by differentiating the cross-entropy loss function:
+\[
+\mathcal{L} = - \frac{1}{m} \sum_{i=1}^m \left( Y^{(i)} \log A^{[L](i)} + (1 - Y^{(i)}) \log (1 - A^{[L](i)}) \right)
+\]
+with respect to \( A^{[L]} \).
+
+In vectorized form, for a batch of \( m \) training examples, the initialization is:
+\[
+dA^{[L]} = \left(- \frac{Y^{(1)}}{A^{(1)}} + \frac{1 - Y^{(1)}}{1 - A^{(1)}} - \dots - \frac{Y^{(m)}}{A^{(m)}} + \frac{1 - Y^{(m)}}{1 - A^{(m)}} \right)
+\]
+
+\subsubsection*{Key Points}
+\begin{itemize}[nosep]
+    \item \( dA^{[L]} \) serves as the starting gradient for the backward pass.
+    \item Once \( dA^{[L]} \) is initialized, it is propagated backward through the layers to compute the gradients of the weights (\( dW^{[l]} \)), biases (\( db^{[l]} \)), and previous layer activations (\( dA^{[l-1]} \)).
+\end{itemize}
+
+\subsubsection*{Summary of Forward and Backward Pass}
+\textbf{Forward Propagation:}
+\begin{itemize}[nosep]
+\item Input \(X\), pass through layers (e.g., ReLU, Sigmoid for binary classification).
+\item Outputs \(\hat{y}\) for loss computation.
+\end{itemize}
+
+\textbf{Backward Propagation:}
+\begin{itemize}[nosep]
+ \item Compute derivatives \(dW^{[l]}\), \(db^{[l]}\), and propagate \(dA^{[l]}\) backward using caches (\(z^{[l]}\), \(a^{[l]}\)).
+ \item Discard \(dA^{[0]}\) as it’s not needed.
+\end{itemize}
+
+% ----------- Understanding Hyperparameters in Deep Neural Networks ---------------%
+\subsection{Understanding Hyperparameters in Deep Neural Networks}
+
+Being effective in developing your deep neural networks requires that you not only organize your parameters well but also your hyperparameters. 
+
+\subsubsection*{What Are Hyperparameters?}
+The parameters of your model are \( W \) and \( b \) .i.e.,  \( W^{[1]},  b^{[1]}, W^{[2]}, b^{[2]}, W^{[3]}, b^{[3]}, \dots \) However, there are other values you need to set for your learning algorithm, such as the learning rate (\( \alpha \)), which determines how your parameters evolve. The hyperparameters you need to specify are: 
+\begin{itemize}[nosep]
+    \item The learning rate (\( \alpha \)).
+    \item The number of iterations of gradient descent.
+    \item The number of hidden layers, denoted as \( L \).
+    \item The number of hidden units (e.g., 1, 2, 3, \dots).
+    \item The choice of activation function (e.g., ReLU, tanh, sigmoid).
+\end{itemize}
+
+These values, which control the parameters \( W \) and \( b \), are known as \textbf{hyperparameters}. Hyperparameters indirectly influence the final values of \( W \) and \( b \).
+
+\textbf{Common Hyperparameters in Deep Learning} \\
+Deep learning has a wide range of hyperparameters, such as:
+\begin{itemize}[nosep]
+    \item Learning rate (\( \alpha \)).
+    \item Number of iterations.
+    \item Momentum term.
+    \item Mini-batch size.
+    \item Regularization parameters.
+\end{itemize}
+
+\textbf{Empirical Nature of Hyperparameter Tuning} \\
+Tuning hyperparameters is an empirical process, which means you often need to:
+\begin{enumerate}[nosep]
+    \item Try out different values for hyperparameters.
+    \item Evaluate the effect of these values on the cost function \( J \).
+    \item Iterate and refine based on observed results.
+\end{enumerate}
+
+For example, if you test learning rates (\( \alpha \)):
+\begin{itemize}[nosep]
+    \item A small \( \alpha \) may result in slow convergence.
+    \item A large \( \alpha \) may cause divergence.
+    \item An optimal \( \alpha \) strikes a balance, providing faster convergence to a lower cost.
+\end{itemize}
+
+The empirical nature of deep learning requires experimenting with various configurations to identify the best combination of hyperparameters.
+
+\textbf{Hyperparameter Intuitions} \\
+When applying deep learning to diverse domains such as computer vision, speech recognition, natural language processing, and structured data applications, note:
+\begin{itemize}[nosep]
+    \item Intuitions about hyperparameters may not always transfer between domains.
+    \item Over time, the optimal hyperparameters may change due to advancements in hardware (e.g., CPUs, GPUs) or the nature of the dataset.
+\end{itemize}
+
+It is advisable to periodically revisit and tune hyperparameters for continued improvements.
+
+\textbf{Future Directions} \\
+Deep learning research continues to explore better guidance for hyperparameter selection. While CPUs, GPUs, and datasets evolve, the field will advance toward systematic methods for hyperparameter optimization. For now, evaluate hyperparameter choices using a hold-out cross-validation set to determine the best settings for your application.
 
 % ---------------- Chapter 2. Improving Deep Neural Networks ----------------------%
 \chapter{Improving Deep Neural Networks: Hyperparameter Tuning, Regularization and Optimization} \label{ch:2}
