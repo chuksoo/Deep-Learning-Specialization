@@ -898,7 +898,81 @@ Deep learning research continues to explore better guidance for hyperparameter s
 
 % ---------------- Chapter 2. Improving Deep Neural Networks ----------------------%
 \chapter{Improving Deep Neural Networks: Hyperparameter Tuning, Regularization and Optimization} \label{ch:2}
+% ---------------- Setting up your Machine Learning Application ----------------------%
+\section{Setting up your Machine Learning Application}
 
+\subsection{Iterative Nature of Deep Learning}
+\begin{itemize}[leftmargin=*,  nosep]
+    \item Applied machine learning is a highly iterative process
+	\begin{enumerate}[nosep]
+	\item Start with an initial idea
+	\item Implement and run experiments.
+	\item Evaluate results and refine the model.
+	\item Repeat until a satisfactory model is found.
+	\end{enumerate}
+    \item Almost impossible to guess correct hyperparameters on first attempt
+    \item Requires continuous experimentation and refinement
+    \item Decisions to make:
+	\begin{itemize}[nosep]
+	\item Number of layers.
+	\item Number of hidden units.
+	\item Learning rate.
+	\item Activation functions.
+	\end{itemize}
+\end{itemize}
+
+\subsection{Dataset Splitting Strategies}
+\begin{enumerate}[leftmargin=*,  nosep]
+    \item Traditional Approach
+    \begin{itemize}[nosep]
+        \item 70\% training, 30\% testing or 60\% training, 20\% dev, 20\% test split 
+        \item Worked well for smaller datasets
+    \end{itemize}
+    
+    \item Modern Big Data Approach
+    \begin{itemize}[leftmargin=*,  nosep]
+        \item For large datasets (e.g., 1 million examples)
+        \item Dev/Test Sets: Use smaller proportions for large datasets (e.g., 10,000 examples for dev/test out of a million).
+        \item Potential split: 
+        \begin{itemize}[nosep]
+            \item 98\% training
+            \item 1\% development
+            \item 1\% testing
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Important Considerations}
+\begin{itemize}[leftmargin=*,  nosep]
+    \item Ensure dev and test sets come from the same distribution, even if the training set differs.
+    \item Dev set purpose: Quickly evaluate different algorithm choices
+    \item Test set purpose: Provide unbiased performance estimate
+    \item To handle mismatched data distribution:
+        \begin{itemize}[nosep]
+            \item Dev/test sets should match the expected real-world conditions.
+            \item Use creative methods (e.g., web scraping) to expand the training set, even if its distribution differs.
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Practical Recommendations}
+\begin{itemize}[leftmargin=*,  nosep]
+    \item Be flexible with dataset proportions
+    \item Prioritize efficient iteration cycle
+    \item Creative data acquisition is acceptable
+    \item Sometimes a dev set without a test set can be sufficient
+\end{itemize}
+
+\subsubsection{Challenges in Deep Learning}
+\begin{itemize}[leftmargin=*,  nosep]
+    \item Intuitions don't always transfer between domains
+    \item Performance depends on:
+    \begin{itemize}[nosep]
+        \item Amount of data
+        \item Input features
+        \item Computational resources
+        \item Training environment (GPUs/CPUs)
+    \end{itemize}
+\end{itemize}
 
 %
 \begin{itemize}
