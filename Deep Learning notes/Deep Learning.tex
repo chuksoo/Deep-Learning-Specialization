@@ -974,7 +974,353 @@ Deep learning research continues to explore better guidance for hyperparameter s
     \end{itemize}
 \end{itemize}
 
-%
+\subsection{Bias/Variance}
+Bias and variance are foundational concepts in understanding machine learning models. They are easy to learn but challenging to master, with nuances often missed. In deep learning, the focus on the \textbf{bias-variance trade-off} has diminished, though bias and variance remain critical.
+\textbf{Fig. \ref{fig:17}} shows the Bias and Variance with underfitting, overfitting and a ``just right'' fit.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Bias-Variance.png}
+	\caption{Bias and Variance}
+	\label{fig:17}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Bias and Variance Intuition}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{High Bias:} Underfitting the data (e.g., a simple linear model for complex data). The model performs poorly on the training set.
+    \item \textbf{High Variance:} Overfitting the data (e.g., a highly complex model fitting every point). The model performs well on the training set but poorly generalizes to the dev/test set.
+    \item \textbf{"Just Right" Model:} A model with moderate complexity that balances bias and variance.
+\end{itemize}
+
+\subsubsection*{Diagnosing Bias and Variance}
+\begin{itemize}[leftmargin=*]
+    \item Use \textbf{training set error} and \textbf{development (dev) set error}:
+    \begin{itemize}
+        \item High training error and similar dev error $\rightarrow$ \textbf{High Bias} (underfitting).
+        \item Low training error but much higher dev error $\rightarrow$ \textbf{High Variance} (overfitting).
+        \item High training error and much higher dev error $\rightarrow$ \textbf{High Bias and High Variance}.
+        \item Low training and dev errors $\rightarrow$ \textbf{Low Bias and Low Variance}.
+    \end{itemize}
+    \item Examples:
+	\begin{itemize}
+	    \item \textbf{High Variance:} Training error = 1\%, Dev error = 11\%. Model overfits the training data and doesn’t generalize well.
+	    \item \textbf{High Bias:} Training error = 15\%, Dev error = 16\%. Model underfits the data.
+	    \item \textbf{High Bias and High Variance:} Training error = 15\%, Dev error = 30\%. Model underfits and poorly generalizes.
+	    \item \textbf{Low Bias and Low Variance:} Training error = 0.5\%, Dev error = 1\%. Model performs well on both sets.
+	\end{itemize}
+\end{itemize}
+
+Depending on whether the issue is high bias, high variance, or both, different approaches can be used to improve the model. By evaluating training and dev set errors, you can diagnose whether your model has bias, variance, or both issues. This diagnosis guides the next steps for improving model performance.
+
+\subsection{Basic Recipe for Diagnosing and Addressing Bias and Variance in Machine Learning}
+
+This note outlines a systematic approach to diagnose and address bias and variance in machine learning algorithms, particularly neural networks. By leveraging tools like training and development set performance, we can iteratively improve model performance using a structured recipe.
+\begin{enumerate}
+    \item Look at the \textbf{training set performance} to identify high \textbf{bias}:
+    \begin{itemize}
+        \item High bias: The model does not fit the training data well.
+        \item Remedies for high bias:
+        \begin{itemize}
+            \item Use a larger network (more hidden layers or units).
+            \item Train for a longer duration.
+            \item Experiment with advanced optimization algorithms.
+            \item Explore different neural network architectures (less systematic, may or may not help).
+        \end{itemize}
+    \end{itemize}
+    \item Look at the \textbf{dev set performance} to identify high \textbf{variance}:
+    \begin{itemize}
+        \item High variance: The model performs well on the training set but poorly on the dev set.
+        \item Remedies for high variance:
+        \begin{itemize}
+            \item Gather more training data (if feasible).
+            \item Apply regularization techniques.
+            \item Experiment with more appropriate neural network architectures.
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Iterative Process}
+\begin{enumerate}
+    \item Start with an initial model.
+    \item Diagnose whether the issue is high bias, high variance, or both.
+    \item Focus on addressing the identified issue:
+    \begin{itemize}
+        \item For high bias, prioritize fitting the training set well.
+        \item For high variance, ensure the model generalizes to the dev set.
+    \end{itemize}
+    \item Repeat until achieving both low bias and low variance.
+\end{enumerate}
+
+\subsubsection{Modern Deep Learning and Bias-Variance Tradeoff}
+\begin{itemize}
+    \item In earlier eras, reducing bias often increased variance and vice versa (\textbf{bias-variance tradeoff}).
+    \item Modern tools and techniques, such as:
+    \begin{itemize}
+        \item Larger networks with appropriate regularization reduce bias without significantly increasing variance.
+        \item More data reduces variance without much impact on bias.
+    \end{itemize}
+    \item This flexibility has made deep learning especially effective for supervised learning problems.
+    \item Regularization helps reduce variance while minimally increasing bias.
+    \item If the network is sufficiently large, the increase in bias is often negligible.
+\end{itemize}
+
+\subsubsection{Key Takeaways}
+\begin{itemize}
+    \item Understanding whether your algorithm suffers from high bias, high variance, or both guides the corrective measures.
+    \item Use training and dev set performance as diagnostic tools.
+    \item Modern machine learning tools allow for systematic improvement of bias and variance independently.
+    \item Larger networks and more data are often key to reducing bias and variance, provided regularization is appropriately applied.
+\end{itemize}
+
+% ---------------- Regularizing your Neural Network ----------------------%
+\section{Regularizing your Neural Network}
+Regularization is a key technique to reduce overfitting (high variance) in neural networks. While obtaining more training data is another effective method, it is often not feasible due to cost or availability. Regularization, however, is a practical alternative and is widely used. Below is a breakdown of how it works in logistic regression and neural networks.
+
+\subsection{Regularization in Logistic Regression}
+
+\subsubsection*{Cost Function with Regularization}
+In Logistic Regression, recall that we try to minimize the cost function $J$ where $w$ and $b$ in the logistic regression, are the parameters. The original cost function \( J \) includes the sum of individual losses over the training examples. So $w$ is an $n_x$-dimensional parameter vector, and $b$ is a real number. i.e., $w \in \mathbb{R}^{n_x}, b \in \mathbb{R}$.
+\begin{equation}
+J (w, b) = \frac{1}{m} \sum_{i=1}^m \mathcal{L} (y^{(i)}, \hat{y}^{(i)})
+\end{equation}
+
+To add regularization, we add the regularization parameter or penalty term
+    \[
+    J = \frac{1}{m} \sum_{i=1}^m \mathcal{L} (y^{(i)}, \hat{y}^{(i)}) + \frac{\lambda}{2m} ||w||_2^2,
+    \]
+    where:
+    \begin{itemize}
+        \item \( \lambda \) is the \textbf{regularization parameter}.
+        \item \( ||w||_2^2 = \sum_{j=1}^{n_x} w_j^2 \) = \( w^Tw \) is the squared L2 norm of the weight vector \( w \).
+    \end{itemize}
+
+\subsubsection{Why Regularize \( w \) and Not \( b \)}
+\begin{itemize}
+    \item Most parameters are in \( w \), making it more impactful.
+    \item \( b \) is a single scalar and contributes minimally to overfitting, so it's often omitted.
+\end{itemize}
+
+\subsubsection{Types of Regularization}
+\begin{itemize}
+    \item \textbf{L2 Regularization}: Adds \( \frac{\lambda}{2m} ||w||^2 \), the most commonly used form.
+    \item \textbf{L1 Regularization}: Adds \( \frac{\lambda}{2m} \sum_{j=1}^{n_x} |w_j| \) = \( \frac{\lambda}{2m} ||w||_1 \)  promoting sparsity (many \( w_j = 0 \)). This can compress models but is less common for neural networks.
+\end{itemize}
+
+\subsubsection{Tuning \( \lambda \)} 
+\begin{itemize}
+    \item Chosen via a development set or cross-validation.
+    \item Balances training set performance with reduced overfitting.
+\end{itemize}
+
+\subsection{Regularization in Neural Networks}
+
+In a Neural Network, you have a cost function that is a function of all your parameters \(w^{[1]}, b^{[1]}, \cdots, w^{[L]}, b^{[L]}\) where \( L \) is 
+the numbers of layers in our network. The cost function is the sum of the losses over \( m \) training examples. To add regularization, we added \( \frac{\lambda}{2m} \) 
+of sum over all parameters \( w \). This regularization is called the squared norm. The cost function with regularization adds a term to penalize large weights:
+    \[
+    J = \frac{1}{m} \sum_{i=1}^m \text{Loss}(y^{(i)}, \hat{y}^{(i)}) + \frac{\lambda}{2m} \sum_{l=1}^L ||w^{[l]}||_F^2,
+    \]
+
+\begin{equation}
+J(w^{[1]}, b^{[1]}, \cdots, w^{[L]}, b^{[L]}) = \frac{1}{m} \sum_{i=1}^m \mathcal{L} (\hat{y}^{(i)}, y^{(i)}) + \frac{\lambda}{2m} \sum_{\ell=1}^L ||w^{[\ell]}||^2
+\end{equation}
+where:
+\begin{itemize}
+\item \( ||w^{[\ell]}||_F^2 = \sum_{i=1}^{n^{[\ell]}} \sum_{j=1}^{n^{[\ell-1]}} (w_{ij}^{[\ell]})^2 \) where the shape of \( w \) is (\(n^{[\ell]}, n^{[\ell-1]} \))
+\end{itemize}
+
+\( ||w^{[\ell]}||^2 \) is is the \textbf{Frobenius norm} of the weight matrix \( w^{[l]} \).
+
+\subsubsection*{Gradient Descent Update with Regularization}
+\begin{itemize}
+    \item Compute \( dw^{[l]} \) from backpropagation, then add \( \frac{\lambda}{m} w^{[l]} \) to account for regularization.
+    \item Update rule: 
+    \[
+    w^{[l]} = w^{[l]} - \alpha \left( dw^{[l]} + \frac{\lambda}{m} w^{[l]} \right).
+    \]
+    \item Equivalent to scaling \( w^{[l]} \) by a factor slightly less than 1 in each iteration, hence the term \textbf{weight decay}.
+\end{itemize}
+
+We can implement gradient descent with regularization. 
+\begin{align*}
+dW^{[l]} &= \frac{1}{m} dZ^{[l]} \cdot A^{[l-1]^T} + \frac{\lambda}{m} W^{[l]} \\
+W^{[l]} &:= W^{[l]} - \alpha \cdot dW^{[l]} ~\text{i.e.,} \\
+W^{[l]} &:= W^{[l]} - \alpha \left( \frac{1}{m} dZ^{[l]} \cdot A^{[l-1]^T} + \frac{\lambda}{m} W^{[l]} \right) \\
+	&= W^{[l]} - \frac{\alpha \lambda}{m} W^{[l]} - \alpha \cdot \frac{1}{m} dZ^{[l]} \cdot A^{[l-1]^T} 
+\end{align*}
+
+L2 norm regularization is also called ``weight decay''. It is called weight decay because \( W^{[l]} - \frac{\alpha \lambda}{m} W^{[l]} = (1 - \frac{\alpha \lambda}{m} ) W^{[l]} \) \\
+\textbf{Note:} \\
+\[ \frac{\partial J}{\partial w^{[l]}} = dW^{[l]} \]
+
+\subsection{Why Does Regularization Help with Overfitting?}
+Regularization helps to mitigate overfitting and reduce variance by penalizing large weight values in the cost function. Let's explore the intuition behind this process and understand why it works effectively.
+ \begin{enumerate}
+\item \textbf{High Bias, High Variance, and the "Just Right" Case} \\
+Consider a large and deep neural network prone to overfitting. The cost function for such a network is:
+\[
+J(W, b) = \text{(sum of losses)} + \frac{\lambda}{m} \|W\|_F^2,
+\]
+where \(\|W\|_F^2\) represents the Frobenius norm of the weight matrices \(W\). The regularization term penalizes large weights.
+\begin{itemize}
+\item Effect of High \(\lambda\):
+	\begin{itemize}[leftmargin=*, nosep]
+	\item A large \(\lambda\) strongly encourages \(W\) to be close to zero. This reduces the impact of many hidden units, effectively simplifying the network.
+	\item With many hidden units ``zeroed out'', the network behaves like a smaller, simpler neural network or even a logistic regression model. This moves the network from the overfitting (high variance) regime to a state closer to the high-bias case.
+	\item At an intermediate value of \(\lambda\), the network achieves a ``just right'' balance, avoiding both overfitting and underfitting.
+	\end{itemize}
+
+\item Reduced Impact of Hidden Units:
+	\begin{itemize}[leftmargin=*, nosep]
+	\item While \(\lambda\) doesn't entirely zero out weights, it reduces their magnitude, resulting in a simpler network that is less prone to overfitting.
+	\end{itemize}
+\end{itemize}
+\item \textbf{Role of Activation Functions (e.g., \(\tanh\))} \\
+Consider the \(\tanh(z)\) activation function, defined as \(g(z) = \tanh(z)\):
+\begin{itemize}
+\item When \(z\) is small (due to small weights \(W\)), \(\tanh(z)\) operates in its linear regime.
+\item In this case, each layer of the neural network approximates a linear transformation, simplifying the network into a nearly linear model.
+\item A deep network with linear activation functions computes a linear function, which cannot model highly complex decision boundaries. Thus, the model avoids overfitting.
+\end{itemize}
+\end{enumerate}
+
+\subsubsection*{Why Regularization Works}
+Regularization helps prevent overfitting by:
+\begin{itemize}[nosep]
+    \item Penalizing large weights, forcing the model to learn simpler, more generalizable patterns.
+    \item Acting as a constraint that keeps the parameter values small, reducing the model's capacity to overfit.
+\end{itemize}
+
+\subsection{Dropout regularization}
+Dropout is a regularization technique used to prevent overfitting in neural networks. The idea is to randomly ``drop'' or deactivate a subset of neurons during training, forcing the network to learn more robust representations.
+
+\subsubsection*{How Does Dropout Work?}
+\textbf{Training Phase}
+\begin{enumerate}
+    \item For each layer, randomly remove nodes with a probability defined by \texttt{keep\_prob}. For example, with \texttt{keep\_prob = 0.8}, there is an 80\% chance of keeping a node and a 20\% chance of removing it.
+    \item After deciding which nodes to drop, remove all outgoing connections from these nodes.
+    \item Train the network with this reduced structure for each batch.
+    \item Repeat the random dropout process for every new batch, creating different network configurations during training.
+\end{enumerate}
+
+\textbf{``Inverted Dropout'' Implementation}
+\begin{itemize}
+    \item A dropout mask \( d^l \) is created for layer \( l \) using a random matrix, where each element is set to 1 with probability \texttt{keep\_prob} and 0 otherwise.
+    \item Multiply the activations \( a^l \) by \( d^l \) element-wise to deactivate certain neurons.
+    \item Scale the activations by dividing by \texttt{keep\_prob} to ensure the expected value remains consistent.
+\end{itemize}
+
+\textbf{Test Phase}
+\begin{itemize}
+    \item Dropout is not used at test time. Instead, the full network is used, and the activations are not scaled, ensuring deterministic predictions.
+\end{itemize}
+
+\subsubsection*{Why Does Dropout Work?}
+\begin{itemize}
+    \item Dropout trains multiple smaller networks by randomly deactivating neurons. This prevents over-reliance on specific neurons and encourages the network to generalize better.
+    \item It reduces co-adaptation of neurons, making the model more robust to variations in data.
+\end{itemize}
+
+\subsubsection{Other Regularization Methods}
+Other techniques in addition to L2 regularization and drop out regularization for reducing over fitting in your neural network includes:
+\begin{itemize}[nosep]
+\item \textbf{Data Augmentation:} Expanding the training dataset by applying transformations to existing data such as random crops, flipping, rotations, zooms, or distortion of an image.
+\item \textbf{Early Stopping:} Stop training when the dev set error starts increasing, even if the training cost is still decreasing. \\
+	- Automatically selects effective parameter magnitudes without exhaustive hyperparameter search.
+\end{itemize}
+
+\subsection{Setting Up Optimization Problem}
+\subsubsection{Normalizing Inputs}
+When training a neural network, one of the techniques to speed up your training is if you \emph{normalize} your inputs. Normalization standardize the input features by setting all the features to a mean of 0 and variance of 1.  Normalization helps the cost function have more symmetric, spherical contours, making optimization smoother and faster. Normalization is crucial if feature ranges differ significantly. If features are already on similar scales, normalization may have less impact but rarely harms performance.
+
+\subsubsection{Vanishing and Exploding Gradients in Deep Neural Networks}
+In very deep networks, gradients can become \textbf{exponentially large (exploding)} or \textbf{exponentially small (vanishing)} as they propagate through layers. This leads to training challenges:
+    \begin{itemize}
+        \item \textit{Exploding gradients}: Outputs grow exponentially with the number of layers.
+        \item \textit{Vanishing gradients}: Gradients shrink exponentially, causing gradient descent to take tiny steps and slow learning.
+    \end{itemize}
+
+This happens because the output $\hat{Y}$ is influenced by the product of weight matrices ($W_1, W_2, \dots, W_L$). If the weights is:
+    \begin{itemize}
+        \item \textit{Slightly $> 1$}: Activations or gradients grow exponentially ($1.5^L$).
+        \item \textit{Slightly $< 1$}: Activations or gradients shrink exponentially ($0.5^L$).
+    \end{itemize}
+
+The impact on training in deep neural network is that training very deep networks (e.g., 150+ layers) becomes difficult:
+    \begin{itemize}
+        \item \textit{Exploding gradients}: Cause instability.
+        \item \textit{Vanishing gradients}: Prevent learning due to tiny updates.
+    \end{itemize}
+
+A \textbf{careful choice of weight initialization} can significantly reduce the problem, though not eliminate it entirely.
+
+\subsubsection{Weight Initialization for Deep Networks}
+Vanishing and Exploding Gradients are significant issues in training very deep neural networks. A \textit{careful choice of weight initialization} can mitigate these problems, though not eliminate them entirely. Weight initialization can help to address the vanishing and exploding gradient problem.
+
+\textbf{Single Neuron Example} \\
+A single neuron with \( n \) input features (\( x_1, x_2, \dots, x_n \)) computes:
+\[
+z = \sum_{i=1}^n w_i x_i, \quad b = 0 \quad \text{(bias ignored)}.
+\]
+To prevent \( z \) from becoming too large or too small:
+\begin{itemize}
+    \item The larger \( n \), the smaller \( w_i \) should be.
+    \item A reasonable choice is to set the variance of \( w \) to:
+    \[
+    \text{Var}(w) = \frac{1}{n}.
+    \]
+\end{itemize}
+
+\textbf{Deep Network Generalization} \\
+For a layer \( l \), where each unit has \( n^{(l-1)} \) inputs:
+\[
+W = \text{np.random.randn}(\text{shape}) \times \sqrt{\frac{1}{n^{(l-1)}}}.
+\]
+
+\textbf{ReLU Activation} \\
+If using a ReLU activation function (\( g(z) = \max(0, z) \)):
+\begin{itemize}
+    \item Set variance to:
+    \[
+    \text{Var}(w) = \frac{2}{n}.
+    \]
+    \item Practical initialization formula:
+    \[
+    W = \text{np.random.randn}(\text{shape}) \times \sqrt{\frac{2}{n^{(l-1)}}}.
+    \]
+\end{itemize}
+
+\textbf{Tanh Activation} \\
+For Tanh (\( g(z) = \tanh(z) \)):
+\begin{itemize}
+    \item Set variance to:
+    \[
+    \text{Var}(w) = \frac{1}{n}.
+    \]
+    \item Known as \textbf{Xavier Initialization}:
+    \[
+    W = \text{np.random.randn}(\text{shape}) \times \sqrt{\frac{1}{n^{(l-1)}}}.
+    \]
+\end{itemize}
+
+In summary: \\
+\begin{enumerate}
+    \item \textbf{Default Weight Initialization:}
+    \begin{itemize}
+        \item Use \( \sqrt{\frac{2}{n}} \) for ReLU.
+        \item Use \( \sqrt{\frac{1}{n}} \) for Tanh.
+    \end{itemize}
+    \item \textbf{Tuning Variance:}
+    \begin{itemize}
+        \item While rarely a primary focus, variance can be treated as a hyperparameter.
+        \item A multiplier to these formulas can sometimes improve training.
+    \end{itemize}
+\end{enumerate}
+
+Proper weight initialization helps control the scale of weights and gradients in deep networks. This reduces the likelihood of vanishing or exploding gradients, enabling more efficient training of deep architectures.
+
+%------------------------------------------------------------------------------------------------------------------------------------------------------------%
+\newpage
 \begin{itemize}
   \item Like this one,
     \begin{notebox}
