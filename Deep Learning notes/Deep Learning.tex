@@ -2099,6 +2099,176 @@ A \textbf{Softmax classifier} without hidden layers creates linear decision boun
     \item Can model increasingly complex decision boundaries when combined with deeper architectures.
 \end{itemize}
 
+% ---------------- Chapter 3. Structuring Machine Learning Projects ----------------------%
+\chapter{Structuring Machine Learning Projects} \label{ch:3}
+% ---------------- Machine Learning Strategy ----------------------%
+\section{Machine Learning Strategy}
+\textbf{Orthogonalization in Machine Learning} is a process where individual ``knobs'' in a system are designed to control only one specific aspect of that system's behavior. This design philosophy makes it easier to diagnose issues and tune performance in machine learning systems. Here is how we can apply it to machine learning.
+\begin{itemize}[noitemsep, topsep=0pt]
+\item \textbf{Training Set Performance} - If the system isn’t performing well on the training set, tune parameters like network size or optimization algorithm.
+\item \textbf{Generalization to Dev Set} - Use knobs like regularization or increasing training data to improve performance on the dev set.
+\item \textbf{Generalization to Test Set} - If the test set performance is lacking, expand the dev set to avoid overfitting.
+\item \textbf{Real-World Performance} - Adjust the dev set distribution or the cost function if performance doesn’t translate to real-world success.
+\end{itemize}
+
+The challenges of non-orthogonalized controls are:
+\begin{itemize}[noitemsep, topsep=0pt]
+\item Techniques like early stopping affect multiple aspects (e.g., training set fit and dev set performance), making optimization harder.
+\item Orthogonalized knobs simplify tuning by isolating their effects on specific performance areas.
+\end{itemize}
+
+By clearly identifying bottlenecks (e.g., training, dev set, test set, or real-world performance) and having orthogonalized controls to address each, you streamline the optimization process and enhance system performance.
+
+\subsection{Single Number Evaluation Metrics}
+Using a single real number evaluation metric accelerates progress in machine learning by providing a quick and clear way to compare different models or approaches. It simplifies decision-making when trying out new ideas, hyperparameters, or learning algorithms.
+
+Machine learning often involves an iterative process:
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item Developing an idea.
+    \item Coding and implementing it.
+    \item Running experiments.
+    \item Using experiment results to refine the idea.
+\end{enumerate}
+This cycle repeats to improve the algorithm. Having a single evaluation metric enables quick comparisons, speeding up this process.
+
+\textbf{For example:}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Precision:} Measures how many predicted cats are actually cats.  
+        \begin{itemize}
+            \item Example: If precision = 95\%, 95\% of predicted cats are correct.
+        \end{itemize}
+    \item \textbf{Recall:} Measures how many actual cats were identified as cats.  
+        \begin{itemize}
+            \item Example: If recall = 90\%, 90\% of actual cats were correctly recognized.
+        \end{itemize}
+\end{itemize}
+
+Although both metrics are important, using them separately can lead to ambiguity when comparing classifiers (e.g., one has higher precision while the other has higher recall).
+
+\textbf{The solution is: F1 Score} \\
+The F1 score combines precision and recall into a single metric using the harmonic mean:
+\[
+F1 = \frac{2}{\frac{1}{P} + \frac{1}{R}}
+\]
+It balances the tradeoff between precision and recall, enabling a clear comparison of classifiers.
+
+\subsection{Satisficing and Optimizing Metrics}
+When it is difficult to combine all desired metrics into a single evaluation metric, it can be helpful to set up \textbf{optimizing} and \textbf{satisficing} metrics. This approach allows you to prioritize certain metrics while ensuring others meet minimum thresholds.
+
+\textbf{For Example: Classification Accuracy and Running Time}
+Suppose you care about two metrics for a classifier:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Accuracy:} How well the classifier identifies the correct category.
+    \item \textbf{Running Time:} The time it takes to classify an image.
+\end{itemize}
+
+If we perform a classification task using three different classifiers and the running time for the models are:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Classifier A: 80 ms
+    \item Classifier B: 95 ms
+    \item Classifier C: 1,500 ms (1.5 s)
+\end{itemize}
+
+One approach is to combine these metrics into a single formula, such as:
+\[
+\text{Overall Metric} = \text{Accuracy} - 0.5 \times \text{Running Time}
+\]
+However, this may feel artificial or arbitrary. Instead, you can:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Optimize Accuracy:} Maximize accuracy.
+    \item \textbf{Satisfice Running Time:} Ensure the running time is $\leq 100$ ms.
+\end{itemize}
+
+Using this setup, classifier B is the best choice because it maximizes accuracy while meeting the running time threshold.
+
+\textbf{The General Approach is:} \\
+For \(N\) metrics:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Select one as the \textbf{optimizing metric} to maximize or minimize.
+    \item Set the remaining \(N-1\) metrics as \textbf{satisficing metrics}, where each must meet a predefined threshold.
+\end{itemize}
+
+Consider a wake word detection system (e.g., \textit{“Alexa”}, \textit{“Hey Siri”}, \textit{“Ni Hao Baidu”}) used in a Trigger Word Detection System:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Accuracy:} Maximize the probability of waking the device when the correct trigger word is spoken.
+    \item \textbf{False Positives:} Minimize the number of random wake-ups to at most one per 24 hours.
+    \item Accuracy is the \textbf{optimizing metric}.
+    \item False positives are the \textbf{satisficing metric}, with the threshold of at most one false positive every 24 hours.
+\end{itemize}
+
+In summary, if you care about multiple metrics:
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item Select one as the \textbf{optimizing metric}.
+    \item Use others as \textbf{satisficing metrics} with thresholds.
+    \item Evaluate metrics on training, development (dev), or test sets.
+\end{enumerate}
+
+This approach simplifies decision-making, allowing you to select the ``best'' system automatically by focusing on the most important metric while ensuring others meet acceptable thresholds.
+
+\subsection{Size of the Dev and Test Sets in the Deep Learning Era}
+The way we set up dev and test sets has evolved with the advent of big data and deep learning. Below are the key takeaways:
+
+\textbf{Key Points}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Outdated Rules of Thumb:}
+    \begin{itemize}
+        \item Traditional splits like 70/30 (train/test) or 60/20/20 (train/dev/test) were reasonable when datasets were small (e.g., 100–10,000 examples).
+        \item These splits are less relevant for modern machine learning problems with larger datasets.
+    \end{itemize}
+
+    \item \textbf{Modern Best Practices:}
+    \begin{itemize}
+        \item With large datasets (e.g., 1 million examples), it’s reasonable to allocate \textbf{98\% for training} and just \textbf{1\% each for dev and test sets}.
+        \item Even 1\% of a million examples provides 10,000 examples, which is often sufficient for evaluation purposes.
+    \end{itemize}
+
+    \item \textbf{Purpose of Dev and Test Sets:}
+    \begin{itemize}
+        \item \textbf{Dev Set:} Used during development to evaluate and select the best model.
+        \item \textbf{Test Set:} Used at the end to evaluate the final system and ensure confidence in its performance.
+    \end{itemize}
+
+    \item \textbf{Size Guidelines:}
+    \begin{itemize}
+        \item The test set should be \textbf{large enough} to provide high confidence in the final system's performance but doesn't need to be excessively large.
+        \item In some applications, 10,000 or 100,000 examples may suffice for test sets.
+    \end{itemize}
+
+    \item \textbf{When to Skip a Test Set:}
+    \begin{itemize}
+        \item If you’re iterating and tuning on the test set, it’s better to call it a \textbf{dev set}.
+        \item In rare cases where overall performance isn't critical, you might only use a train-dev split (no separate test set). However, this is generally \textbf{not recommended}.
+    \end{itemize}
+
+    \item \textbf{Focus on Training Data:}
+    \begin{itemize}
+        \item Deep learning algorithms are data-hungry, so prioritize allocating a \textbf{large fraction of data to training} for better model performance.
+    \end{itemize}
+\end{enumerate}
+
+In Summary:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item The old 70/30 split is outdated in the era of big data. Instead, use \textbf{more data for training} and proportionally less for dev and test sets.
+    \item Dev and test sets should be sized based on their purpose:
+    \begin{itemize}
+        \item \textbf{Dev Set:} Big enough to evaluate and compare ideas effectively.
+        \item \textbf{Test Set:} Big enough to ensure confidence in final system performance but doesn’t need to be excessively large.
+    \end{itemize}
+    \item In rare cases, a train-dev split without a test set may suffice, though it’s not ideal.
+\end{itemize}
+
+\textbf{A learning algorithm’s performance can be better than human-level performance but it can never be better than Bayes error.}
+
+This is because:
+\begin{itemize}[noitemsep, topsep=0pt]
+\item \textbf{Bayes error} represents the lowest possible error rate achievable by any model, given the true underlying distribution of the data. It sets a theoretical lower bound on the error.
+\item \textbf{Human-level performance} is the level of performance achieved by human experts. In some cases, machine learning algorithms can outperform human-level performance, especially in tasks involving large-scale data or pattern recognition.
+\end{itemize}
+
+However, no algorithm can exceed the \textbf{Bayes error}, as it represents the best possible performance based on the available data and model assumptions.
+
+
 
 
 
