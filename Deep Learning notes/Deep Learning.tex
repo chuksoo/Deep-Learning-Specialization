@@ -1319,124 +1319,788 @@ In summary: \\
 
 Proper weight initialization helps control the scale of weights and gradients in deep networks. This reduces the likelihood of vanishing or exploding gradients, enabling more efficient training of deep architectures.
 
-%------------------------------------------------------------------------------------------------------------------------------------------------------------%
-\newpage
-\begin{itemize}
-  \item Like this one,
-    \begin{notebox}
-      which is wrapped in gray. I use it for notes.\ldots
-    \end{notebox}
+% ---------------- Optimization Algorithms ----------------------%
+\section{Optimization Algorithms}
+Large datasets slow training, but efficient optimization algorithms, like \emph{mini-batch gradient descent}, can significantly improve performance. Vectorization efficiently computes on all $m$ training examples simultaneously by stacking data into matrices $X$ (shape: $n_x \times m$) and $Y$ (shape: $1 \times m$). For large $m$ (e.g., millions), processing the entire dataset per gradient descent step becomes slow. 
 
-  \item Or this one,
-    \begin{funfact}
-      which is wrapped in red. I use it for fun facts or other asides\ldots
-    \end{funfact}
+\textbf{Batch Gradient Descent} processes the entire dataset per step (slower with large datasets) whereas \textbf{Mini-Batch Gradient Descent} takes multiple steps per epoch (e.g., 5,000 steps for $b = 1,000$ mini-batches in 1 epoch). An Epoch is one full pass through the training set. Mini-batch gradient descent allows faster training, making it the standard for large datasets.
 
-  \item Or this one,
-    \begin{mathaside}
-      which is wrapped in blue and used for mathy stuff.
-    \end{mathaside}
+In Mini-Batches, we:
+\begin{itemize}[nosep]
+    \item Divide the training set into smaller subsets (\textbf{mini-batches}) of size $b$ (e.g., $b = 1,000$).
+    \item Each mini-batch $t$ contains $X^{\{t\}}$ (inputs) and $Y^{\{t\}}$ (outputs), with dimensions:
+    \[
+    X^{\{t\}}: n_x \times b, \quad Y^{\{t\}}: 1 \times b
+    \]
+    \item Example: With 5 million samples and $b = 1,000$, there are $5,000$ mini-batches.
+	\[
+	X = 
+	\begin{bmatrix}
+	x^{(1)} & x^{(2)} & x^{(3)} & \cdots & x^{(1000)} | & x^{(1001)} & \cdots & x^{(2000)} | & \cdots & x^{(m)}
+	\end{bmatrix}
+	\]
+	
+	\vspace{-3.0em}
 
-  \item Or this last one,
-    \begin{example}
-      which is wrapped in green. With a title, it's used for enumerated examples
-      (see \smtt{\textbackslash extitle} and \smtt{\textbackslash excounter}).
-      Observe:
-    \end{example}
+	\[
+	\underbrace{\phantom{
+	\begin{bmatrix}
+	x^{(1)} & x^{(2)} & x^{(3)} & \cdots & x^{(1000)}
+	\end{bmatrix}
+	}}_{X^{\{1\}}}
+	\quad
+	\underbrace{\phantom{
+	\begin{bmatrix}
+	x^{(1001)} & \cdots & x^{(2000)}
+	\end{bmatrix}
+	}}_{X^{\{2\}}}
+	\quad
+	\cdots
+	\quad
+	\underbrace{\phantom{
+	\begin{bmatrix}
+	x^{(m)}
+	\end{bmatrix}
+	}}_{X^{\{5000\}}}
+	\]
 
-    \begin{example}[frametitle=\extitle{Test}]
-      This is an example. What's the answer to $2+2$?
-      \answer{Obviously 4, lol.}
-    \end{example}
+	\[
+	Y = 
+	\begin{bmatrix}
+	y^{(1)} & y^{(2)} & y^{(3)} & \cdots & y^{(1000)} | & y^{(1001)} & \cdots & y^{(2000)} | & \cdots & y^{(m)}
+	\end{bmatrix}
+	\]
+	
+	\vspace{-3.0em}
 
-    \begin{example}[frametitle=\extitle{Test Again}]
-      This one will increment the counter automatically, resetting for each
-      chapter.
-    \end{example}
-
-
-  \item For red and blue boxes, there are custom commands for titles, too:
-    \begin{mathaside}[frametitle=\mathtitle{One Title}]
-      Like this
-    \end{mathaside}
-    \begin{mathaside}[frametitle=\mathtitlep{Two Titles}{A Subtitle}]
-      Or this
-    \end{mathaside}
+	\[
+	\underbrace{\phantom{
+	\begin{bmatrix}
+	y^{(1)} & y^{(2)} & y^{(3)} & \cdots & y^{(1000)}
+	\end{bmatrix}
+	}}_{Y^{\{1\}}}
+	\quad
+	\underbrace{\phantom{
+	\begin{bmatrix}
+	y^{(1001)} & \cdots & y^{(2000)}
+	\end{bmatrix}
+	}}_{Y^{\{2\}}}
+	\quad
+	\cdots
+	\quad
+	\underbrace{\phantom{
+	\begin{bmatrix}
+	y^{(m)}
+	\end{bmatrix}
+	}}_{Y^{\{5000\}}}
+	\]
 \end{itemize}
 
-\hr{5in}
+\subsection{Mini-Batch Gradient Descent}
+In Mini-batch gradient descent, we process one mini-batch at a time instead of the entire dataset, allowing faster gradient descent steps.
+\begin{itemize}[nosep]
+    \item Training consists of:
+    \begin{enumerate}
+        \item \textbf{Forward Propagation} on $X^{\{t\}}$.
+        \item \textbf{Cost Calculation} ($J^{\{t\}}$): Average loss + regularization.
+        \item \textbf{Backpropagation}: Compute gradients for $J^{\{t\}}$ using $X^{\{t\}}, Y^{\{t\}}$.
+        \item \textbf{Parameter Updates}: Update weights $W$ and biases $b$ using:
+        \[
+        W^{[l]} \gets W^{[l]} - \alpha \cdot \frac{\partial J^{\{t\}}}{\partial W^{[l]}}
+        \]
+    \end{enumerate}
+    \item A single pass through all mini-batches = \textbf{1 epoch}.
+\end{itemize}
 
-These styles also automatically apply to theorems and claims.
+To run mini-batch on the training set, we would have:
+\begin{lstlisting}
+for t =  $1,  \cdots, 5000$: 
+	$\quad$ implement 1 step of gradient descent using $X^{[t]}, Y^{[t]}$ (as if $m = 1000$)
+	
+	$\quad$ Forward prop on $X^{[t]}$
+	$\hspace{4em} Z^{[1]} = W^{[1]}.X^{t} + b^{[1]}$
+	$\hspace{4em} A^{[1]} = g^{[1]}(Z^{[1]})$
+	$\hspace{4em}$		.
+	$\hspace{4em}$		.
+	$\hspace{4em}$		.
+	$\hspace{4em}$		.
+	$\hspace{4em} A^{[L]} = g^{[L]}(Z^{[L]})$
+	$\quad$ Compute cost $J^{[t]}= \frac{1}{1000} * \sum_{i=1}^l \mathcal{L} (\hat{y}^{(i)}, y^{(i)}) + \frac{\lambda}{2*1000} \sum_{\ell=1}^L ||w^{[\ell]}||^2_F$
+	$\quad$ Backprop to compute gradient w.r.t. $J^{[t]}$ (using $X^{\{t\}}, Y^{\{t\}}$)
+	$\quad$ $W^{[l]} := W^{[l]} - \alpha \cdot \frac{\partial J^{\{t\}}}{\partial W^{[l]}} = W^{[l]} - \alpha \cdot dW^{[l]}$
+	$\quad$ $b^{[l]} := b^{[l]} - \alpha \cdot \frac{\partial J^{\{t\}}}{\partial b^{[l]}} = b^{[l]} - \alpha \cdot db^{[l]}$
+\end{lstlisting}
 
-\begin{theorem}[Pythagorean Theorem]
-  \label{thm:pyth}
-  For any right triangle with legs $a,b$ and hypotenuse $c$:
-  %
-  \begin{equation}
-    \label{eq:pyth}
-    a^2+b^2=c^2
-  \end{equation}
-\end{theorem}
-\begin{proof}
-  This is left as an exercise to the reader.
-\end{proof}
+The code above is doing 1 epoch of training .i.e., a single pass through the training set which allows you to take 5,000 gradient descent steps.
 
-\begin{claim}
-  This is the greatest note template in the world.
-\end{claim}
+We perform Mini-Batch Gradient Descent because it:
+\begin{itemize}
+    \item Balances the extremes of \textbf{batch gradient descent} (entire dataset) and \textbf{stochastic gradient descent} (one sample at a time).
+    \item Speeds up training while maintaining efficient vectorized operations.
+\end{itemize}
 
-\hr{5in}
+\textbf{Fig. \ref{fig:18}} shows the Batch versus Mini-batch Gradient Descent.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Batch vs Mini-batch GD.png}
+	\caption{Training with Mini-batch Gradient Descent}
+	\label{fig:18}
+\end{figure}
+\FloatBarrier
 
-There are different ways to quote things, too, depending on how you want to
-emphasize:
+\subsubsection{Training with Mini-batch Gradient Descent}
+In summary:
+\begin{itemize}[nosep]
+\item Gradient Descent Overview
+\begin{itemize}
+    \item \textbf{Batch Gradient Descent:} Processes the \textit{entire training set} during each iteration.
+    \item The cost function \( J \) should \textbf{decrease consistently} across iterations. If it increases, it may indicate an issue, such as a learning rate that is too large.
+\end{itemize}
 
-\begin{quoting}
-  This is a simple, indented quote with small letters and italics usually
-  suitable for in-text quotations when you just want a block.
-\end{quoting}
+\item Mini-Batch Gradient Descent
+\begin{itemize}
+    \item Divides the training set into smaller \textit{mini-batches}, enabling gradient descent steps after processing parts of the training set.
+    \item The cost function \( J \) becomes \textbf{noisier} (due to variations across mini-batches) but \textbf{trends downward} over multiple epochs.
+\end{itemize}
 
-Alternatively, you can use the \smtt{\textbackslash inspiration} command from
-the chapter heading, which leverages the \smtt{thickleftborder} frame
-internally, but adds a little more padding and styling (there's also just
-\smtt{leftborder} for a thinner variant):
+\item Stochastic Gradient Descent (SGD)
+\begin{itemize}
+    \item Special case where the \textbf{mini-batch size = 1}.
+    \item Processes one training example per iteration, resulting in extremely \textbf{noisy updates}.
+    \item SGD often oscillates near the minimum and does not fully converge.
+\end{itemize}
+\end{itemize}
 
-\begin{thickleftborder}
-  Hello there!
-\end{thickleftborder}
+\subsubsection{Choosing the Mini-Batch Size}
+\begin{itemize}[nosep]
+    \item \textbf{Batch Gradient Descent} (\( m \),  entire training set):
+    \begin{itemize}
+        \item Suitable for \textbf{small datasets} (e.g., less than 2000 examples).
+        \item Slow for large datasets due to high computational cost per iteration.
+    \end{itemize}
+    \item \textbf{Stochastic Gradient Descent} (size = 1):
+    \begin{itemize}
+        \item Highly inefficient due to lack of vectorization and increased noise.
+    \end{itemize}
+    \item \textbf{Mini-Batch Gradient Descent} (\( 1 < size < m \)):
+    \begin{itemize}
+        \item Balances computational efficiency and noise reduction.
+        \item Typical sizes: \textbf{64, 128, 256, 512} (powers of 2 are preferred for memory efficiency).
+    \end{itemize}
+\end{itemize}
 
+\subsubsection{Practical Guidelines}
+\begin{itemize}[nosep]
+    \item Use \textbf{batch gradient descent} for \textbf{small datasets} (e.g., less than 2000 examples).
+    \item For larger datasets, try mini-batch sizes in the range of \textbf{64 to 512}, or up to \textbf{1024}.
+    \item Ensure that the mini-batch fits in CPU/GPU memory.
+    \item Fine-tune the mini-batch size as a \textbf{hyperparameter} to optimize the cost function.
+\end{itemize}
 
+\subsubsection{Performance Considerations}
+\begin{itemize}[nosep]
+    \item Mini-batches allow for \textbf{vectorization}, speeding up computations compared to SGD.
+    \item Enables progress without needing to process the entire training set, leading to \textbf{faster convergence}.
+\end{itemize}
 
-\section{On Cross-Referencing}
-\marginnote{\footnotesize\softtext This is the standard way to include margin
-notes. There are also commands to link to source papers directly (see
-\smtt{\textbackslash lesson}).} You can reference most things---see
-\autoref{thm:pyth} or \eqref{eq:pyth} or the \nameref{ch:1} chapter---directly
-and easily as long as you give them labels. These are ``built-ins.'' However,
-you can also create a \term{custom term} that will be included in the index,
-then include references to it that link back to the original definition. Try
-clicking: \refterm{custom term}. Building the index is on you, though. You can
-also reference by using a different term for the text: \reftermx{custom
-term}{like this}. Sometimes it doesn't fit the \termx{grammar}{grammatical
-structure} of the sentence so you can define the term one way and visualize it
-another way (this creates a \aterm{grammar} entry in the index). There's also
-\prop{math terms} and a way to reference them: \refprop{math terms} (clickable),
-but they do \textbf{not} show up in the index.
+\subsection{Algorithms Faster than Gradient Descent}
+The algorithms faster than gradient descent include:
+\begin{itemize}[nosep]
+\item Gradient Descent with Momentum
+\item RMSprop
+\item Adam Optimization Algorithm
+\end{itemize}
 
+Some important concept that are useful in these faster algorithms include Exponentially Weighted Averages and Bias Correction.
 
+\textbf{Exponentially Weighted Averages (EWA)} are foundational for understanding advanced optimization algorithms that improve upon gradient descent. Also known as \textbf{Exponentially Weighted Moving Averages (EWMA)} in statistics. EWAs are useful for smoothing noisy data and capturing trends.
 
-\section{On Math}
-Most of the math stuff is just macros for specific things like the convolution
-operator, $\conv$, probabilities, $\cprob{A}{B=C}$, or big-$O$ notation,
-$\bigO{n^2\log{n}}$ but there's also a convenient way to include explanations on
-the side of an equation:
-%
+\subsubsection{Computing the Exponentially Weighted Average (EWA)}
+\begin{itemize}
+    \item Initialize \( V_0 = 0 \).
+    \item Update formula for \( V_t \) (EWA at day \( t \)):
+    \[
+    V_t = \beta V_{t-1} + (1 - \beta)\theta_t
+    \]
+    where:
+    \begin{itemize}
+        \item \( \beta \): Smoothing parameter (e.g., \( \beta = 0.9 \)).
+        \item \( \theta_t \): Temperature on day \( t \).
+    \end{itemize}
+    \item Intuition:
+    \begin{itemize}
+        \item \( \beta \): Controls the weight of the previous value \( V_{t-1} \).
+        \item \( 1 - \beta \): Weight assigned to the current temperature \( \theta_t \).
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Impact of \(\beta\) on EWA Behavior}
+\begin{itemize}
+    \item For \( \beta = 0.9 \):
+    \begin{itemize}
+        \item Averages over approximately \( \frac{1}{1 - \beta} = 10 \) days of temperatures.
+        \item Produces a red curve (smooth but responsive to changes).
+    \end{itemize}
+    \item For \( \beta = 0.98 \):
+    \begin{itemize}
+        \item Averages over approximately \( \frac{1}{1 - \beta} = 50 \) days.
+        \item Produces a green curve (very smooth but slower to adapt to changes).
+        \item High \( \beta \) values cause \textbf{latency} due to increased weight on previous values.
+    \end{itemize}
+    \item For \( \beta = 0.5 \):
+    \begin{itemize}
+        \item Averages over approximately \( \frac{1}{1 - \beta} = 2 \) days.
+        \item Produces a yellow curve (highly responsive to changes but noisy).
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    % First subfigure
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/Exponentially Weighted Averages.png}
+        \caption{Exponentially Weighted Averages}
+        \label{fig:19}
+    \end{subfigure}
+    \hfill
+    % Second subfigure
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/EWA for beta=0.5.png}
+        \caption{Exponentially Weighted Averages for beta of 0.5}
+        \label{fig:20}
+    \end{subfigure}
+    \caption{Comparison of Exponentially Weighted Averages}
+    \label{fig:side_by_side}
+\end{figure}
+\FloatBarrier
+
+\subsubsection{Trade-offs in Smoothing}
+\begin{itemize}
+    \item High \( \beta \) (e.g., \( 0.98 \)):
+    \begin{itemize}
+        \item Smoother curve (less noisy).
+        \item Slower adaptation to changes (lag).
+    \end{itemize}
+    \item Low \( \beta \) (e.g., \( 0.5 \)):
+    \begin{itemize}
+        \item Faster adaptation to changes.
+        \item Noisier curve (more susceptible to outliers).
+    \end{itemize}
+    \item Choosing an optimal \( \beta \):
+    \begin{itemize}
+        \item Balances smoothness and responsiveness.
+        \item Often a hyperparameter tuned for the application.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Bias Correction in Exponentially Weighted Average}
+Typically, EWAs are initialized with \( V_0 = 0\).  For \( V_1 \):  
+     \[
+     V_1 = \beta V_0 + (1 - \beta) \theta_1 = (1 - \beta) \theta_1
+     \]  
+Since \( V_0 = 0 \), this leads to an initial value for \( V_1 \) that is much smaller than \( \theta_1 \).  As we propagate from \(V_1\) to \(V_t\), the weights are biased toward earlier terms, resulting in underestimates for the initial days.  
+
+To correct the bias, divide \( V_t \) by \( 1 - \beta^t \):  
+   \[
+   \hat{V}_t = \frac{V_t}{1 - \beta^t} 
+   \]  
+This normalization removes the downward bias during the early phase. After applying bias correction, \( \hat{V}_t \) becomes a proper weighted average of temperatures (\( \theta_1, \theta_2, \dots \)) without the initial downward bias.  
+
+Bias correction is critical for obtaining better estimates early on.  In later stages, both corrected and uncorrected EWAs converge to the same values.  
+
+\subsubsection{Gradient Descent with Momentum}
+Gradient descent with momentum, (also called \emph{Momentum}), often speeds up the optimization process compared to standard gradient descent. The core idea is to compute an exponentially weighted average of the gradients and use this to update the weights.
+
+In Standard Gradient Descent, oscillations in the vertical direction slow progress and limit the learning rate. Also a larger learning rate can lead to overshooting or divergence.To solve this, we make use of Gradient Descent with momentum.
+
+To run Gradient Descent with Momentum:
+\begin{lstlisting}
+Initialize $v_{dW}$ and $v_{db}$ as zero vectors with same dimensions as $W$ and $b$.
+Hyperparameters are $\alpha$ and $\beta$
+Select $\beta = 0.9$ (commom choice for hyperparameter $\beta$)
+On iteration $t$: 
+	$\quad$ Compute the gradient $dW$ and $db$ on current mini-batch
+	$\quad$ Update the moving averages:
+	$\hspace{4em} v_{dW} = \beta v_{dW} + (1 - \beta) dW$
+	$\hspace{4em} v_{db} = \beta v_{db} + (1 - \beta) db $
+	$\quad$ Update the weights using the smoothed gradients:
+	$\hspace{4em} W := W - \alpha v_{dW} $
+	$\hspace{4em} b := b - \alpha v_{db} $		
+\end{lstlisting}
+This algorithm reduces oscillations in the vertical direction by averaging out gradients, enabling a smoother descent and increases speed in the horizontal direction, allowing faster convergence.
+
+\subsubsection{RMSProp Algorithm}
+RMSprop (\textbf{Root Mean Square Propagation}) is an optimization algorithm designed to speed up gradient descent by addressing issues such as oscillations in parameter updates.
+
+The steps in RMSprop are:
+\begin{lstlisting}
+On iteration $t$: 
+	$\quad$ Compute the gradient $dW$ and $db$ on current mini-batch
+	$\quad$ Keep an exponentially weighted average of the squared gradients:
+	$\hspace{4em} S_{dW} = \beta_2 S_{dW} + (1 - \beta_2) \cdot (dW^2) $
+	$\hspace{4em} S_{db} = \beta_2 S_{db} + (1 - \beta_2) \cdot (db^2) $
+	$\hspace{4em}$Here, squaring is an element-wise operation.
+	$\quad$ Update the parameters:
+	$\hspace{4em} W = W - \frac{\alpha \cdot dW}{\sqrt{S_{dW}} + \epsilon} $
+	$\hspace{4em} b = b - \frac{\alpha \cdot db}{\sqrt{S_{db}} + \epsilon} $	
+\end{lstlisting}
+where \( \epsilon \) is a small value (e.g., \( 10^{-8} \)) added for numerical stability.
+
+\subsubsection*{Intuition Behind RMSprop}
+Gradient descent can suffer from \textbf{oscillations in the vertical direction} (e.g., parameter \( b \)) while trying to progress in the horizontal direction (e.g., parameter \( W \)). RMSprop slows learning in the \textbf{vertical direction} and maintains or accelerates learning in the \textbf{horizontal direction}.
+
+\begin{itemize}[nosep]
+    \item \textbf{Horizontal direction (parameter \( W \)):}
+    \begin{itemize}
+        \item \( S_{dW} \) is relatively small since gradients (\( dW \)) are small.
+        \item Updates in this direction are \textbf{not slowed down}.
+    \end{itemize}
+    \item \textbf{Vertical direction (parameter \( b \)):}
+    \begin{itemize}
+        \item \( S_{db} \) is relatively large due to large gradients (\( db \)).
+        \item Updates in this direction are \textbf{damped}, reducing oscillations.
+    \end{itemize}
+\end{itemize}
+
+The net effect is that RMSprop smoothens the learning process and allows faster convergence.
+
+The advantages of RMSprop are:
+\begin{itemize}[nosep]
+    \item Reduces oscillations in problematic directions.
+    \item Allows the use of a \textbf{larger learning rate} (\( \alpha \)) without divergence.
+    \item Speeds up mini-batch gradient descent.
+\end{itemize}
+
+In practice:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item RMSprop is effective in \textbf{high-dimensional parameter spaces}.
+    \item To prevent instability, always add a small \( \epsilon \) in the denominator.
+    \item Common default for \( \beta_2 \): \( 0.9 \).
+\end{itemize}
+
+RMSprop is a powerful optimization tool that works well for neural network training. Combining RMSprop with momentum can further improve performance.
+
+\subsubsection{Adam Optimization Algorithm}
+Adam (\textbf{Adaptive Moment Estimation}) optimization algorithm combines the effect of gradient descent with momentum together with gradient descent with RMSprop.
+
+\begin{lstlisting}
+Initialize $v_{dW}=0, S_{dW} =0,  v_{db}=0, S_{db} =0$ as zero vectors with same dimensions as $W$ and $b$.
+On iteration $t$: 
+	$\quad$ Compute the gradient $dW$ and $db$ on current mini-batch
+	$\quad$ Perform $\emph{momentum}$ update on the moving averages:
+	$\hspace{4em} v_{dW} = \beta_1 v_{dW} + (1 - \beta_1) dW$
+	$\hspace{4em} v_{db} = \beta_1 v_{db} + (1 - \beta_1) db $
+	$\quad$ Perform $\emph{RMSprop}$ update of the squared gradients:
+	$\hspace{4em} S_{dW} = \beta_2 S_{dW} + (1 - \beta_2) \cdot (dW^2) $
+	$\hspace{4em} S_{db} = \beta_2 S_{db} + (1 - \beta_2) \cdot (db^2) $
+	$\quad$ Implement bias correction on $V$ and $S$:
+	$\hspace{4em} v^{corrected}_{dW} = \frac{v_{dW}}{1 - {\beta_1}^t} $
+	$\hspace{4em} v^{corrected}_{db} = \frac{v_{db}}{1 - {\beta_1}^t} $
+	$\hspace{4em} S^{corrected}_{dW} = \frac{S_{dW}}{1 - {\beta_2}^t} $
+	$\hspace{4em} S^{corrected}_{db} = \frac{S_{db}}{1 - {\beta_2}^t} $
+	$\quad$ Update the parameters:
+	$\hspace{4em} W := W - \frac{\alpha \cdot v^{corrected}_{dW}}{\sqrt{S^{corrected}_{dW}} + \epsilon} $
+	$\hspace{4em} b := b - \frac{\alpha \cdot v^{corrected}_{db}}{\sqrt{S^{corrected}_{db}} + \epsilon} $	
+\end{lstlisting}
+
+The Hyperparameters choice are:
+\begin{itemize}[label={\ding{224}}]
+	\item \(\alpha\): needs to be tuned
+	\item \(\beta_1\): 0.9 \(\qquad \longrightarrow (dW)\)
+	\item \(\beta_2\): 0.999 \(\quad \longrightarrow (dW^2)\)
+	\item \(\epsilon\): \(10^{-8}\)
+\end{itemize}
+
+\subsubsection{Learning Rate Decay}
+One of the things that might help speed up your learning algorithm is to slowly reduce your learning rate over time. The way to reduce the learning rate over time is to use a \textbf{learning rate decay}.  Suppose you are using mini-batch gradient descent with a small mini-batch size (e.g., 64 or 128 examples). During training:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item The gradient descent steps will be noisy, and the algorithm may oscillate around the minimum rather than converge.
+    \item If the learning rate (\( \alpha \)) is fixed, the algorithm might wander and never fully converge due to mini-batch noise.
+\end{itemize}
+
+By slowly reducing \( \alpha \):
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item At the start of training (when \( \alpha \) is large), the algorithm learns faster with bigger steps.
+    \item As training progresses and \( \alpha \) decreases, the steps become smaller, allowing the algorithm to oscillate closer to the minimum.
+\end{itemize}
+
+The intuition is that during the initial phase, large steps are beneficial, but as training approaches convergence, smaller steps are needed for fine-tuning.
+
+The formula for learning rate decay \(\alpha\) is:
+\[ \alpha = \frac{1}{1+\text{decayRate}*\text{epochNumber}}*\alpha_0\]
+where:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \( \alpha_0 \): Initial learning rate.
+    \item \text{decay\_rate}: A hyperparameter that controls how fast the learning rate decreases.
+    \item \text{epoch\_num}: Current epoch number.
+\end{itemize}
+
+Other learning rate decay methods used to decay the learning rate includes:
+\begin{enumerate}
+    \item \textbf{Exponential Decay:}
+    \[
+    \alpha = \alpha_0 \cdot 0.95^{\text{epoch\_num}}
+    \]
+    where \( 0.95 \) is a constant (less than 1) that exponentially decays the learning rate.
+
+    \item \textbf{Square Root Decay:}
+    \[
+    \alpha = \frac{\alpha_0}{\sqrt{\text{epoch\_num}}}
+    \]
+
+    \item \textbf{Discrete Staircase Decay:}
+    Reduce \( \alpha \) by half after a fixed number of epochs.
+
+    \item \textbf{Manual Decay:}
+    For long training sessions, monitor the training progress and manually decrease \( \alpha \) when needed. This works well for small-scale experiments.
+\end{enumerate}
+
+In practice:
+\begin{itemize}[noitemsep, topsep=0pt]
+	\item Learning rate decay adds hyperparameters (e.g., \(\alpha_0\) and decay rate).
+	\item Tuning \(\alpha\) as a fixed value usually has a bigger impact than decay.
+	\item Decay is useful for fine-tuning after good \(\alpha\) initialization.
+\end{itemize}
+
+% ---------------- Hyperparameter Tuning, Batch Normalization and Programming Frameworks ----------------------%
+\section{Hyperparameter Tuning, Batch Normalization and Programming Frameworks}
+\subsection{Hyperparameter Tuning and Key Hyperparameters in Neural Networks}
+\begin{enumerate}[nosep]
+    \item \textbf{Most Important: Learning Rate ($\alpha$)}  
+    \begin{itemize}
+        \item Critical for convergence; tune this first.
+    \end{itemize}
+    \item \textbf{Second Tier:}
+    \begin{itemize}
+        \item Momentum term ($\beta$, default: 0.9).
+        \item Mini-batch size (affects optimization efficiency).
+        \item Number of hidden units.
+    \end{itemize}
+    \item \textbf{Third Tier:}
+    \begin{itemize}
+        \item Number of layers.
+        \item Learning rate decay.
+    \end{itemize}
+    \item \textbf{Adam Optimization Hyperparameters:}  
+    \begin{itemize}
+        \item Defaults ($\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$) generally work well and rarely need tuning.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Random Sampling vs. Grid Search}
+\begin{itemize}[nosep]
+    \item \textbf{Grid Search:}
+    \begin{itemize}
+        \item Systematically samples a fixed grid of hyperparameter values.
+        \item Effective for a small number of hyperparameters.
+        \item Inefficient when some hyperparameters (e.g., $\alpha$) are more critical than others.
+    \end{itemize}
+    \item \textbf{Random Sampling (Preferred):}
+    \begin{itemize}
+        \item Samples random points in the hyperparameter space.
+        \item Provides richer exploration of important hyperparameters.
+        \item Works better when the importance of hyperparameters varies.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Coarse-to-Fine Search}
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item Start with a broad, random sample across the hyperparameter space.
+    \item Identify regions where hyperparameters perform well.
+    \item Refine the search by zooming into these regions and sampling more densely.
+\end{enumerate}
+
+The key takeaways is that:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Prioritize tuning learning rate ($\alpha$) first, followed by other hyperparameters.
+    \item Use \textbf{random sampling} for richer exploration.
+    \item Apply a \textbf{coarse-to-fine search} to focus resources efficiently.
+\end{itemize}
+
+\newpage
+\subsubsection{Using Appropriate Scale to pick Hyperparameters}
+It is usually important to pick the appropriate scale on which to explore the hyperparameters.
+\begin{enumerate}[noitemsep, topsep=0pt]
+\item Random Sampling Over Hyperparameters
+\begin{itemize}
+    \item Sampling at random is more efficient than grid search, but it doesn’t mean sampling uniformly across valid values.
+    \item The appropriate scale must be used to explore hyperparameters effectively.
+\end{itemize}
+
+\item Sampling on a Linear Scale
+\begin{itemize}
+    \item Suitable for hyperparameters like:
+    \begin{itemize}
+        \item Number of hidden units $n[l]$: e.g., range $50$–$100$.
+        \item Number of layers $L$: e.g., values $2$, $3$, $4$.
+    \end{itemize}
+    \item For these, uniform sampling or grid search over the range is reasonable.
+\end{itemize}
+
+\item Sampling on a Logarithmic Scale
+\begin{itemize}
+    \item Necessary for hyperparameters like the learning rate $\alpha$:
+    \begin{itemize}
+        \item Example: range $0.0001$ to $1$.
+        \item On a linear scale, $90\%$ of sampled values might fall between $0.1$ and $1$, ignoring smaller values like $0.0001$.
+    \end{itemize}
+    \item Use log scale to distribute resources effectively:
+    \begin{itemize}
+        \item Convert range $[10^{-4}, 10^0]$ to $[-4, 0]$ by taking log base $10$.
+        \item Sample $r$ uniformly in $[-4, 0]$, then set $\alpha = 10^r$.
+    \end{itemize}
+\end{itemize}
+
+\item Sampling for $\beta$ (Exponential Weighted Average)
+\begin{itemize}
+    \item Example: $\beta$ in the range $[0.9, 0.999]$.
+    \item Direct linear sampling results in uneven exploration:
+    \begin{itemize}
+        \item Sensitivity increases for $\beta$ values close to $1$.
+    \end{itemize}
+    \item Solution:
+    \begin{itemize}
+        \item Focus on $1 - \beta$, with range $[0.1, 0.001]$.
+        \item Transform to log scale: $10^{-1}$ to $10^{-3}$.
+        \item Sample $r$ in $[-3, -1]$, set $1 - \beta = 10^r$, and $\beta = 1 - 10^r$.
+    \end{itemize}
+\end{itemize}
+\end{enumerate}
+
+We sample on a log scale because:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Small changes in hyperparameters like $\beta$ near critical regions (e.g., close to $1$) have significant effects.
+    \item Log scaling ensures resources are allocated to regions with greater sensitivity.
+\end{itemize}
+
+The key takeaways is that:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Select the correct scale (linear or log) for each hyperparameter.
+    \item Even if the wrong scale is used, a coarse-to-fine search can mitigate inefficiencies.
+    \item Organize the search to refine promising ranges iteratively.
+\end{itemize}
+
+\subsection{Batch Normalization}
+Batch Normalization (Batch Norm), introduced by Sergey Ioffe and Christian Szegedy, is a technique that simplifies hyperparameter tuning and makes training neural networks more robust. It allows for training very deep networks by normalizing intermediate layer values.
+
+\subsubsection{Normalizing Inputs in Neural Networks}
+When training models like logistic regression, normalizing the input features \(X\) helps speed up learning:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Steps:}
+    \begin{enumerate}[noitemsep, topsep=0pt]
+        \item Compute the mean: 
+        \[
+        \mu = \frac{1}{m} \sum_{i=1}^m X^{(i)}
+        \]
+        \item Subtract the mean from the dataset: 
+        \[
+        X_{\text{mean}} = X - \mu
+        \]
+        \item Compute the variance: 
+        \[
+        \sigma^2 = \frac{1}{m} \sum_{i=1}^m (X^{(i)} - \mu)^2
+        \]
+        \item Normalize the data:
+        \[
+        X_{\text{norm}} = \frac{X - \mu}{\sqrt{\sigma^2 + \epsilon}}
+        \]
+        Here, \(\epsilon\) is a small constant for numerical stability.
+    \end{enumerate}
+\end{itemize}
+
+Normalizing inputs makes the optimization contours more circular, improving algorithms like gradient descent.
+
+\subsubsection{Batch Norm for Hidden Layers}
+Batch Norm normalizes activations or intermediate values \(z\) in hidden layers:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item This normalization ensures efficient training of parameters \(w, b\), e.g., \(w_3, b_3\).
+    \item It generalizes input normalization to intermediate layers (\(a_1, a_2, \dots\)).
+\end{itemize}
+
+\subsubsection{Implementing Batch Norm}
+For a hidden layer with values \(z^{(1)}, z^{(2)}, \dots, z^{(m)}\):
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item \textbf{Compute the Mean:}
+    \[
+    \mu = \frac{1}{m} \sum_{i=1}^m z^{(i)}
+    \]
+    \item \textbf{Compute the Variance:}
+    \[
+    \sigma^2 = \frac{1}{m} \sum_{i=1}^m (z^{(i)} - \mu)^2
+    \]
+    \item \textbf{Normalize \(z^{(i)}\):}
+    \[
+    z^{(i)}_{\text{norm}} = \frac{z^{(i)} - \mu}{\sqrt{\sigma^2 + \epsilon}}
+    \]
+    where \(\epsilon\) ensures numerical stability.
+    \item \textbf{Scale and Shift:}
+    Introduce learnable parameters \(\gamma\) and \(\beta\) to allow flexibility:
+    \[
+    \tilde{z^{(i)}} = \gamma \cdot z^{(i)}_{\text{norm}} + \beta
+    \]
+    \(\gamma\) controls the variance, and \(\beta\) controls the mean.
+\end{enumerate}
+
+We use \(\gamma\) and \(\beta\) because:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Without \(\gamma\) and \(\beta\), hidden units would have fixed mean (0) and variance (1).
+    \item Learnable \(\gamma\) and \(\beta\) enable the network to optimize mean and variance.
+    \item For example, with sigmoid activation, avoiding values clustered around 0 can better utilize its nonlinearity.
+\end{itemize}
+
+\subsubsection{Implementation and Integration}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Replace each layer’s \(z_i\) values with the scaled and shifted values \(\tilde{z}_i\).
+    \item During backpropagation, update \(\gamma\) and \(\beta\) using gradient descent or other optimization algorithms.
+\end{itemize}
+
+Batch Norm applies normalization to deeper layers, not just input features. It ensures standardized mean and variance for hidden units, controlled by \(\gamma\) and \(\beta\). Batch Norm Works because:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Stabilizes learning by preventing activations from becoming too large or small.
+    \item Reduces internal covariate shift (changes in layer input distributions during training).
+    \item Improves gradient flow, enabling efficient optimization of deep networks.
+\end{itemize}
+
+\subsubsection{Batch Normalization in a Deep Network}
+Batch Normalization (Batch Norm) normalizes the intermediate outputs (activations) in a neural network, stabilizing learning and improving convergence speed. It is applied after computing the linear transformation \( Z \) and before applying the activation function \( A \).
+
+Each layer of a neural network computes:
 \begin{align*}
-  1 + 1 &\overset{?}{=} 2    \sideblock{2in}{first we do this} \\
-      2 &\overset{?}{=} 2    \sideblock{2in}{then we do this} \\
-      2 &= 2 \qed
+    Z &= W \cdot A_{\text{prev}} + B \quad \text{(Linear transformation)} \\
+    A &= g(Z) \quad \text{(Activation function application)}
 \end{align*}
 
-These are all in the \smtt{CustomCommands.sty} file.
+\textit{\textbf{With Batch Norm:}}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Compute \( Z \), then normalize it to \( \tilde{Z} \) using the mean and variance of the mini-batch.
+    \item Rescale \( \tilde{Z} \) with learnable parameters \( \beta \) (shift) and \( \gamma \) (scale):
+    \[
+    \tilde{Z} = \gamma \cdot Z_{\text{normalized}} + \beta
+    \]
+    \item Pass \( \tilde{Z} \) through the activation function to compute \( A \).
+\end{itemize}
+
+\textit{\textbf{Steps in Batch Norm:}}
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item Compute \( Z \) for the current layer.
+    \item Calculate the mean and variance of \( Z \) across the current mini-batch.
+    \item Normalize \( Z \):
+    \[
+    Z_{\text{normalized}} = \frac{Z - \mu}{\sqrt{\sigma^2 + \epsilon}}
+    \]
+    \item Rescale and shift \( Z_{\text{normalized}} \) to get \( \tilde{Z} \) using \( \gamma \) and \( \beta \).
+    \item Feed \( \tilde{Z} \) into the activation function to compute \( A \).
+\end{enumerate}
+
+\textit{\textbf{Parameter Updates:}} \\
+Additional parameters introduced for Batch Norm are \( \beta \) (shift) and \( \gamma \) (scale) for each layer. \\
+During training:
+\begin{align*}
+    \beta &:= \beta - \eta \cdot \frac{\partial L}{\partial \beta} \\
+    \gamma &:= \gamma - \eta \cdot \frac{\partial L}{\partial \gamma}
+\end{align*}
+where \( \eta \) is the learning rate. Updates can also use optimizers like Adam or RMSprop.
+
+Since Batch Norm centers \( Z \) to have a mean of 0, the bias term \( \beta \) becomes redundant and can be removed.
+
+\textit{\textbf{Dimension of Parameters:}} \\
+If a layer has \( n_L \) units:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Dimensions of \( Z \): \( n_L \times 1 \) (for one example).
+    \item Dimensions of \( \beta \) and \( \gamma \): \( n_L \times 1 \).
+\end{itemize}
+
+\subsubsection{Training Process with Batch Norm:}
+Batch Norm is applied to each mini-batch independently by computing the mean and variance of \( Z \) using only the examples in the current mini-batch. The training process with Batch Norm includes:
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item \textbf{Forward Propagation:}
+    \begin{itemize}
+        \item Compute \( Z \), apply Batch Norm to get \( \tilde{Z} \), and compute activations \( A \).
+    \end{itemize}
+    \item \textbf{Backward Propagation:}
+    \begin{itemize}
+        \item Compute gradients for \( W \), \( \gamma \), and \( \beta \).
+        \item Update all parameters using gradient descent or advanced optimization algorithms.
+    \end{itemize}
+\end{enumerate}
+
+\textit{\textbf{Why Does Batch Norm Work?}} 
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Speeding Up learning} - Normalizing input features \( X \) to have mean 0 and variance 1 can speed up learning.
+    \item \textbf{Reducing Covariate Shift} - Batch Norm minimizes these shifts by ensuring that the hidden unit values in each layer (e.g., \(Z_2\)) maintain a consistent mean and variance across training, making it easier for deeper layers to learn.
+    \item \textbf{Stabilizing Hidden Unit Distributions} - Batch Norm keeps the mean and variance of the hidden unit values stable. For example, even as parameters in earlier layers change, Batch Norm ensures that the later layers still see input values with similar distributions.
+    \item \textbf{Regularization Effect} - Batch Norm introduces slight noise during training because the mean and variance are computed on mini-batches rather than the entire dataset. This noise adds a small regularization effect similar to dropout.
+    \item \textbf{Handling Mini-Batches at Test Time} - During training, Batch Norm computes the mean and variance for each mini-batch. However, during testing, predictions may be made on individual examples, not mini-batches. To address this, Batch Norm uses running averages of the mean and variance computed during training for consistent predictions.
+\end{itemize}
+
+\subsection{Multi-Class Classification}
+\textit{\textbf{Binary vs Multi-Class Classification}}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Binary classification:} Used when there are two possible labels (e.g., 0 or 1). Example: Is it a cat or not?
+    \item \textbf{Multi-class classification:} Used when there are multiple possible classes (e.g., cats, dogs, baby chicks, or ``none of the above'').
+    \begin{itemize}
+        \item Classes are indexed as $0, 1, 2, \ldots, C-1$, where $C$ is the total number of classes.
+        \item Example: Cats = 1, Dogs = 2, Baby chicks = 3, and ``Other'' = 0.
+    \end{itemize}
+\end{itemize}
+
+\textit{\textbf{Generalization of Logistic Regression: Softmax Regression}}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Logistic regression generalizes to multi-class classification through \textbf{Softmax regression}.
+    \item For $C$ classes, the output layer will have $C$ units, each representing the probability of a class given the input $x$.
+\end{itemize}
+
+\textit{\textbf{Softmax Layer}}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Output vector $\hat{y}$:} A $C \times 1$ dimensional vector where:
+    \begin{itemize}
+        \item Each element represents the probability of one class.
+        \item Probabilities sum to 1.
+    \end{itemize}
+\end{itemize}
+
+The Softmax Activation Function is computed using the steps below:
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item Compute $z^{[L]} = W^{[L]} \cdot a^{[L-1]} + b^{[L]}$ (linear component of layer $L$).
+    \item Compute $t = e^{z^{[L]}}$ element-wise (temporary variable).
+    \item Normalize $t$ to sum to 1:
+    \[
+    a^{[L]}_i = \frac{t_i}{\sum_{j=1}^{C} t_j}
+    \]
+    where $a^{[L]}$ is the output of the Softmax layer.
+\end{enumerate}
+
+For example: \\
+Given $z^{[L]} = [5, 2, -1, 3]$:
+\begin{itemize}
+    \item $t = [e^5, e^2, e^{-1}, e^3] = [148.4, 7.4, 0.37, 20.1]$
+    \item Normalize: 
+    \[
+    \hat{y} = \frac{t}{\sum t} \approx [0.842, 0.042, 0.002, 0.114]
+    \]
+\end{itemize}
+
+A \textbf{Softmax classifier} without hidden layers creates linear decision boundaries between classes. For example: with $C = 3$, three linear boundaries partition the input space into regions corresponding to the classes. A deeper neural network with hidden layers can model \textbf{non-linear decision boundaries}, making it suitable for complex datasets.
+
+\begin{itemize}
+    \item \textbf{Sigmoid vs. Softmax:}
+    \begin{itemize}
+        \item Sigmoid handles binary classification (outputs a scalar probability for one class).
+        \item Softmax handles multi-class classification (outputs a vector of probabilities across classes).
+    \end{itemize}
+    \item Softmax ensures all probabilities sum to 1, normalizing the outputs.
+\end{itemize}
+
+\textit{\textbf{Applications of Softmax}}
+\begin{itemize}
+    \item Used for tasks requiring multi-class predictions (e.g., image classification, natural language processing).
+    \item Can model increasingly complex decision boundaries when combined with deeper architectures.
+\end{itemize}
+
+
+
 
 
 
