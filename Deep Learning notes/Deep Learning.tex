@@ -12,7 +12,10 @@
 }
 \usepackage{pifont} % to use the ding itemize
 \usepackage[dvipsnames]{xcolor}
-
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{siunitx} % delete this
+\usepackage{booktabs}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -70,8 +73,8 @@
   % \tableofcontents
 \end{titlepage}
 
-% ---------------- Chapter 1. Welcome to Deep learning ----------------------%
-\chapter{Welcome to Deep Learning} \label{ch:1}
+% ---------------- Chapter 1. Neural Networks and Deep learning ----------------------%
+\chapter{Neural Networks and Deep learning} \label{ch:1}
 \inspiration{Just as electricity transformed almost everything 100 years ago, today I actually have a hard time thinking of an industry that I don’t think AI (Artificial Intelligence) will transform in the next several years.}{Andrew Ng}{DeepLearning.AI}
 
 \firstletter{Hello there}, and welcome to \booktopic. This work is a culmination of hours of effort to create my reference for deep learning. All the explanations are in my own words but majority of the contents are based on DeepLearning.AI's specialization in \href{https://www.deeplearning.ai/courses/deep-learning-specialization/}{Deep Learning}.
@@ -93,6 +96,7 @@ Neural networks are useful in supervised learning scenarios, where the goal is t
 \end{figure}
 \FloatBarrier
 
+% ------------------ Supervised Learning with Neural Networks -----------------------------%
 \subsection{Supervised Learning with Neural Networks}
 Neural networks have gained a lot of attention lately for their ability to solve complex problems effectively. In supervised learning, you input data and aim to predict an output. Examples include predicting house prices or online ad clicks. Neural networks have been successful in various applications, like online advertising, computer vision, speech recognition, and machine translation. Different types of neural networks are used based on the nature of the data, such as convolutional neural networks for images and recurrent neural networks for sequential data. Structured data, like database entries, and unstructured data, like images or text, are both now interpretable by neural networks, thanks to recent advancements. While neural networks are often associated with recognizing images or text, they also excel in processing structured data, leading to improved advertising and recommendation systems. The techniques covered in this course apply to both structured and unstructured data, reflecting the versatility of neural networks in various applications.
 
@@ -128,6 +132,7 @@ Deep Learning took off in the last few years and not before mainly because of gr
 
 % ------------------ Neural Network Basics -----------------------------%
 \section{Neural Network Basics}
+% ------------------ Logistic Regression as a Neural Network -----------------------------%
 \subsection{Logistic Regression as a Neural Network}
 Logistic regression is an algorithm for binary classification problem.  In a binary classification problem,  the goal is to train a classifier for which the input is an image represented by a feature vector, $x$, and predicts whether the corresponding label $y$ is 1 or 0. In this case, whether this is a cat image (1) or a non-cat image (0). 
 
@@ -154,7 +159,8 @@ To create a feature vector, $x$, the pixel intensity values will be ``unrolled''
 \end{figure}
 \FloatBarrier
 
-\subsubsection{Logistic Regression}
+% ------------------ Logistic Regression -----------------------------%
+\subsection*{Logistic Regression}
 In Logistic regression, the goal is to minimize the error between the prediction and the training data. Given an image represented by a feature vector $x$, the algorithm will evaluate the probability of a cat being in that image.
 
 \begin{equation}
@@ -196,8 +202,8 @@ Note that as $\theta^T x^{(i)}$ i.e.  $w^Tx$ gets closer and closer to $-\infty$
     When we implement logistic regression,  our job is to try to learn parameters $w$ and $b$ so that $\hat{y}$ becomes a good estimate of the chance of $y$ being equal to one. 
 \end{example}
 
-\subsubsection{Logistic Regression Cost function}
-
+% ------------------ Logistic Regression Cost Function -----------------------------%
+\subsection*{Logistic Regression Cost Function}
 The \emph{loss function} ($\mathcal{L}$) is a function we need to define to measure how good our output $\hat{y}$ is when the true label is $y$. The loss function measures how well we are doing on a single training example. \\
 \textcolor{RoyalBlue}{$\text{Loss function}~ \Rightarrow~ \mathcal{L}(\hat{y}, y) = - y*log~\hat{y} + (1 - y)*log(1 - \hat{y})$}
 
@@ -224,12 +230,13 @@ In logistic regression, you use the cost function $\mathcal{J}(w, b)$ to measure
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.85\textwidth]{Images/Gradient descent.png}
+	\includegraphics[width=0.75\textwidth]{Images/Gradient descent.png}
 	\caption{Gradient descent Optimization}
 	\label{fig:10}
 \end{figure}
 \FloatBarrier
 
+% ------------------ Gradient Descent -----------------------------%
 \subsection{Gradient Descent}
 \begin{funfact}
 Imagine you're on top of a big hill where the goal is to get to the lowest point.
@@ -249,7 +256,6 @@ This is basically what gradient descent does. The ``hill'' is like a mathematica
 The trick is to not take steps that are too big (or you might overshoot the bottom) or too small (or it will take forever to get there). In the algorithm, we control this with something called the ``learning rate''. That's gradient descent! It's a way of finding the lowest point by always moving downhill, little by little.
 \end{funfact}
 
-\newpage
 \textbf{Gradient descent} is an optimization technique used to minimize a function, often applied in machine learning for model training. The algorithm starts with an initial guess for the parameters and iteratively updates them by moving in the direction of the negative gradient (the direction of steepest descent) of the function, until it reaches a local minimum. The step size, or learning rate, controls how big each move is.
 
 The gradient descent update rule is:
@@ -319,6 +325,7 @@ Gradient descent is an optimization algorithm used to minimize the cost function
     \item \textbf{Repeat:} Continue recalculating the gradient and updating the parameters until the algorithm converges, meaning the changes in the cost function become very small, indicating that a minimum has been reached.
 \end{enumerate}
 
+\newpage
 \begin{funfact}[frametitle=\facttitlep{FunFact}{Computation Graph}]
 The computation graph organizes a computation from left-to-right computation. Through a left-to-right pass, we can compute the value of $\mathcal{J}$. In order to compute derivatives there'll be a right-to-left pass, kind of going in the opposite direction called backwards propagation. That would be most natural for computing the derivatives. 
 \end{funfact}
@@ -326,8 +333,9 @@ The computation graph organizes a computation from left-to-right computation. Th
 \textbf{Forward Propagation}: Computes the output $y$ from the input $X$ by passing through the network layers. \\
 \textbf{Backward propagation} adjusts the network's parameters (weights and biases) by propagating the error backward from the output to the input, using the gradients to minimize the loss.
 
-% ------------------ Shallow Neural Network -----------------------------%
-\section{Shallow Neural Network}
+% ------------------ Shallow Neural Networks -----------------------------%
+\section{Shallow Neural Networks}
+% ------------------ Neural Network Representation -----------------------------%
 \subsection{Neural Network Representation}
 A neural network is a machine learning model inspired by the human brain. It consists of layers of interconnected nodes (neurons) where each connection has a weight, representing its importance. Neural networks process input data by passing it through these layers, applying activation functions to transform the data, and adjusting the weights based on the output error during training. The goal is to minimize the error and improve the model's predictions. Neural networks are widely used in tasks like image recognition, language processing, and complex data modeling.
 
@@ -338,6 +346,7 @@ A neural network is a machine learning model inspired by the human brain. It con
 	\label{fig:11}
 \end{figure}
 
+% ------------------ Neural Network Structure -----------------------------%
 \subsection{Neural Network Structure}
 A simple neural network has similar structure as a linear classifier:
 \begin{itemize}[nosep]
@@ -352,7 +361,7 @@ A simple neural network has similar structure as a linear classifier:
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.75\textwidth]{Images/Activation function.png}
+	\includegraphics[width=0.65\textwidth]{Images/Activation function.png}
 	\caption{Structure of a simple neural network}
 	\label{fig:12}
 \end{figure}
@@ -404,6 +413,7 @@ While this neural network has three layers (input, hidden, output), it is common
 \subsubsection{Training}
 The parameters \( W \) and \( b \) are optimized during training to minimize the error between the predicted output \( \hat{y} \) and the actual output \( y \). In this process, the neural network learns the best weights and biases for making accurate predictions.
 
+% ------------------ Activation Functions -----------------------------%
 \subsection{Activation Functions}
 Activation functions are mathematical equations that determine the output of a neural network node. They introduce non-linearity into the model, enabling the network to learn complex patterns. Below are some common activation functions used in neural networks:
 
@@ -454,19 +464,19 @@ Each activation function has its specific use cases depending on the task and ne
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.85\textwidth]{Images/Activation functions.png}
+	\includegraphics[width=0.75\textwidth]{Images/Activation functions.png}
 	\caption{Activation Functions in Neural Networks}
 	\label{fig:15}
 \end{figure}
 \FloatBarrier
 
-% ------------------ Deep Neural Network ---------------------------%
-\section{Deep Neural Network}
+% ------------------ Deep Neural Networks ---------------------------%
+\section{Deep Neural Networks}
 % ------------ Deep L-layer Neural Network -----------------%
 \subsection{Deep L-layer Neural Network}
 A \textbf{Deep Neural Network (DNN)} is a type of artificial neural network that contains multiple layers between the input and output layers. These intermediate layers, known as \textit{hidden layers}, allow the network to learn more complex patterns and representations from the data.
 
-\subsubsection{Key Characteristics of Deep Neural Networks:}
+\subsection*{Key Characteristics of Deep Neural Networks:}
 \begin{enumerate}
     \item \textbf{Multiple Hidden Layers}:
     \begin{itemize}
@@ -507,7 +517,7 @@ A deep neural network is a powerful tool for learning from data with multiple hi
 \textbf{Fig. \ref{fig:16}} shows a four-layer neural network consisting of three hidden layers. The number of units in each layer of the neural network is 5, 5, 3, and 1, respectively.  
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.85\textwidth]{Images/Deep Neural Network.png}
+	\includegraphics[width=0.75\textwidth]{Images/Deep Neural Network.png}
 	\caption{Deep Neural Networks with 5 hidden layers}
 	\label{fig:16}
 \end{figure}
@@ -552,7 +562,8 @@ where \( g \) is the activation function, and \( z^{[l]} \) depends on \( W^{[l]
 \subsection{Forward propagation in a Deep Neural Network}
 Forward propagation in a deep neural network involves passing the input data through the network, layer by layer, to compute the output prediction. Below are the steps to carry out forward propagation:
 
-\subsubsection*{Steps for Forward Propagation}
+\newpage
+\subsection*{Steps for Forward Propagation}
 
 \begin{enumerate}
     \item \textbf{Input Layer Initialization}:
@@ -644,7 +655,7 @@ Forward propagation involves:
 
 In the previous discussion, we described what constitutes a deep \( L \)-layer neural network and introduced the notation to represent such networks. This note elaborates on performing forward propagation in a deep network, first for a single training example \( x \), and later for the entire training set using vectorization.
 
-\subsubsection{Forward Propagation for a Single Training Example}
+\subsection*{Forward Propagation for a Single Training Example}
 
 \begin{enumerate}
     \item \textbf{Layer 1 Computation}:
@@ -677,7 +688,7 @@ In the previous discussion, we described what constitutes a deep \( L \)-layer n
     \end{itemize}
 \end{enumerate}
 
-\subsubsection{Vectorized Forward Propagation for the Entire Training Set}
+\subsection*{Vectorized Forward Propagation for the Entire Training Set}
 
 To compute forward propagation for all training examples simultaneously, the equations are extended:
 
@@ -744,8 +755,7 @@ A systematic approach to debugging involves verifying the matrix dimensions at e
 
 This method ensures bug-free implementation and aids in understanding the flow of forward propagation in neural networks.
 
-% ------------ Forward and Backward Propagation in Deep Neural Network -----------------%
-
+% ------------ Implementing Forward and Backward Propagation in Deep Neural Networks -----------------%
 \subsection{Implementing Forward and Backward Propagation in Deep Neural Networks}
 
 \subsubsection{1. Forward Propagation for layer $l$}
@@ -898,10 +908,13 @@ Deep learning research continues to explore better guidance for hyperparameter s
 
 % ---------------- Chapter 2. Improving Deep Neural Networks ----------------------%
 \chapter{Improving Deep Neural Networks: Hyperparameter Tuning, Regularization and Optimization} \label{ch:2}
-% ---------------- Setting up your Machine Learning Application ----------------------%
-\section{Setting up your Machine Learning Application}
 
-\subsection{Iterative Nature of Deep Learning}
+% ---------------- Practical Aspects of Deep Learning ----------------------%
+\section{Practical Aspects of Deep Learning}
+% ---------------- Setting up your Machine Learning Application ----------------------%
+\subsection{Setting up your Machine Learning Application}
+% ---------------- Iterative Nature of Deep Learning ----------------------%
+\subsection*{Iterative Nature of Deep Learning}
 \begin{itemize}[leftmargin=*,  nosep]
     \item Applied machine learning is a highly iterative process
 	\begin{enumerate}[nosep]
@@ -921,7 +934,8 @@ Deep learning research continues to explore better guidance for hyperparameter s
 	\end{itemize}
 \end{itemize}
 
-\subsection{Dataset Splitting Strategies}
+% ---------------- Train/Dev/Test sets ----------------------%
+\subsection*{Dataset Splitting Strategies}
 \begin{enumerate}[leftmargin=*,  nosep]
     \item Traditional Approach
     \begin{itemize}[nosep]
@@ -974,7 +988,8 @@ Deep learning research continues to explore better guidance for hyperparameter s
     \end{itemize}
 \end{itemize}
 
-\subsection{Bias/Variance}
+% ---------------- Bias/Variance ----------------------%
+\subsection*{Bias/Variance}
 Bias and variance are foundational concepts in understanding machine learning models. They are easy to learn but challenging to master, with nuances often missed. In deep learning, the focus on the \textbf{bias-variance trade-off} has diminished, though bias and variance remain critical.
 \textbf{Fig. \ref{fig:17}} shows the Bias and Variance with underfitting, overfitting and a ``just right'' fit.
 \begin{figure}[h]
@@ -986,10 +1001,10 @@ Bias and variance are foundational concepts in understanding machine learning mo
 \FloatBarrier
 
 \subsubsection*{Bias and Variance Intuition}
-\begin{itemize}[leftmargin=*]
+\begin{itemize}[leftmargin=*, nosep]
     \item \textbf{High Bias:} Underfitting the data (e.g., a simple linear model for complex data). The model performs poorly on the training set.
     \item \textbf{High Variance:} Overfitting the data (e.g., a highly complex model fitting every point). The model performs well on the training set but poorly generalizes to the dev/test set.
-    \item \textbf{"Just Right" Model:} A model with moderate complexity that balances bias and variance.
+    \item \textbf{``Just Right'' Model:} A model with moderate complexity that balances bias and variance.
 \end{itemize}
 
 \subsubsection*{Diagnosing Bias and Variance}
@@ -1012,7 +1027,8 @@ Bias and variance are foundational concepts in understanding machine learning mo
 
 Depending on whether the issue is high bias, high variance, or both, different approaches can be used to improve the model. By evaluating training and dev set errors, you can diagnose whether your model has bias, variance, or both issues. This diagnosis guides the next steps for improving model performance.
 
-\subsection{Basic Recipe for Diagnosing and Addressing Bias and Variance in Machine Learning}
+% ---------------- Basic Recipe for Machine Learning ----------------------%
+\subsection*{Basic Recipe for Diagnosing and Addressing Bias and Variance in Machine Learning}
 
 This note outlines a systematic approach to diagnose and address bias and variance in machine learning algorithms, particularly neural networks. By leveraging tools like training and development set performance, we can iteratively improve model performance using a structured recipe.
 \begin{enumerate}
@@ -1073,11 +1089,11 @@ This note outlines a systematic approach to diagnose and address bias and varian
 \end{itemize}
 
 % ---------------- Regularizing your Neural Network ----------------------%
-\section{Regularizing your Neural Network}
+\subsection{Regularizing your Neural Network}
 Regularization is a key technique to reduce overfitting (high variance) in neural networks. While obtaining more training data is another effective method, it is often not feasible due to cost or availability. Regularization, however, is a practical alternative and is widely used. Below is a breakdown of how it works in logistic regression and neural networks.
 
-\subsection{Regularization in Logistic Regression}
-
+% ---------------- Regularization in Logistic Regression ----------------------%
+\subsection*{Regularization in Logistic Regression}
 \subsubsection*{Cost Function with Regularization}
 In Logistic Regression, recall that we try to minimize the cost function $J$ where $w$ and $b$ in the logistic regression, are the parameters. The original cost function \( J \) includes the sum of individual losses over the training examples. So $w$ is an $n_x$-dimensional parameter vector, and $b$ is a real number. i.e., $w \in \mathbb{R}^{n_x}, b \in \mathbb{R}$.
 \begin{equation}
@@ -1112,7 +1128,8 @@ To add regularization, we add the regularization parameter or penalty term
     \item Balances training set performance with reduced overfitting.
 \end{itemize}
 
-\subsection{Regularization in Neural Networks}
+% ---------------- Regularization in Neural Networks ----------------------%
+\subsection*{Regularization in Neural Networks}
 
 In a Neural Network, you have a cost function that is a function of all your parameters \(w^{[1]}, b^{[1]}, \cdots, w^{[L]}, b^{[L]}\) where \( L \) is 
 the numbers of layers in our network. The cost function is the sum of the losses over \( m \) training examples. To add regularization, we added \( \frac{\lambda}{2m} \) 
@@ -1131,7 +1148,8 @@ where:
 
 \( ||w^{[\ell]}||^2 \) is is the \textbf{Frobenius norm} of the weight matrix \( w^{[l]} \).
 
-\subsubsection*{Gradient Descent Update with Regularization}
+% ---------------- Gradient Descent Update with Regularization ----------------------%
+\subsection*{Gradient Descent Update with Regularization}
 \begin{itemize}
     \item Compute \( dw^{[l]} \) from backpropagation, then add \( \frac{\lambda}{m} w^{[l]} \) to account for regularization.
     \item Update rule: 
@@ -1153,10 +1171,11 @@ L2 norm regularization is also called ``weight decay''. It is called weight deca
 \textbf{Note:} \\
 \[ \frac{\partial J}{\partial w^{[l]}} = dW^{[l]} \]
 
-\subsection{Why Does Regularization Help with Overfitting?}
+% ---------------- Why Does Regularization Help with Overfitting? ----------------------%
+\subsection*{Why Does Regularization Help with Overfitting?}
 Regularization helps to mitigate overfitting and reduce variance by penalizing large weight values in the cost function. Let's explore the intuition behind this process and understand why it works effectively.
  \begin{enumerate}
-\item \textbf{High Bias, High Variance, and the "Just Right" Case} \\
+\item \textbf{High Bias, High Variance, and the ``Just Right'' Case} \\
 Consider a large and deep neural network prone to overfitting. The cost function for such a network is:
 \[
 J(W, b) = \text{(sum of losses)} + \frac{\lambda}{m} \|W\|_F^2,
@@ -1184,14 +1203,15 @@ Consider the \(\tanh(z)\) activation function, defined as \(g(z) = \tanh(z)\):
 \end{itemize}
 \end{enumerate}
 
-\subsubsection*{Why Regularization Works}
+\subsection*{Why Regularization Works}
 Regularization helps prevent overfitting by:
 \begin{itemize}[nosep]
     \item Penalizing large weights, forcing the model to learn simpler, more generalizable patterns.
     \item Acting as a constraint that keeps the parameter values small, reducing the model's capacity to overfit.
 \end{itemize}
 
-\subsection{Dropout regularization}
+% ---------------- Dropout regularization ----------------------%
+\subsection*{Dropout regularization}
 Dropout is a regularization technique used to prevent overfitting in neural networks. The idea is to randomly ``drop'' or deactivate a subset of neurons during training, forcing the network to learn more robust representations.
 
 \subsubsection*{How Does Dropout Work?}
@@ -1229,11 +1249,14 @@ Other techniques in addition to L2 regularization and drop out regularization fo
 	- Automatically selects effective parameter magnitudes without exhaustive hyperparameter search.
 \end{itemize}
 
+% ---------------- Setting Up Optimization Problem ----------------------%
 \subsection{Setting Up Optimization Problem}
-\subsubsection{Normalizing Inputs}
+% ---------------- Normalizing Inputs ----------------------%
+\subsection*{Normalizing Inputs}
 When training a neural network, one of the techniques to speed up your training is if you \emph{normalize} your inputs. Normalization standardize the input features by setting all the features to a mean of 0 and variance of 1.  Normalization helps the cost function have more symmetric, spherical contours, making optimization smoother and faster. Normalization is crucial if feature ranges differ significantly. If features are already on similar scales, normalization may have less impact but rarely harms performance.
 
-\subsubsection{Vanishing and Exploding Gradients in Deep Neural Networks}
+% ---------------- Vanishing/Exploding Gradients ----------------------%
+\subsection*{Vanishing and Exploding Gradients in Deep Neural Networks}
 In very deep networks, gradients can become \textbf{exponentially large (exploding)} or \textbf{exponentially small (vanishing)} as they propagate through layers. This leads to training challenges:
     \begin{itemize}
         \item \textit{Exploding gradients}: Outputs grow exponentially with the number of layers.
@@ -1254,7 +1277,8 @@ The impact on training in deep neural network is that training very deep network
 
 A \textbf{careful choice of weight initialization} can significantly reduce the problem, though not eliminate it entirely.
 
-\subsubsection{Weight Initialization for Deep Networks}
+% ---------------- Weight Initialization for Deep Networks ----------------------%
+\subsection*{Weight Initialization for Deep Networks}
 Vanishing and Exploding Gradients are significant issues in training very deep neural networks. A \textit{careful choice of weight initialization} can mitigate these problems, though not eliminate them entirely. Weight initialization can help to address the vanishing and exploding gradient problem.
 
 \textbf{Single Neuron Example} \\
@@ -1396,6 +1420,7 @@ In Mini-Batches, we:
 	\]
 \end{itemize}
 
+% ---------------- Mini-Batch Gradient Descent ----------------------%
 \subsection{Mini-Batch Gradient Descent}
 In Mini-batch gradient descent, we process one mini-batch at a time instead of the entire dataset, allowing faster gradient descent steps.
 \begin{itemize}[nosep]
@@ -1503,6 +1528,7 @@ In summary:
     \item Enables progress without needing to process the entire training set, leading to \textbf{faster convergence}.
 \end{itemize}
 
+% ---------------- Algorithms Faster than Gradient Descent ----------------------%
 \subsection{Algorithms Faster than Gradient Descent}
 The algorithms faster than gradient descent include:
 \begin{itemize}[nosep]
@@ -1513,6 +1539,8 @@ The algorithms faster than gradient descent include:
 
 Some important concept that are useful in these faster algorithms include Exponentially Weighted Averages and Bias Correction.
 
+% ---------------- Exponentially Weighted Averages ----------------------%
+\subsection*{Exponentially Weighted Averages}
 \textbf{Exponentially Weighted Averages (EWA)} are foundational for understanding advanced optimization algorithms that improve upon gradient descent. Also known as \textbf{Exponentially Weighted Moving Averages (EWMA)} in statistics. EWAs are useful for smoothing noisy data and capturing trends.
 
 \subsubsection{Computing the Exponentially Weighted Average (EWA)}
@@ -1610,7 +1638,9 @@ This normalization removes the downward bias during the early phase. After apply
 
 Bias correction is critical for obtaining better estimates early on.  In later stages, both corrected and uncorrected EWAs converge to the same values.  
 
-\subsubsection{Gradient Descent with Momentum}
+
+% ---------------- Gradient Descent with Momentum ----------------------%
+\subsection*{Gradient Descent with Momentum}
 Gradient descent with momentum, (also called \emph{Momentum}), often speeds up the optimization process compared to standard gradient descent. The core idea is to compute an exponentially weighted average of the gradients and use this to update the weights.
 
 In Standard Gradient Descent, oscillations in the vertical direction slow progress and limit the learning rate. Also a larger learning rate can lead to overshooting or divergence.To solve this, we make use of Gradient Descent with momentum.
@@ -1631,7 +1661,8 @@ On iteration $t$:
 \end{lstlisting}
 This algorithm reduces oscillations in the vertical direction by averaging out gradients, enabling a smoother descent and increases speed in the horizontal direction, allowing faster convergence.
 
-\subsubsection{RMSProp Algorithm}
+% ---------------- RMSProp Algorithm ----------------------%
+\subsection*{RMSProp Algorithm}
 RMSprop (\textbf{Root Mean Square Propagation}) is an optimization algorithm designed to speed up gradient descent by addressing issues such as oscillations in parameter updates.
 
 The steps in RMSprop are:
@@ -1682,7 +1713,8 @@ In practice:
 
 RMSprop is a powerful optimization tool that works well for neural network training. Combining RMSprop with momentum can further improve performance.
 
-\subsubsection{Adam Optimization Algorithm}
+% ---------------- Adam Optimization Algorithm ----------------------%
+\subsection*{Adam Optimization Algorithm}
 Adam (\textbf{Adaptive Moment Estimation}) optimization algorithm combines the effect of gradient descent with momentum together with gradient descent with RMSprop.
 
 \begin{lstlisting}
@@ -1766,6 +1798,8 @@ In practice:
 
 % ---------------- Hyperparameter Tuning, Batch Normalization and Programming Frameworks ----------------------%
 \section{Hyperparameter Tuning, Batch Normalization and Programming Frameworks}
+
+% ---------------- Hyperparameter Tuning and Key Hyperparameters in Neural Networks ----------------------%
 \subsection{Hyperparameter Tuning and Key Hyperparameters in Neural Networks}
 \begin{enumerate}[nosep]
     \item \textbf{Most Important: Learning Rate ($\alpha$)}  
@@ -1789,7 +1823,7 @@ In practice:
     \end{itemize}
 \end{enumerate}
 
-\subsubsection*{Random Sampling vs. Grid Search}
+\subsection*{Random Sampling vs. Grid Search}
 \begin{itemize}[nosep]
     \item \textbf{Grid Search:}
     \begin{itemize}
@@ -1819,9 +1853,8 @@ The key takeaways is that:
     \item Apply a \textbf{coarse-to-fine search} to focus resources efficiently.
 \end{itemize}
 
-\newpage
-\subsubsection{Using Appropriate Scale to pick Hyperparameters}
-It is usually important to pick the appropriate scale on which to explore the hyperparameters.
+% ---------------- Using an Appropriate Scale to pick Hyperparameters ----------------------%
+\subsection*{Using an Appropriate Scale to pick Hyperparameters}
 \begin{enumerate}[noitemsep, topsep=0pt]
 \item Random Sampling Over Hyperparameters
 \begin{itemize}
@@ -1882,10 +1915,12 @@ The key takeaways is that:
     \item Organize the search to refine promising ranges iteratively.
 \end{itemize}
 
+% ---------------- Batch Normalization ----------------------%
 \subsection{Batch Normalization}
 Batch Normalization (Batch Norm), introduced by Sergey Ioffe and Christian Szegedy, is a technique that simplifies hyperparameter tuning and makes training neural networks more robust. It allows for training very deep networks by normalizing intermediate layer values.
 
-\subsubsection{Normalizing Inputs in Neural Networks}
+% ---------------- Normalizing Inputs in Neural Networks ----------------------%
+\subsection*{Normalizing Inputs in Neural Networks}
 When training models like logistic regression, normalizing the input features \(X\) helps speed up learning:
 \begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Steps:}
@@ -1912,7 +1947,8 @@ When training models like logistic regression, normalizing the input features \(
 
 Normalizing inputs makes the optimization contours more circular, improving algorithms like gradient descent.
 
-\subsubsection{Batch Norm for Hidden Layers}
+% ---------------- Batch Norm for Hidden Layers ----------------------%
+\subsection*{Batch Norm for Hidden Layers}
 Batch Norm normalizes activations or intermediate values \(z\) in hidden layers:
 \begin{itemize}[noitemsep, topsep=0pt]
     \item This normalization ensures efficient training of parameters \(w, b\), e.g., \(w_3, b_3\).
@@ -1963,7 +1999,8 @@ Batch Norm applies normalization to deeper layers, not just input features. It e
     \item Improves gradient flow, enabling efficient optimization of deep networks.
 \end{itemize}
 
-\subsubsection{Batch Normalization in a Deep Network}
+% ---------------- Batch Normalization in a Deep Network ----------------------%
+\subsection*{Fitting Batch Normalization into a Deep Network}
 Batch Normalization (Batch Norm) normalizes the intermediate outputs (activations) in a neural network, stabilizing learning and improving convergence speed. It is applied after computing the linear transformation \( Z \) and before applying the activation function \( A \).
 
 Each layer of a neural network computes:
@@ -1972,7 +2009,7 @@ Each layer of a neural network computes:
     A &= g(Z) \quad \text{(Activation function application)}
 \end{align*}
 
-\textit{\textbf{With Batch Norm:}}
+\subsubsection{With Batch Norm:}
 \begin{itemize}[noitemsep, topsep=0pt]
     \item Compute \( Z \), then normalize it to \( \tilde{Z} \) using the mean and variance of the mini-batch.
     \item Rescale \( \tilde{Z} \) with learnable parameters \( \beta \) (shift) and \( \gamma \) (scale):
@@ -1982,7 +2019,7 @@ Each layer of a neural network computes:
     \item Pass \( \tilde{Z} \) through the activation function to compute \( A \).
 \end{itemize}
 
-\textit{\textbf{Steps in Batch Norm:}}
+\subsubsection{Steps in Batch Norm:}
 \begin{enumerate}[noitemsep, topsep=0pt]
     \item Compute \( Z \) for the current layer.
     \item Calculate the mean and variance of \( Z \) across the current mini-batch.
@@ -1994,7 +2031,7 @@ Each layer of a neural network computes:
     \item Feed \( \tilde{Z} \) into the activation function to compute \( A \).
 \end{enumerate}
 
-\textit{\textbf{Parameter Updates:}} \\
+\subsubsection{Parameter Updates:}
 Additional parameters introduced for Batch Norm are \( \beta \) (shift) and \( \gamma \) (scale) for each layer. \\
 During training:
 \begin{align*}
@@ -2005,14 +2042,15 @@ where \( \eta \) is the learning rate. Updates can also use optimizers like Adam
 
 Since Batch Norm centers \( Z \) to have a mean of 0, the bias term \( \beta \) becomes redundant and can be removed.
 
-\textit{\textbf{Dimension of Parameters:}} \\
+\subsubsection{Dimension of Parameters:}
 If a layer has \( n_L \) units:
 \begin{itemize}[noitemsep, topsep=0pt]
     \item Dimensions of \( Z \): \( n_L \times 1 \) (for one example).
     \item Dimensions of \( \beta \) and \( \gamma \): \( n_L \times 1 \).
 \end{itemize}
 
-\subsubsection{Training Process with Batch Norm:}
+% ---------------- Training Process with Batch Norm ----------------------%
+\subsection*{Training Process with Batch Norm}
 Batch Norm is applied to each mini-batch independently by computing the mean and variance of \( Z \) using only the examples in the current mini-batch. The training process with Batch Norm includes:
 \begin{enumerate}[noitemsep, topsep=0pt]
     \item \textbf{Forward Propagation:}
@@ -2026,7 +2064,7 @@ Batch Norm is applied to each mini-batch independently by computing the mean and
     \end{itemize}
 \end{enumerate}
 
-\textit{\textbf{Why Does Batch Norm Work?}} 
+\subsubsection{Why Does Batch Norm Work?}
 \begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Speeding Up learning} - Normalizing input features \( X \) to have mean 0 and variance 1 can speed up learning.
     \item \textbf{Reducing Covariate Shift} - Batch Norm minimizes these shifts by ensuring that the hidden unit values in each layer (e.g., \(Z_2\)) maintain a consistent mean and variance across training, making it easier for deeper layers to learn.
@@ -2035,8 +2073,9 @@ Batch Norm is applied to each mini-batch independently by computing the mean and
     \item \textbf{Handling Mini-Batches at Test Time} - During training, Batch Norm computes the mean and variance for each mini-batch. However, during testing, predictions may be made on individual examples, not mini-batches. To address this, Batch Norm uses running averages of the mean and variance computed during training for consistent predictions.
 \end{itemize}
 
+% ---------------- Multi-Class Classification ----------------------%
 \subsection{Multi-Class Classification}
-\textit{\textbf{Binary vs Multi-Class Classification}}
+\subsection*{Binary vs Multi-Class Classification}
 \begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Binary classification:} Used when there are two possible labels (e.g., 0 or 1). Example: Is it a cat or not?
     \item \textbf{Multi-class classification:} Used when there are multiple possible classes (e.g., cats, dogs, baby chicks, or ``none of the above'').
@@ -2046,13 +2085,15 @@ Batch Norm is applied to each mini-batch independently by computing the mean and
     \end{itemize}
 \end{itemize}
 
-\textit{\textbf{Generalization of Logistic Regression: Softmax Regression}}
+% ---------------- Softmax Regression ----------------------%
+\subsection*{Generalization of Logistic Regression: Softmax Regression}
 \begin{itemize}[noitemsep, topsep=0pt]
     \item Logistic regression generalizes to multi-class classification through \textbf{Softmax regression}.
     \item For $C$ classes, the output layer will have $C$ units, each representing the probability of a class given the input $x$.
 \end{itemize}
 
-\textit{\textbf{Softmax Layer}}
+\newpage
+\subsubsection{Softmax Layer}
 \begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Output vector $\hat{y}$:} A $C \times 1$ dimensional vector where:
     \begin{itemize}
@@ -2093,7 +2134,7 @@ A \textbf{Softmax classifier} without hidden layers creates linear decision boun
     \item Softmax ensures all probabilities sum to 1, normalizing the outputs.
 \end{itemize}
 
-\textit{\textbf{Applications of Softmax}}
+\subsubsection{Applications of Softmax}
 \begin{itemize}
     \item Used for tasks requiring multi-class predictions (e.g., image classification, natural language processing).
     \item Can model increasingly complex decision boundaries when combined with deeper architectures.
@@ -2119,6 +2160,7 @@ The challenges of non-orthogonalized controls are:
 
 By clearly identifying bottlenecks (e.g., training, dev set, test set, or real-world performance) and having orthogonalized controls to address each, you streamline the optimization process and enhance system performance.
 
+% ---------------- Single Number Evaluation Metrics ----------------------%
 \subsection{Single Number Evaluation Metrics}
 Using a single real number evaluation metric accelerates progress in machine learning by providing a quick and clear way to compare different models or approaches. It simplifies decision-making when trying out new ideas, hyperparameters, or learning algorithms.
 
@@ -2152,10 +2194,11 @@ F1 = \frac{2}{\frac{1}{P} + \frac{1}{R}}
 \]
 It balances the tradeoff between precision and recall, enabling a clear comparison of classifiers.
 
+% ---------------- Satisficing and Optimizing Metrics ----------------------%
 \subsection{Satisficing and Optimizing Metrics}
 When it is difficult to combine all desired metrics into a single evaluation metric, it can be helpful to set up \textbf{optimizing} and \textbf{satisficing} metrics. This approach allows you to prioritize certain metrics while ensuring others meet minimum thresholds.
 
-\textbf{For Example: Classification Accuracy and Running Time}
+\subsubsection{For Example: Classification Accuracy and Running Time}
 Suppose you care about two metrics for a classifier:
 \begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Accuracy:} How well the classifier identifies the correct category.
@@ -2205,11 +2248,9 @@ In summary, if you care about multiple metrics:
 
 This approach simplifies decision-making, allowing you to select the ``best'' system automatically by focusing on the most important metric while ensuring others meet acceptable thresholds.
 
+% ---------------- Size of the Dev and Test Sets ----------------------%
 \subsection{Size of the Dev and Test Sets in the Deep Learning Era}
 The way we set up dev and test sets has evolved with the advent of big data and deep learning. Below are the key takeaways:
-
-\textbf{Key Points}
-
 \begin{enumerate}[label=\textbf{\arabic*.}]
     \item \textbf{Outdated Rules of Thumb:}
     \begin{itemize}
@@ -2258,7 +2299,9 @@ In Summary:
     \item In rare cases, a train-dev split without a test set may suffice, though it’s not ideal.
 \end{itemize}
 
-\textbf{A learning algorithm’s performance can be better than human-level performance but it can never be better than Bayes error.}
+\begin{thickleftborder}
+  \textit{A learning algorithm’s performance can be better than human-level performance but it can never be better than Bayes error.}
+\end{thickleftborder}
 
 This is because:
 \begin{itemize}[noitemsep, topsep=0pt]
@@ -2268,10 +2311,488 @@ This is because:
 
 However, no algorithm can exceed the \textbf{Bayes error}, as it represents the best possible performance based on the available data and model assumptions.
 
+% ---------------- Carrying Out Error Analysis ----------------------%
+\section{Carrying Out Error Analysis}
+Error analysis is the process of manually examining the mistakes made by a learning algorithm to gain insights into how to improve it.
+
+The key steps in carrying out error analysis are:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Analyze mislabeled examples from the dev set.
+    \item Categorize and count errors by type.
+    \item Estimate potential improvements for each category.
+    \item Prioritize based on potential impact.
+\end{itemize}
+
+% ---------------- Handling Incorrectly Labeled Data ----------------------%
+\subsection{Handling Incorrectly Labeled Data}
+\textbf{Key Concepts}
+\begin{itemize}
+    \item \textbf{Incorrect Labels vs. Mislabeled Examples:}
+    \begin{itemize}
+        \item \textit{Incorrectly labeled examples:} Errors in the dataset where the label $Y$ is wrong (e.g., a dog labeled as a cat).
+        \item \textit{Mislabeled examples:} Cases where the learning algorithm predicts an incorrect value of $Y$.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Handling Incorrect Labels in the Dataset}
+\subsubsection{Training Set}
+\begin{itemize}
+    \item \textbf{Random Errors:}
+    \begin{itemize}
+        \item Deep learning algorithms are robust to random labeling errors in the training set.
+        \item If errors are reasonably random (e.g., accidental keystrokes), fixing them may be unnecessary if the dataset is large and errors are a small percentage.
+    \end{itemize}
+    \item \textbf{Systematic Errors:}
+    \begin{itemize}
+        \item Algorithms are less robust to systematic errors (e.g., consistently labeling white dogs as cats).
+        \item Fixing systematic errors is critical to prevent biases in the model.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Dev and Test Sets}
+\begin{itemize}
+    \item \textbf{Impact on Evaluation:}
+    \begin{itemize}
+        \item Dev and test sets are used to evaluate and select between models. Incorrect labels can lead to flawed conclusions.
+    \end{itemize}
+    \item \textbf{Error Analysis:}
+    \begin{itemize}
+        \item Add a column during error analysis to identify incorrectly labeled examples.
+        \item Calculate the fraction of errors due to incorrect labels and assess their impact on the dev/test set.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Guidelines for Fixing Incorrect Labels}
+\subsubsection{When to Fix Incorrect Labels}
+\begin{itemize}
+    \item If incorrect labels significantly impact the ability to evaluate models (e.g., dev set accuracy differences are small, but incorrect labels distort results), invest time in correcting them.
+    \item \textbf{Example:}
+    \begin{itemize}
+        \item If 6\% of a 10\% error rate is due to incorrect labels, this is 0.6\%. Errors from other causes are 9.4\%, making incorrect labels a smaller priority.
+        \item If the error rate decreases to 2\%, but 0.6\% is still from incorrect labels, this now accounts for 30\% of errors, making it more worthwhile to fix them.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Correcting Incorrect Dev/Test Set}
+\begin{itemize}
+    \item Apply the same process to both dev and test sets to make sure they come from the same distributions.
+    \item Optionally examine examples the algorithm got right to avoid bias in error estimates.
+    \item Focus on Dev/Test Sets Over Training Set
+	\begin{itemize}
+	    \item Correcting labels in the dev/test set is more impactful for evaluation.
+	    \item Training set corrections are often less critical unless errors are systematic.
+	\end{itemize}
+\end{itemize}
+
+Correcting mislabeled data depends on its impact on evaluation and the nature of the errors. Prioritize fixes in dev/test sets if they significantly affect model selection or evaluation. Use error analysis to guide decisions and be willing to manually inspect data for deeper insights.
+
+One of the recommended practice when building a brand new machine learning system is to \textbf{build your first system quickly and then iterate}.
+
+% ---------------- Mismatched Training and Dev/Test Set ----------------------%
+\subsection{Mismatched Training and Dev/Test Set}
+
+% ---------------- Training and Testing on Different Distributions ----------------------%
+\subsection*{Handling Training and Test Data from Different Distributions}
+
+Deep learning algorithms perform better with larger datasets, even when data sources differ in distribution. Teams often mix data from different distributions into the training set to increase dataset size, even when test and dev sets come from another distribution. Best practices are needed when training and test distributions differ.
+
+\subsubsection*{Example 1: Mobile App Cat Classifier}
+\textbf{Scenario:} Building a classifier for user-uploaded photos (mobile app) to detect cats.
+\begin{itemize}
+    \item \textbf{Mobile app data:} Less professional, 10,000 images.
+    \item \textbf{Web data:} High-quality, professionally taken, 200,000 images.
+\end{itemize}
+
+\textbf{Options for Splitting Data:}
+\begin{enumerate}
+    \item \textbf{Option 1: Combine All Data Randomly}
+    \begin{itemize}
+        \item \textbf{Setup:} Training set: 205,000; Dev/Test sets: 2,500 examples each (randomly mixed).
+        \item \textbf{Advantage:} Simplifies management; all sets share the same distribution.
+        \item \textbf{Disadvantage:} Dev/Test sets predominantly reflect web data ($\sim 95\%$), not mobile app data.
+        \item \textbf{Impact:} Misleads the team to optimize for web data distribution, which is not the end goal.
+    \end{itemize}
+    
+    \item \textbf{Option 2: Keep Dev/Test from Target Distribution}
+    \begin{itemize}
+        \item \textbf{Setup:}
+        \begin{itemize}
+            \item Training set: 200,000 web + 5,000 mobile images.
+            \item Dev/Test sets: 2,500 mobile app images each.
+        \end{itemize}
+        \item \textbf{Advantage:} Focuses model optimization on the mobile app distribution, aligning with project goals.
+        \item \textbf{Disadvantage:} Training set distribution differs from dev/test set distribution.
+        \item \textbf{Outcome:} Better long-term performance despite differing distributions.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Example 2: Speech-Activated Rearview Mirror}
+\textbf{Scenario:} Building a speech recognition system for a rearview mirror product.
+\begin{itemize}
+    \item \textbf{Training data:} 500,000 utterances from unrelated sources (smart speakers, keyboards, etc.).
+    \item \textbf{Dev/Test data:} 20,000 utterances specific to rearview mirror use cases.
+\end{itemize}
+
+\textbf{Options for Splitting Data:}
+\begin{enumerate}
+    \item \textbf{Option 1:}
+    \begin{itemize}
+        \item Training set: 500,000 unrelated utterances.
+        \item Dev/Test sets: 10,000 utterances each from rearview mirror data.
+    \end{itemize}
+    \item \textbf{Option 2:}
+    \begin{itemize}
+        \item Training set: 510,000 utterances (500,000 unrelated + 10,000 rearview mirror).
+        \item Dev/Test sets: 5,000 utterances each from rearview mirror data.
+    \end{itemize}
+    \item \textbf{Impact:} Combining data increases training set size, improving model performance, while retaining dev/test sets specific to the target distribution.
+\end{enumerate}
+
+The key takeaways is to:
+\begin{itemize}
+    \item Use larger datasets even when training distribution differs from test/dev sets.
+    \item Ensure dev/test sets align with the target distribution to optimize for end-use scenarios.
+    \item Trade-offs exist between dataset size and distribution alignment, but prioritizing the dev/test distribution often leads to better results.
+\end{itemize}
 
 
+% ---------------- Bias and Variance Analysis with Mismatched Data Distributions ----------------------%
+\subsection*{Bias and Variance Analysis with Mismatched Data Distributions}
+
+Estimating the bias and variance of a learning algorithm helps prioritize improvements. However, the analysis differs when the training set has a different distribution than the development (dev) and test sets. 
+
+\subsubsection*{Example: Cat Classification}
+Assume that:
+\begin{itemize}
+    \item Human-level (Bayes) error: ~0\%.
+    \item Training error: 1\%, Dev error: 10\%.
+\end{itemize}
+
+\begin{example}
+If your dev data came from the same distribution as your training set, you would say that here you have a large variance problem, that your algorithm's just not generalizing well from the training set which it's doing well on to the dev set, which it's suddenly doing much worse on. 
+\end{example}
+
+Here's how to approach this:
+\begin{enumerate}
+\item \textbf{Same Distribution (Training \& Dev Sets):}
+	\begin{itemize}
+	    \item Large difference (10\% - 1\%) indicates a variance problem (poor generalization).
+	\end{itemize}
+     \[
+     \text{Large gap between training and dev error} \implies \text{Variance problem.}
+     \]
+\item \textbf{Different Distribution:}
+	\begin{itemize}
+	    \item Cannot directly conclude a variance problem.
+	    \item E.g., Training images may be clearer, dev images harder.
+	\end{itemize}
+\end{enumerate}
+
+The solution is to introduce a ``Training-Dev Set'' which is a subset of the training set with the same distribution as the training set, excluded from training. To carry out error analysis, we look at the error of the classifier on the training set, on the training-dev set (same distribution as training data) as well as on the dev set (different distribution).
+
+Assume after analysis, we have:
+\begin{itemize}[nosep]
+\item \text{Training error: } 1\%
+\item \text{Training-dev error: } 9\%,
+\item \text{Dev error: } 10\%. 
+\end{itemize}
+
+We can conclude that significant increase (9\% - 1\%) indicates a \textbf{variance problem} (poor generalization within the same distribution).
+
+Assume instead that after analysis:
+\begin{itemize}[nosep]
+\item \text{Training error: } 1\%
+\item \text{Training-dev error: } 1.5\%
+\item \text{Dev error: } 10\%
+\end{itemize}
+The Minimal difference (1.5\% - 1\%) suggests \textbf{low variance} and the large jump (10\% - 1.5\%) suggests a data mismatch problem.i.e., the algorithm performs well within the training distribution but poorly on the dev set, indicating a mismatch.
+
+Assume after analysis:
+\begin{itemize}[nosep]
+\item  \text{Training error: } 10\%
+\item  \text{Training-dev error: } 11\%
+\item  \text{Dev error: } 12\%
+\end{itemize}
+The High training error indicates \textbf{avoidable bias}.
+
+If after analysis:
+\begin{itemize}[nosep]
+\item  \text{Training error: } 10\%
+\item  \text{Training-dev error: } 11\%
+\item  \text{Dev error: } 20\%
+\end{itemize}
+We conclude there is an \textbf{High Avoidable bias} (high training error) and \textbf{Data mismatch problem} (large gap between training-dev and dev errors).
+
+Some general principles for key quantities to look for in error analysis are:
+\begin{itemize}[nosep]
+    \item \textbf{Human-level error:} Approximate Bayes error.
+    \item \textbf{Training error:} Measures avoidable bias.
+    \item \textbf{Training-dev error:} Measures variance (gap with training error).
+    \item \textbf{Dev error:} Measures data mismatch (gap with training-dev error).
+    \item \textbf{Test error:} Identifies overfitting to the dev set (gap with dev error).
+\end{itemize}
+
+\subsubsection*{Error Analysis Table}
+Error values can be organized in a table:
+\begin{center}
+    % Adjust row spacing by setting \arraystretch
+    \renewcommand{\arraystretch}{2.0} % Increase row spacing (1.5x default)
+    \begin{tabular}{@{}c c l@{}}
+        \toprule
+        \textbf{Dataset Type} & \textbf{Error} & \textbf{Conclusion} \\
+        \midrule
+        Human-level error & 4\% & \multirow{2}{*}{$\bigg\}\begin{array}{l}
+        \end{array} \text{Avoidable bias}$} \\
+        Training set error & 7\% & \multirow{2}{*}{$\bigg\}\begin{array}{l}
+        \end{array} \text{Variance}$} \\
+        Training-Dev set error & 10\% & \multirow{2}{*}{$\bigg\}\begin{array}{l}
+        \end{array} \text{Data mismatch}$} \\
+        Dev error & 12\% & \multirow{2}{*}{$\bigg\}\begin{array}{l}
+        \end{array} \text{Overfitting to Dev set}$} \\
+        Test error & 12\% & \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{itemize}[nosep]
+    \item \textbf{Avoidable Bias:} Gap between human-level and training error.
+    \item \textbf{Variance:} Gap between training and training-dev error.
+    \item \textbf{Data Mismatch:} Gap between training-dev and dev error.
+    \item \textbf{Degree of overfitting to dev set:} Gap between dev and test error. Solution: Use a larger dev set.
+\end{itemize}
+
+% ---------------- Addressing Data Mismatch Problems ----------------------%
+\subsection*{Addressing Data Mismatch Problems}
+\begin{enumerate}
+\item Diagnosing Data Mismatch:
+\begin{itemize}
+    \item If training data differs from dev/test data and error analysis indicates a mismatch:
+    \begin{itemize}
+        \item Perform manual error analysis to identify differences between training and dev/test sets.
+        \item Focus analysis on the dev set to avoid overfitting the test set.
+    \end{itemize}
+\end{itemize}
+
+\item Identifying and Understanding Errors:
+\begin{itemize}
+    \item Example: A speech-activated rear-view mirror system:
+    \begin{itemize}
+        \item Dev set may have noisy in-car data, e.g., car noise.
+        \item Training set might lack examples with navigational queries, e.g., street numbers.
+    \end{itemize}
+    \item Insights into these differences can guide data improvement efforts.
+\end{itemize}
+
+\item Strategies to Address Data Mismatch:
+\begin{itemize}
+    \item Make Training Data More Similar to Dev/Test Data:
+    \begin{itemize}
+        \item Collect additional data similar to dev/test sets.
+        \item Simulate data with key characteristics of dev/test sets.
+    \end{itemize}
+    \item Example: For noisy in-car speech data:
+    \begin{itemize}
+        \item Combine clean audio recordings with car noise recordings to synthesize realistic training data.
+    \end{itemize}
+\end{itemize}
+
+\item Artificial Data Synthesis:
+\begin{itemize}
+    \item Create synthetic data to match target conditions, e.g., combining audio recordings with background noise or using computer graphics for vision tasks.
+    \item Caution:
+    \begin{itemize}
+        \item Avoid overfitting to a small subset of synthesized data (e.g., reusing one hour of car noise or a limited number of car models).
+        \item Ensure synthesized data covers a broad range of scenarios.
+    \end{itemize}
+\end{itemize}
+
+\item Challenges of Artificial Data Synthesis:
+\begin{itemize}
+    \item Synthesized data might represent a small portion of the real-world distribution.
+    \item Neural networks may overfit to this limited subset, even if it seems realistic to humans.
+    \item Example: In self-driving car systems:
+    \begin{itemize}
+        \item Using computer graphics with only 20 car models may result in overfitting, as real-world car diversity is much greater.
+    \end{itemize}
+\end{itemize}
+\end{enumerate}
+
+The key takeaways is that:
+\begin{itemize}[nosep]
+    \item Conduct thorough error analysis to understand data distribution differences.
+    \item Collect or synthesize more representative training data to align with dev/test sets.
+    \item Use artificial data synthesis cautiously to avoid overfitting to narrow subsets.
+    \item Despite its challenges, artificial data synthesis can significantly improve performance when applied carefully.
+\end{itemize}
+
+% ---------------- Learning from Multiple Tasks ----------------------%
+\subsection{Learning from Multiple Tasks}
+% ---------------- Transfer Learning ----------------------%
+\subsection*{Transfer Learning in Deep Learning}
+One of the most powerful ideas in deep learning is the ability to transfer knowledge from one task to another. This is called \textbf{transfer learning}. For example, you could train a neural network to recognize objects (e.g., cats) and use that knowledge to help read x-ray scans. The process involves using what the neural network has learned from a primary task and applying it to a secondary task.
+
+Suppose you train a neural network on an image recognition task:
+\begin{itemize}[nosep]
+    \item Input: Images (\(X\)) and Labels (\(Y\)) - images of cats, dogs, birds, etc.
+    \item Output: A model that recognizes different objects in images.
+\end{itemize}
+
+Now, you want to apply this knowledge to a radiology diagnosis task (e.g., reading x-ray scans). The steps are as follows:
+\begin{enumerate}[nosep]
+    \item \textbf{Remove the last output layer} of the image recognition model.
+    \item \textbf{Replace the last layer} with a new randomly initialized layer for radiology diagnosis.
+    \item \textbf{Retrain the model} on the radiology dataset.
+\end{enumerate}
+This approach leverages the low-level features (e.g., detecting edges, curves, and patterns) that the neural network has already learned from the image recognition task.
+
+\subsubsection*{Pre-training and Fine-tuning}
+The process of using a pre-trained model (e.g., trained on image recognition) and adapting it to a new task is often referred to as:
+\begin{itemize}
+    \item \textbf{Pre-training}: Training the neural network on a task (e.g., image recognition) to learn general features.
+    \item \textbf{Fine-tuning}: Adapting the pre-trained model to the new task (e.g., radiology diagnosis) by retraining some or all layers.
+\end{itemize}
+If you have a small dataset for the new task, it's common to only retrain the last few layers. If you have a large dataset, you may choose to retrain the entire model.
+
+\subsubsection*{Transfer Learning in Action}
+\begin{itemize}
+    \item \textbf{Radiology Example}: A neural network trained on image recognition (e.g., cats, dogs) can be fine-tuned with a small dataset of radiology images to perform diagnosis tasks, as it already knows about image structures like edges and patterns.
+    \item \textbf{Speech Recognition Example}: A speech recognition system trained on large amounts of data can be adapted to detect specific ``wake words'' (e.g., ``Alexa'', ``Hey Siri'') by retraining the last layer or layers with a smaller dataset.
+\end{itemize}
+
+\subsubsection*{When Does Transfer Learning Make Sense?}
+Transfer learning is most effective when:
+\begin{itemize}[nosep]
+    \item The source task (Task A) and the target task (Task B) have the same input $X$.
+    \item You have \textbf{more data for the source task} (e.g., image recognition or speech recognition) than for the target task (e.g., radiology diagnosis or wake word detection).
+    \item The tasks share similar inputs, such as both being image-based (for image recognition and radiology) or audio-based (for speech recognition and wake word detection).
+    \item Low-level features from the source task can be useful for the target task.
+\end{itemize}
+
+For example:
+\begin{itemize}[nosep]
+    \item If you have a million images for image recognition and only 100 radiology images, the knowledge from image recognition can be transferred to improve radiology diagnosis, even with limited data.
+    \item Similarly, if you have 10,000 hours of speech data for a speech recognition system and only 1 hour for wake word detection, transfer learning can help by applying learned features of human speech.
+\end{itemize}
+
+\subsubsection*{When Does Transfer Learning Not Make Sense?}
+Transfer learning is less useful when:
+\begin{itemize}[nosep]
+    \item The source task has less data than the target task.
+    \item The tasks are not sufficiently related (e.g., transferring from image recognition to radiology diagnosis when you already have enough data for radiology).
+    \item The value of each example in the target task is much higher than in the source task.
+\end{itemize}
+For example, if you have a small number of radiology images and a large amount of data for image recognition, the transfer learning from image recognition may not be helpful, as the radiology task has more valuable and specific data.
+
+In summary, transfer learning is useful when:
+\begin{itemize}[nosep]
+    \item The tasks share the same input type.
+    \item The source task has more data than the target task.
+    \item Low-level features learned from the source task are transferable to the target task.
+\end{itemize}
+This process allows you to build a model for a task with limited data by leveraging knowledge from a related task with more data.
 
 
+% ---------------- Multi-task Learning ----------------------%
+\subsection*{Multi-task Learning}
+Multi-task learning (MTL) is an approach where a single neural network is trained to perform multiple tasks simultaneously. Unlike transfer learning, where knowledge gained from one task (Task A) is transferred to a new, related task (Task B), MTL aims to solve several problems at once within the same network. For example, in autonomous vehicles, a neural network can be trained to detect pedestrians, cars, stop signs, and traffic lights simultaneously.
+
+\subsubsection*{Key Concepts of Multi-task Learning}
+\begin{itemize}
+    \item \textbf{Multiple Labels}: Each input image in MTL can have multiple labels. For instance, an image of a car and a stop sign will have both labels, instead of just one (like in softmax regression).
+    \item \textbf{Loss Function}: In MTL, the loss function is computed for each individual task (e.g., pedestrian, car, stop sign, traffic light), and the final loss is the sum of these individual losses.
+    \item \textbf{Shared Features}: The network benefits from shared low-level features across tasks. For example, recognizing cars, pedestrians, and stop signs may use similar visual features. This helps improve the overall performance by leveraging shared information.
+    \item \textbf{Handling Missing Labels}: MTL can handle missing labels in some images, as it only sums over the labels that are available for each task, ignoring missing values.
+\end{itemize}
+
+\subsubsection*{When Does MTL Make Sense?}
+\begin{itemize}[nosep]
+    \item \textbf{Shared Low-Level Features}: MTL is beneficial when the tasks share common features. For example, detecting traffic-related objects (cars, pedestrians, traffic lights) likely shares common visual features.
+    \item \textbf{Data Volume Balance}: MTL works well when the tasks have similar amounts of training data. If some tasks have less data, MTL can leverage the larger data sets from other tasks to improve performance.
+    \item \textbf{Network Size}: For MTL to work effectively, a sufficiently large neural network is needed to handle all the tasks simultaneously. If the network is too small, it might not be able to learn all tasks properly, which could hurt performance compared to training separate networks for each task.
+\end{itemize}
+
+\subsubsection*{Benefits of MTL}
+\begin{itemize}[nosep]
+    \item \textbf{Improved Performance}: MTL can outperform training separate networks for each task by sharing learned features, especially when the tasks are related.
+    \item \textbf{Efficiency}: Instead of training multiple networks, MTL allows you to train a single model that solves several problems.
+\end{itemize}
+
+\subsubsection*{Applications}
+MTL is particularly effective in domains like \textbf{computer vision}, where multiple related tasks, such as object detection (e.g., cars, pedestrians, and traffic signs), can be tackled by a single neural network. While transfer learning is more widely used due to its applicability in situations with small data sets, MTL is a powerful tool when the problem involves multiple related tasks.
+
+% ---------------- End-to-End Deep Learning ----------------------%
+\subsection{End-to-End Deep Learning}
+\subsection*{What is End-to-end Deep Learning}
+End-to-end deep learning refers to training a single neural network to handle all stages of a traditional multi-stage processing pipeline. In many domains, like speech recognition and machine translation, deep learning systems now aim to replace traditional feature extraction and processing steps with a single, unified model.
+
+\subsubsection*{Traditional Systems vs. End-to-End Deep Learning}
+In traditional machine learning systems, multiple stages of processing are involved. For example, in speech recognition, the process often includes:
+\begin{itemize}[nosep]
+    \item Feature extraction (e.g., MFCC for audio).
+    \item Phoneme detection.
+    \item Stringing phonemes to form words.
+    \item Generating a transcript.
+\end{itemize}
+
+End-to-end deep learning simplifies this by directly mapping the input (e.g., an audio clip) to the output (e.g., a transcript) through a single neural network. This eliminates the need for feature extraction and multiple intermediate stages.
+
+\subsubsection*{Challenges of End-to-End Learning}
+End-to-end deep learning is powerful but requires a large amount of data to be effective. For example, in speech recognition, traditional systems may work better with smaller datasets, while the end-to-end approach excels only when vast datasets (e.g., 10,000 to 100,000 hours of audio) are available. Additionally, intermediate approaches, like learning phonemes before learning full words, can be useful in cases with medium-sized datasets.
+
+\subsubsection*{Example: Face Recognition System}
+A face recognition turnstile system is a good example of when end-to-end learning is not ideal. A traditional multi-step approach works better here:
+\begin{itemize}[nosep]
+    \item \textbf{Step 1:} Use face detection algorithms to locate the face in the image.
+    \item \textbf{Step 2:} Crop and center the detected face, then feed it into a neural network for identity recognition.
+\end{itemize}
+
+This approach is more effective because each step is simpler and has more labeled data available. For instance, there is abundant labeled data for face detection, and companies have millions of images for identity verification tasks.
+
+\subsection*{Comparison with End-to-End Learning in Other Applications}
+\subsubsection{Machine Translation}
+End-to-end deep learning works well for machine translation because large datasets of paired sentences (e.g., English and French) are readily available, enabling the direct mapping from one language to another.
+
+\subsubsection{Estimating Child's Age from X-rays}
+For tasks like estimating the age of a child from an X-ray, a non-end-to-end approach (multi-step) may perform better. In this case:
+\begin{itemize}[nosep]
+    \item \textbf{Step 1:} Segment the X-ray to identify bones.
+    \item \textbf{Step 2:} Use bone length statistics from a database to estimate age.
+\end{itemize}
+This two-step process works better because the tasks are simpler and sufficient data for each step is available, whereas end-to-end learning would require significantly more data to directly map an X-ray to an age.
+
+End-to-end deep learning offers a simplified system that eliminates the need for hand-designed features and multiple processing steps. However, it is not a one-size-fits-all solution. It works best when large amounts of data are available. In cases where data is limited or tasks are complex, a multi-step approach might be more effective.
+
+\subsection*{Whether to use End-to-end Deep Learning}
+End-to-end deep learning can be a powerful method for certain machine learning tasks, but it comes with both benefits and limitations. Here's an overview to guide decision-making:
+\subsubsection*{Benefits and Drawbacks of End-to-end deep learning}
+\textbf{Benefits:}
+\begin{enumerate}
+    \item \textbf{Data-Driven}: End-to-end learning allows the data to determine the best function mapping from input (\(X\)) to output (\(Y\)). The neural network learns the most appropriate representations without human-imposed structures.
+    \begin{itemize}
+        \item \textit{Example}: In speech recognition, phonemes (human-defined units of sound) may not be the best representation. Letting the model learn its own representation can lead to better performance.
+    \end{itemize}
+    \item \textbf{Less Hand Design}: It minimizes the need for manual feature engineering or designing intermediate components, simplifying the workflow.
+\end{enumerate}
+
+\textbf{Drawbacks}
+\begin{enumerate}
+    \item \textbf{Data Hungry}: This approach requires a large amount of data to learn the complex function from \(X\) to \(Y\). If data is sparse, it may be harder for the model to capture the necessary patterns.
+    \begin{itemize}
+        \item \textit{Example}: Tasks like face recognition might have enough data for \(X\) (input image) and \(Y\) (identified face), but other tasks may not.
+    \end{itemize}
+    \item \textbf{Excludes Hand-Designed Components}: While hand-designed components can inject valuable knowledge into a model (especially when data is limited), end-to-end learning doesn't use these components, potentially losing out on human expertise that could improve performance in small datasets.
+\end{enumerate}
+
+To decide whether an end-to-end approach is suitable, consider whether you have sufficient data to support learning the required complexity from \(X\) to \(Y\). If the task is relatively simple (e.g., recognizing faces), end-to-end learning can work well with less data. But for more complex tasks (e.g., predicting age from an image), it may require more data.
+
+For example, in autonomous driving:
+\begin{itemize}
+    \item \textbf{Deep Learning} can detect objects (cars, pedestrians) from sensor inputs (images, lidar).
+    \item \textbf{Motion Planning} (non-deep learning) is needed to decide the car’s route and how to execute the steering, acceleration, and braking commands.
+\end{itemize}
+Thus, while deep learning can work for detection, motion planning and control are better served by specialized algorithms.
+
+End-to-end deep learning is promising for many applications, but it is not a one-size-fits-all solution. If data is abundant and the task can be learned directly, end-to-end learning is effective. However, combining deep learning with other techniques often yields better results, especially in cases of limited data or high complexity.
 
 
 \end{document}
