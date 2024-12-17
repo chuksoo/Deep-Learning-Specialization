@@ -2794,6 +2794,111 @@ Thus, while deep learning can work for detection, motion planning and control ar
 
 End-to-end deep learning is promising for many applications, but it is not a one-size-fits-all solution. If data is abundant and the task can be learned directly, end-to-end learning is effective. However, combining deep learning with other techniques often yields better results, especially in cases of limited data or high complexity.
 
+% ---------------- Chapter 4. Convolutional Neural Networks ----------------------%
+\chapter{Convolutional Neural Networks} \label{ch:4}
+% ---------------- Foundations of Convolutional Neural Networks ----------------------%
+\section{Foundations of Convolutional Neural Networks}
+% ---------------- Computer Vision ----------------------%
+\subsection{Computer Vision}
+Computer Vision has advanced rapidly thanks to Deep Learning. Some of the applications of Deep Learning Computer Vision are: 
+    \begin{itemize}[nosep]
+        \item Self-driving cars: Detecting other cars and pedestrians to avoid collisions.
+        \item Face recognition: Unlocking phones or doors using facial recognition.
+        \item Photo applications: Selecting attractive and relevant pictures using deep learning.
+        \item Art generation: Enabling new types of artwork through neural networks.
+    \end{itemize}
+
+We focus on Computer Vision because:
+    \begin{enumerate}
+        \item New applications are being invented that were impossible a few years ago.
+        \item Computer vision inspires ideas and architectures in other fields, such as speech recognition.
+    \end{enumerate}
+
+Some example of Computer Vision Problems include:
+\begin{enumerate}[nosep]
+    \item Image Classification (Image Recognition):
+    \begin{itemize}
+        \item Input: 64x64 images.
+        \item Example: Predict if an image contains a cat.
+    \end{itemize}
+
+    \item Object Detection:
+    \begin{itemize}
+        \item Goal: Detect objects in an image and determine their positions.
+        \item Example: In self-driving cars, identify other cars and draw bounding boxes around them.
+        \item Multiple objects can exist in a single image.
+    \end{itemize}
+
+    \item Neural Style Transfer:
+    \begin{itemize}
+        \item Combine a \textbf{content image} and a \textbf{style image} to generate a new image.
+        \item Example: Repainting an image in Picasso's style using a neural network.
+    \end{itemize}
+\end{enumerate}
+
+One of the challenges in Computer Vision is that the input can get really big.
+\begin{enumerate}
+    \item High Dimensional Input:
+    \begin{itemize}
+        \item Images have large dimensions due to pixel count and RGB color channels.
+        \item Example:
+        \begin{itemize}
+            \item 64x64x3 image $\rightarrow$ 12,288 input features.
+            \item 1000x1000x3 image $\rightarrow$ 3 million input features.
+        \end{itemize}
+    \end{itemize}
+
+    \item Fully Connected Neural Networks:
+    \begin{itemize}
+        \item Large input dimensions combined with hidden layers lead to massive weight matrices.
+        \item Example:
+        \begin{itemize}
+            \item For input $X \in \mathbb{R}^{3,000,000}$ and 1000 hidden units: \\
+            $W_1 \text{ (weight matrix)} \in \mathbb{R}^{1000 \times 3,000,000} \implies \text{3 billion parameters}.$
+        \end{itemize}
+        \item Issues:
+        \begin{itemize}
+            \item Overfitting due to insufficient data.
+            \item Computational and memory constraints.
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+To efficiently work with large images, implement the \textbf{Convolution Operation}. Convolution is the fundamental building block of \textbf{Convolutional Neural Networks (CNNs)}.
+
+% ---------------- Edge Detection ----------------------%
+\subsection{Edge Detection}
+
+% ---------------- Padding ----------------------%
+\subsection{Padding}
+% ---------------- Convolution ----------------------%
+\subsection{Convolution}
+
+
+% ---------------- Deep Convolutional Models ----------------------%
+\section{Deep Convolutional Models: Case Studeis}
+
+% ---------------- Case Studies ----------------------%
+\subsection{Case Studies}
+% ---------------- Classic Networks ----------------------%
+\subsection*{Classic Networks}
+
+% ---------------- ResNets ----------------------%
+\subsection*{ResNets}
+% ---------------- MobileNet ----------------------%
+\subsection*{MobileNet}
+% ---------------- EfficientNet ----------------------%
+\subsection*{EfficientNet}
+
+
+% ---------------- Practical Advice for Using ConvNets ----------------------%
+\subsection{Practical Advice for Using ConvNets}
+% ---------------- Using Open-Source Implementation ----------------------%
+\subsection*{Using Open-Source Implementation}
+% ---------------- Transfer Leraning ----------------------%
+\subsection*{Transfer Leraning}
+% ---------------- Data Augmentation ----------------------%
+\subsection*{Data Augmentation}
 
 \end{document}
 
