@@ -16,6 +16,7 @@
 \usepackage{multirow}
 \usepackage{siunitx} % delete this
 \usepackage{booktabs}
+\usetikzlibrary{matrix,positioning,fit,backgrounds,intersections}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -2864,10 +2865,490 @@ One of the challenges in Computer Vision is that the input can get really big.
     \end{itemize}
 \end{enumerate}
 
-To efficiently work with large images, implement the \textbf{Convolution Operation}. Convolution is the fundamental building block of \textbf{Convolutional Neural Networks (CNNs)}.
+To efficiently work with large images, implement the \textbf{Convolution Operation}. The Convolution Operation is the fundamental building block of Convolutional Neural Networks (CNNs).
 
 % ---------------- Edge Detection ----------------------%
 \subsection{Edge Detection}
+\textbf{Edge detection} is a motivating example to understand convolution. Earlier layers of a neural network might detect edges, while later layers can detect parts of objects and eventually complete objects like faces. \textbf{Fig. \ref{fig:20}} shows the layers of neural network edge detection from detection by earlier layers to detection by later layers.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Edge Detection Example.png}
+	\caption{Edge Detection Example}
+	\label{fig:20}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Edge Detection Example}
+\begin{itemize}
+    \item Given an image:
+    \begin{itemize}[nosep]
+        \item The first step may involve detecting \textbf{vertical edges}.
+        \item Similarly, \textbf{horizontal edges} can also be detected.
+    \end{itemize}
+\end{itemize}
+
+To detect edges in an image:
+\begin{itemize}
+    \item Consider a \textbf{6x6 grayscale image} (a 6x6x1 matrix).
+    \[
+    \text{Image} = 
+    \begin{bmatrix}
+    3 & 0 & 1 & 2 & 7 & 4 \\
+    1 & 5 & 8 & 9 & 3 & 1 \\
+    2 & 7 & 2 & 5 & 1 & 3 \\
+    0 & 1 & 3 & 1 & 7 & 8 \\
+    4 & 2 & 1 & 6 & 2 & 8 \\
+    2 & 4 & 5 & 2 & 3 & 9 
+    \end{bmatrix}
+    \]
+    \item A \textbf{3x3 filter (kernel)} is defined as:
+    \[
+    \text{Filter} = 
+    \begin{bmatrix}
+    1 & 1 & 1 \\
+    0 & 0 & 0 \\
+    -1 & -1 & -1
+    \end{bmatrix}
+    \]
+    \item This filter will detect \textbf{vertical edges}.
+    \item The convolution operation, denoted by the symbol $*$, is applied:
+    \[
+    \text{Output} = \text{Image} * \text{Filter}.
+    \]
+\end{itemize}
+
+In the Convolution Process:
+\begin{enumerate}[nosep]
+    \item The 3x3 filter is placed over a 3x3 region of the input image.
+    \item The \textbf{element-wise product} of corresponding values is computed and summed to obtain a single value.
+    \item The filter shifts (or slides) across the image to compute all elements of the output matrix.
+    \item For a 6x6 input convolved with a 3x3 filter, the output is a \textbf{4x4 matrix}.
+\end{enumerate}
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=1.8em, minimum height=1.8em, anchor=center}] {
+ |[fill=yellow!30]| 3 & |[fill=yellow!30]| 0 & |[fill=yellow!30]| 1 & 2 & 7 & 4 \\
+ |[fill=yellow!30]| 1 & |[fill=yellow!30]| 5 & |[fill=yellow!30]| 8 & 9 & 3 & 1 \\
+ |[fill=yellow!30]| 2 & |[fill=yellow!30]| 7 & |[fill=yellow!30]| 2 & 5 & 1 & 3 \\
+0 & 1 & 3 & 1 & 7 & 8 \\
+4 & 2 & 1 & 6 & 2 & 8 \\
+2 & 4 & 5 & 2 & 3 & 9 \\
+};
+\node[below=of mtr-5-4] {$\mathbf{6 \times 6}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, nodes={draw, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=of K-3-2] {$\mathbf{3 \times 3}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[draw=green,fill=green!30]| -5 & -4 & 0 & 8 \\
+-10 & -2 & 2 & 3 \\
+0 & -2 & -4 & -7 \\
+-3 & -2 & -3 & -16 \\
+};
+\node[below=of O-4-3] {$\mathbf{4 \times 4}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-1-3.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-3-3.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-1-1.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-1-1.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1, 2,3} { % Rows of filter
+    \foreach \j in {1,2,3} { % Columns of filter
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\i-\j) {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+For the given image and filter above:
+\begin{itemize}[nosep]
+    \item First position: The filter is placed on the top-left 3x3 region. 
+    \item Compute the element-wise product and sum:
+    \[
+    3 \cdot 1 + 1 \cdot 1 + 2 \cdot 1 + 0 \cdot 0 + 5 \cdot 0 + 7 \cdot 0 + 1 \cdot (-1) + 8 \cdot (-1) + 2 \cdot (-1) = -5.
+    \]
+    \item The value \(-5\) is placed in the top-left corner of the output matrix.
+    \item Repeat this process by shifting the filter one step to the right.
+\end{itemize}
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=1.8em, minimum height=1.8em, anchor=center}] {
+3 & |[fill=orange!30]| 0 & |[fill=orange!30]| 1 & |[fill=orange!30]| 2 & 7 & 4 \\
+1 & |[fill=orange!30]| 5 & |[fill=orange!30]| 8 & |[fill=orange!30]| 9 & 3 & 1 \\
+2 & |[fill=orange!30]| 7 & |[fill=orange!30]| 2 & |[fill=orange!30]| 5 & 1 & 3 \\
+0 & 1 & 3 & 1 & 7 & 8 \\
+4 & 2 & 1 & 6 & 2 & 8 \\
+2 & 4 & 5 & 2 & 3 & 9 \\
+};
+\node[below=of mtr-5-4] {$\mathbf{I}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, nodes={draw, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=of K-3-2] {$\mathbf{K}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[draw=green, fill=green!30]| -5 &  |[draw=brown, fill=brown!30]| -4 & 0 & 8 \\
+-10 & -2 & 2 & 3 \\
+0 & -2 & -4 & -7 \\
+-3 & -2 & -3 & -16 \\
+};
+\node[below=of O-4-3] {$\mathbf{I * K}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-1-4.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-3-4.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-1-2.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-1-2.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1,2,3} { % Rows of the filter
+    \foreach \j in {1,2,3} { % Columns of the filter
+        % Properly compute indices with numerical expression
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\the\numexpr\i\relax-\the\numexpr\j+1\relax) 
+        {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+\begin{itemize}[nosep]
+    \item At the second position, we compute the element-wise product and sum:
+    \[
+    0 \cdot 1 + 5 \cdot 1 + 7 \cdot 1 + 1 \cdot 0 + 8 \cdot 0 + 2 \cdot 0 + 2 \cdot (-1) + 9 \cdot (-1) + 5 \cdot (-1) = -4.
+    \]
+    \item The value \(-4\) is placed in the first row-second column corner of the output matrix.
+    \item Repeat this process by shifting the filter one step to the right.
+\end{itemize}
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=1.8em, minimum height=1.8em, anchor=center}] {
+3 & 0 & |[fill=red!30]| 1 & |[fill=red!30]| 2 &|[fill=red!30]|  7 & 4 \\
+1 & 5 & |[fill=red!30]| 8 & |[fill=red!30]| 9 &|[fill=red!30]|  3 & 1 \\
+2 & 7 & |[fill=red!30]| 2 & |[fill=red!30]| 5 &|[fill=red!30]|  1 & 3 \\
+0 & 1 & 3 & 1 & 7 & 8 \\
+4 & 2 & 1 & 6 & 2 & 8 \\
+2 & 4 & 5 & 2 & 3 & 9 \\
+};
+\node[below=of mtr-5-4] {$\mathbf{I}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, nodes={draw, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=of K-3-2] {$\mathbf{K}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[draw=green, fill=green!30]| -5 &  |[draw=brown, fill=brown!30]| -4 &  |[draw=violet, fill=violet!30]| 0 & 8 \\
+-10 & -2 & 2 & 3 \\
+0 & -2 & -4 & -7 \\
+-3 & -2 & -3 & -16 \\
+};
+\node[below=of O-4-3] {$\mathbf{I * K}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-1-5.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-3-5.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-1-3.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-1-3.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1,2,3} { % Rows of the filter
+    \foreach \j in {1,2,3} { % Columns of the filter
+        % Properly compute indices with numerical expression
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\the\numexpr\i\relax-\the\numexpr\j+2\relax) 
+        {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+\begin{itemize}[nosep]
+    \item At the third position, we compute the element-wise product and sum:
+    \[
+    1 \cdot 1 + 8 \cdot 1 + 2 \cdot 1 + 2 \cdot 0 + 9 \cdot 0 + 5 \cdot 0 + 7 \cdot (-1) + 3 \cdot (-1) + 1 \cdot (-1) = 0.
+    \]
+    \item The value \(0\) is placed in the first row-third column corner of the output matrix.
+    \item Repeat this process by shifting the filter one step to the right.
+\end{itemize}
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=1.8em, minimum height=1.8em, anchor=center}] {
+3 & 0 &  1 & |[fill=green!30]| 2 &|[fill=green!30]|  7 &  |[fill=green!30]|4 \\
+1 & 5 &  8 & |[fill=green!30]| 9 &|[fill=green!30]|  3 & |[fill=green!30]| 1 \\
+2 & 7 & 2 & |[fill=green!30]| 5 &|[fill=green!30]|  1 & |[fill=green!30]| 3 \\
+0 & 1 & 3 & 1 & 7 & 8 \\
+4 & 2 & 1 & 6 & 2 & 8 \\
+2 & 4 & 5 & 2 & 3 & 9 \\
+};
+\node[below=of mtr-5-4] {$\mathbf{I}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, nodes={draw, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=of K-3-2] {$\mathbf{K}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[draw=green, fill=green!30]| -5 &  |[draw=brown, fill=brown!30]| -4 &  |[draw=violet, fill=violet!30]| 0 & |[draw=teal, fill=teal!30]|  8 \\
+-10 & -2 & 2 & 3 \\
+0 & -2 & -4 & -7 \\
+-3 & -2 & -3 & -16 \\
+};
+\node[below=of O-4-3] {$\mathbf{I * K}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-1-6.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-3-6.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-1-4.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-1-4.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1,2,3} { % Rows of the filter
+    \foreach \j in {1,2,3} { % Columns of the filter
+        % Properly compute indices with numerical expression
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\the\numexpr\i\relax-\the\numexpr\j+3\relax) 
+        {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+\begin{itemize}[nosep]
+    \item At the fourth position, we compute the element-wise product and sum:
+    \[
+    2 \cdot 1 + 9 \cdot 1 + 5 \cdot 1 + 7 \cdot 0 + 3 \cdot 0 + 1 \cdot 0 + 4 \cdot (-1) + 1 \cdot (-1) + 3 \cdot (-1) = 8.
+    \]
+    \item The value \(8\) is placed in the first row-third column corner of the output matrix.
+    \item Repeat this process by shifting the filter one step downward to the left-most 3x3 region.
+\end{itemize}
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=1.8em, minimum height=1.8em, anchor=center}] {
+3 & 0 &  1 & 2 & 7 & 4 \\
+ |[fill=violet!30]| 1 & |[fill=violet!30]|  5 & |[fill=violet!30]|  8 & 9 & 3 & 1 \\
+|[fill=violet!30]| 2 & |[fill=violet!30]| 7 &  |[fill=violet!30]| 2 & 5 & 1 & 3 \\
+|[fill=violet!30]| 0 & |[fill=violet!30]| 1 & |[fill=violet!30]|  3 & 1 & 7 & 8 \\
+4 & 2 & 1 & 6 & 2 & 8 \\
+2 & 4 & 5 & 2 & 3 & 9 \\
+};
+\node[below=of mtr-5-4] {$\mathbf{I}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, nodes={draw, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=of K-3-2] {$\mathbf{K}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[draw=green, fill=green!30]| -5 &  |[draw=brown, fill=brown!30]| -4 &  |[draw=violet, fill=violet!30]| 0 & |[draw=teal, fill=teal!30]|  8 \\
+|[draw=purple, fill=purple!30]| -10 & -2 & 2 & 3 \\
+0 & -2 & -4 & -7 \\
+-3 & -2 & -3 & -16 \\
+};
+\node[below=of O-4-3] {$\mathbf{I * K}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-2-3.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-4-3.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-2-1.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-2-1.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1,2,3} { % Rows of the filter
+    \foreach \j in {1,2,3} { % Columns of the filter
+        % Properly compute indices with numerical expression
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\the\numexpr\i+1\relax-\the\numexpr\j\relax) 
+        {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+\begin{itemize}[nosep]
+    \item At the fifth position, we compute the element-wise product and sum:
+    \[
+    1 \cdot 1 + 2 \cdot 1 + 0 \cdot 1 + 5 \cdot 0 + 7 \cdot 0 + 1 \cdot 0 + 8 \cdot (-1) + 2 \cdot (-1) + 3 \cdot (-1) = -10.
+    \]
+    \item The value \(-10\) is placed in the second row-first column corner of the output matrix.
+    \item Repeat this process by shifting the filter one step to the left and so on.
+\end{itemize}
+
+Convolution detects Edges because:
+\begin{itemize}
+    \item Consider a simple 6x6 image where:
+    \begin{itemize}
+        \item The left half has pixel values of 10.
+        \item The right half has pixel values of 0.
+    \end{itemize}
+    \item The 3x3 filter detects the \textbf{vertical edge} separating the two halves:
+    \[
+    \text{Left: Bright pixels, Middle: Zero, Right: Dark pixels}.
+    \]
+    \item The output matrix will highlight the edge as a \textbf{bright vertical line}.
+\end{itemize}
+
+\section*{Intuition for Vertical Edge Detection}
+\begin{itemize}
+    \item A vertical edge occurs where there are bright pixels on the left and dark pixels on the right.
+    \item The convolution operation captures this pattern effectively:
+    \begin{itemize}
+        \item Bright pixels on the left produce positive values.
+        \item Dark pixels on the right produce negative values.
+    \end{itemize}
+    \item This difference highlights the vertical edge in the output matrix.
+\end{itemize}
+
+The \textbf{convolution operation} provides a systematic way to detect edges in an image.Vertical and horizontal edge detection are foundational concepts for building Convolutional Neural Networks (CNNs).
+
+
+% More Edge Detection
+The convolution operation can implement edge detection filters. This note explores:
+\begin{itemize}
+    \item Positive and negative edge detection (light-to-dark vs.~dark-to-light transitions).
+    \item Different edge detectors, such as vertical and horizontal filters.
+    \item Learning edge detection filters through backpropagation rather than hand-coding.
+\end{itemize}
+
+\section{Vertical Edge Detection Example}
+\begin{itemize}
+    \item A vertical edge detection filter detects transitions from bright to dark regions (light-to-dark).
+    \item If the image colors are flipped (dark-to-light), the output is a negative value.
+    \item Taking the absolute value of the output removes the distinction between edge direction.
+\end{itemize}
+
+\section{Horizontal Edge Detection}
+\begin{itemize}
+    \item A horizontal edge detection filter detects transitions between bright pixels on top and dark pixels below.
+    \item Example:
+    \begin{itemize}
+        \item Positive edge: bright pixels on top and dark on the bottom.
+        \item Negative edge: dark pixels on top and bright on the bottom.
+    \end{itemize}
+    \item Intermediate values occur due to blending positive and negative edges in small images (e.g., $6 \times 6$).
+\end{itemize}
+
+\section{Sobel and Scharr Filters}
+\begin{itemize}
+    \item The \textbf{Sobel filter} enhances robustness by emphasizing the center row:
+    \[
+    \begin{bmatrix}
+    1 & 2 & 1 \\
+    0 & 0 & 0 \\
+    -1 & -2 & -1
+    \end{bmatrix}
+    \]
+    \item The \textbf{Scharr filter} uses different weights for improved performance:
+    \[
+    \begin{bmatrix}
+    3 & 10 & 3 \\
+    0 & 0 & 0 \\
+    -3 & -10 & -3
+    \end{bmatrix}
+    \]
+    \item Flipping these filters by $90^\circ$ produces horizontal edge detectors.
+\end{itemize}
+
+\section{Learning Filters with Backpropagation}
+\begin{itemize}
+    \item Instead of hand-coding filters, deep learning allows learning filters as parameters through backpropagation.
+    \item The $3 \times 3$ filter values are treated as parameters to optimize.
+    \item Neural networks can learn:
+    \begin{itemize}
+        \item Vertical, horizontal, and diagonal edges.
+        \item Complex features beyond predefined filters.
+    \end{itemize}
+    \item Example: Neural networks can learn edges at arbitrary angles (e.g., $45^\circ$, $70^\circ$).
+\end{itemize}
+
+\section{Key Idea}
+The convolution operation enables backpropagation to learn any filter that detects relevant features in an image, such as edges, by applying it across the entire image.
 
 % ---------------- Padding ----------------------%
 \subsection{Padding}
