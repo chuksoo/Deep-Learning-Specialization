@@ -3260,51 +3260,53 @@ For the given image and filter above:
     \item Repeat this process by shifting the filter one step to the left and so on.
 \end{itemize}
 
-Convolution detects Edges because:
-\begin{itemize}
-    \item Consider a simple 6x6 image where:
-    \begin{itemize}
+Consider a simple 6x6 image in  \textbf{Fig. \ref{fig:21}} where:
+    \begin{itemize}[nosep]
         \item The left half has pixel values of 10.
         \item The right half has pixel values of 0.
+        \item Plotting as an image gives a left half that denotes brighter pixel intensive values and the right half gives you darker pixel intensive values
     \end{itemize}
-    \item The 3x3 filter detects the \textbf{vertical edge} separating the two halves:
+The 3x3 filter detects the \textbf{vertical edge} separating the two halves:
     \[
     \text{Left: Bright pixels, Middle: Zero, Right: Dark pixels}.
     \]
-    \item The output matrix will highlight the edge as a \textbf{bright vertical line}.
-\end{itemize}
+The output matrix will highlight the edge as a \textbf{bright vertical line}.
 
-\section*{Intuition for Vertical Edge Detection}
-\begin{itemize}
-    \item A vertical edge occurs where there are bright pixels on the left and dark pixels on the right.
-    \item The convolution operation captures this pattern effectively:
-    \begin{itemize}
+% Figure 21
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Vertical Edge Detection Examples.png}
+	\caption{Vertical Edge Detection Examples}
+	\label{fig:21}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Vertical and Horizontal Edge Detection Example}
+There are different edge detectors, such as vertical and horizontal filters shown in \textbf{Fig. \ref{fig:22}}. Other types of filter includes Sobel and Scharr filters. A vertical edge occurs where there are bright pixels on the left and dark pixels on the right. The convolution operation captures this pattern effectively:
+    \begin{itemize}[nosep]
         \item Bright pixels on the left produce positive values.
         \item Dark pixels on the right produce negative values.
+        \item Positive and negative edge detection (light-to-dark vs.~dark-to-light transitions).
     \end{itemize}
-    \item This difference highlights the vertical edge in the output matrix.
-\end{itemize}
 
-The \textbf{convolution operation} provides a systematic way to detect edges in an image.Vertical and horizontal edge detection are foundational concepts for building Convolutional Neural Networks (CNNs).
+% Figure 22
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.65\textwidth]{Images/Vertical and Horizontal Edge Detection.png}
+	\caption{Vertical and Horizontal Edge Detection}
+	\label{fig:22}
+\end{figure}
+\FloatBarrier
 
-
-% More Edge Detection
-The convolution operation can implement edge detection filters. This note explores:
-\begin{itemize}
-    \item Positive and negative edge detection (light-to-dark vs.~dark-to-light transitions).
-    \item Different edge detectors, such as vertical and horizontal filters.
-    \item Learning edge detection filters through backpropagation rather than hand-coding.
-\end{itemize}
-
-\section{Vertical Edge Detection Example}
-\begin{itemize}
+\subsubsection{Vertical Edge Detection Example}
+\begin{itemize}[nosep]
     \item A vertical edge detection filter detects transitions from bright to dark regions (light-to-dark).
     \item If the image colors are flipped (dark-to-light), the output is a negative value.
     \item Taking the absolute value of the output removes the distinction between edge direction.
 \end{itemize}
 
-\section{Horizontal Edge Detection}
-\begin{itemize}
+\subsubsection{Horizontal Edge Detection}
+\begin{itemize}[nosep]
     \item A horizontal edge detection filter detects transitions between bright pixels on top and dark pixels below.
     \item Example:
     \begin{itemize}
@@ -3313,32 +3315,40 @@ The convolution operation can implement edge detection filters. This note explor
     \end{itemize}
     \item Intermediate values occur due to blending positive and negative edges in small images (e.g., $6 \times 6$).
 \end{itemize}
+The \textbf{convolution operation} provides a systematic way to detect edges in an image.Vertical and horizontal edge detection are foundational concepts for building Convolutional Neural Networks (CNNs).
 
-\section{Sobel and Scharr Filters}
+\subsubsection{Sobel and Scharr Filters}
 \begin{itemize}
-    \item The \textbf{Sobel filter} enhances robustness by emphasizing the center row:
+    \item The \textbf{Sobel filter} enhances robustness by emphasizing the center row.  It puts a little bit more weight to the central row, the central pixel, and this makes it maybe a little bit more robust.
     \[
     \begin{bmatrix}
-    1 & 2 & 1 \\
-    0 & 0 & 0 \\
-    -1 & -2 & -1
+    1 & 0 & -1 \\
+    2 & 0 & -2 \\
+    1 & 0 & -1
     \end{bmatrix}
     \]
     \item The \textbf{Scharr filter} uses different weights for improved performance:
     \[
     \begin{bmatrix}
-    3 & 10 & 3 \\
-    0 & 0 & 0 \\
-    -3 & -10 & -3
+    3 & 0 & -3 \\
+    10 & 0 & -10 \\
+    3 & 0 & -3
     \end{bmatrix}
     \]
     \item Flipping these filters by $90^\circ$ produces horizontal edge detectors.
 \end{itemize}
 
-\section{Learning Filters with Backpropagation}
+\subsubsection*{Learning Filters with Backpropagation}
 \begin{itemize}
     \item Instead of hand-coding filters, deep learning allows learning filters as parameters through backpropagation.
     \item The $3 \times 3$ filter values are treated as parameters to optimize.
+    \[
+    \begin{bmatrix}
+    w_1 & w_2 & w_3 \\
+    w_4 & w_5 & w_6 \\
+    w_7 & w_8 & w_9
+    \end{bmatrix}
+    \]
     \item Neural networks can learn:
     \begin{itemize}
         \item Vertical, horizontal, and diagonal edges.
@@ -3346,18 +3356,473 @@ The convolution operation can implement edge detection filters. This note explor
     \end{itemize}
     \item Example: Neural networks can learn edges at arbitrary angles (e.g., $45^\circ$, $70^\circ$).
 \end{itemize}
-
-\section{Key Idea}
 The convolution operation enables backpropagation to learn any filter that detects relevant features in an image, such as edges, by applying it across the entire image.
 
 % ---------------- Padding ----------------------%
-\subsection{Padding}
+\subsection{Padding in Convolutional Neural Networks}
+
+Padding is used in convolutional operations to address two main problems:
+\begin{enumerate}
+    \item Shrinking of the image size after each convolution.
+    \item Loss of information from the edges of the image.
+\end{enumerate}
+
+% Figure 23
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Padding.png}
+	\caption{Padding in Convolutional Neural Networks}
+	\label{fig:23}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Convolution Without Padding}
+When convolving an \(n \times n\) image with an \(f \times f\) filter, the output size is:
+\[
+\text{Output Size} = (n - f + 1) \times (n - f + 1).
+\]
+A \(6 \times 6\) image convolved with a \(3 \times 3\) filter results in a \(4 \times 4\) output.
+
+The downsides of Convolution without padding is that:
+\begin{enumerate}[nosep]
+    \item The image size reduces with each convolution, which is problematic in deep networks.
+    \item Edge pixels are used less frequently in the output, leading to information loss at the boundaries.
+\end{enumerate}
+
+To avoid this, we add padding to the image. Padding involves adding a border of pixels (typically zero-valued) around the image to preserve its size after convolution.
+
+The formula for the output size with padding is:
+\[
+\text{Output Size} = (n + 2p - f + 1) \times (n + 2p - f + 1),
+\]
+where \(p\) is the padding amount.
+
+\textbf{Example:}
+\begin{itemize}[nosep]
+    \item A \(6 \times 6\) image padded with \(p = 1\) becomes an \(8 \times 8\) image.
+    \item Convolving this \(8 \times 8\) image with a \(3 \times 3\) filter results in a \(6 \times 6\) output, preserving the original image size.
+\end{itemize}
+
+\subsubsection*{Types of Convolutions}
+\begin{enumerate}
+    \item \textbf{Valid Convolution:} No padding (\(p = 0\)).
+    \[
+    \text{Output Size} = (n - f + 1) \times (n - f + 1).
+    \]
+
+    \item \textbf{Same Convolution:} Padding is applied to ensure the output size is the same as the input size. The padding is calculated as:
+    \[
+    p = \frac{f - 1}{2}.
+    \]
+    \textbf{Examples:}
+    \begin{itemize}[nosep]
+        \item For a \(3 \times 3\) filter (\(f = 3\)), \(p = 1\).
+        \item For a \(5 \times 5\) filter (\(f = 5\)), \(p = 2\).
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Why Filters are Usually Odd-Sized}
+Odd-sized filters (e.g., \(3 \times 3\), \(5 \times 5\)) are preferred because:
+\begin{enumerate}[nosep]
+    \item They ensure symmetric padding, avoiding uneven padding on different sides.
+    \item They have a central pixel, making it easier to define the filter’s position.
+\end{enumerate}
+
+\subsubsection*{Padding in Practice}
+To specify padding for your convolution operation, you can:
+\begin{enumerate}
+    \item Explicitly set the padding value (\(p\)).
+    \item Use predefined options:
+    \begin{itemize}
+        \item \textbf{Valid Convolution:} \(p = 0\).
+        \item \textbf{Same Convolution:} Automatically pads to maintain input size.
+    \end{itemize}
+\end{enumerate}
+
+Odd-sized filters (e.g., \(3 \times 3\), \(5 \times 5\)) are recommended for compatibility with common conventions in computer vision.
+
 % ---------------- Convolution ----------------------%
 \subsection{Convolution}
+\subsection*{Strided Convolutions}
+Stride convolutions are a fundamental concept in convolutional neural networks (CNNs). The stride determines how the convolutional filter moves across the input image during the convolution operation.
+
+\textbf{Example with a Stride of 2} \\
+Suppose you have a $7 \times 7$ image and a $3 \times 3$ filter. Instead of shifting the filter one step at a time (as in standard convolution), you move it \textbf{two steps} at a time (stride $s = 2$).
+
+\begin{enumerate}
+    \item Perform the element-wise product in the upper-left $3 \times 3$ region of the image, sum the values, and store the result (e.g., $91$).
+    \item Move the filter \textbf{two steps to the right} (instead of one). Compute the next output (e.g., $100$).
+    \item Repeat this process across the entire row.
+    \item When moving to the next row, \textbf{step down by two rows} instead of one and repeat the process.
+\end{enumerate}
+
+\textbf{Result:} Convolving a $7 \times 7$ image with a $3 \times 3$ filter using a stride of $2$ results in a $3 \times 3$ output.
+
+\subsubsection*{Output Size Formula}
+For an input image of size $n \times n$, a filter of size $f \times f$, padding $p$, and stride $s$, the output dimensions are given by:
+\[
+\text{Output Size} = \left\lfloor \frac{n + 2p - f}{s} + 1 \right\rfloor
+\]
+where $\lfloor \cdot \rfloor$ denotes the floor function (rounding down to the nearest integer).
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[fill=yellow!30]| 2 & |[fill=yellow!30]| 3 & |[fill=yellow!30]| 7 & 4 & 6 & 2 & 9  \\
+ |[fill=yellow!30]| 6 & |[fill=yellow!30]| 6 & |[fill=yellow!30]| 9 & 8 & 7 & 4 & 3  \\
+ |[fill=yellow!30]| 3 & |[fill=yellow!30]| 4 & |[fill=yellow!30]| 8 & 3 & 8 & 9 & 7 \\
+7 & 8 & 3 & 6 & 6 & 3 & 4 \\
+4 & 2 & 1 & 8 & 3 & 4 & 6 \\
+3 & 2 & 4 & 1 & 9 & 8 & 3 \\
+0 & 1 & 3 & 9 & 2 & 1 & 4 \\
+};
+\node[below=4.0em of mtr-5-4] {$\mathbf{7 \times 7}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, column sep=-\pgflinewidth, row sep=-\pgflinewidth, 
+	nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=0.2em of K-3-2] {$\mathbf{3 \times 3}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[draw=green,fill=green!30]| -13 & 3 & 2 \\
+2 & -5 & 0 \\
+-1 & -6 & 1 \\
+};
+\node[below=-1.0em of O-4-4] {$\mathbf{3 \times 3}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-1-3.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-3-3.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-1-1.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-1-1.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1, 2,3} { % Rows of filter
+    \foreach \j in {1,2,3} { % Columns of filter
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\i-\j) {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ 2 &  3 & |[fill=orange!30]| 7 & |[fill=orange!30]| 4 & |[fill=orange!30]| 6 & 2 & 9  \\
+  6 & 6 & |[fill=orange!30]| 9 & |[fill=orange!30]| 8 & |[fill=orange!30]| 7 & 4 & 3  \\
+ 3 & 4 & |[fill=orange!30]| 8 & |[fill=orange!30]| 3 & |[fill=orange!30]| 8 & 9 & 7 \\
+7 & 8 & 3 & 6 & 6 & 3 & 4 \\
+4 & 2 & 1 & 8 & 3 & 4 & 6 \\
+3 & 2 & 4 & 1 & 9 & 8 & 3 \\
+0 & 1 & 3 & 9 & 2 & 1 & 4 \\
+};
+\node[below=4.0em of mtr-5-4] {$\mathbf{7 \times 7}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, column sep=-\pgflinewidth, row sep=-\pgflinewidth, 
+	nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=0.2em of K-3-2] {$\mathbf{3 \times 3}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[draw=green,fill=green!30]| -13 &  |[draw=brown, fill=brown!30]| 3 & 2 \\
+2 & -5 & 0 \\
+-1 & -6 & 1 \\
+};
+\node[below=-1.0em of O-4-4] {$\mathbf{3 \times 3}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-1-5.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-3-5.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-1-2.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-1-2.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1,2,3} { % Rows of the filter
+    \foreach \j in {1,2,3} { % Columns of the filter
+        % Properly compute indices with numerical expression
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\the\numexpr\i\relax-\the\numexpr\j+2\relax) 
+        {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ 2 &  3 &  7 & 4 & |[fill=red!30]| 6 & |[fill=red!30]| 2 & |[fill=red!30]| 9  \\
+  6 & 6 & 9 & 8 & |[fill=red!30]| 7 & |[fill=red!30]| 4 & |[fill=red!30]| 3  \\
+ 3 & 4 & 8 & 3 & |[fill=red!30]|  8 & |[fill=red!30]| 9 & |[fill=red!30]| 7 \\
+7 & 8 & 3 & 6 & 6 & 3 & 4 \\
+4 & 2 & 1 & 8 & 3 & 4 & 6 \\
+3 & 2 & 4 & 1 & 9 & 8 & 3 \\
+0 & 1 & 3 & 9 & 2 & 1 & 4 \\
+};
+\node[below=4.0em of mtr-5-4] {$\mathbf{7 \times 7}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, column sep=-\pgflinewidth, row sep=-\pgflinewidth, 
+	nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=0.2em of K-3-2] {$\mathbf{3 \times 3}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ |[draw=green,fill=green!30]| -13 &  |[draw=brown, fill=brown!30]| 3 & |[draw=violet, fill=violet!30]| 2 \\
+2 & -5 & 0 \\
+-1 & -6 & 1 \\
+};
+\node[below=-1.0em of O-4-4] {$\mathbf{3 \times 3}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-1-7.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-3-7.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-1-3.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-1-3.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1,2,3} { % Rows of the filter
+    \foreach \j in {1,2,3} { % Columns of the filter
+        % Properly compute indices with numerical expression
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\the\numexpr\i\relax-\the\numexpr\j+4\relax) 
+        {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+ 2 &  3 & 7 & 4 & 6 & 2 & 9  \\
+ 6 & 6 & 9 & 8 &  7 & 4 & 3  \\
+|[fill=violet!30]| 3 & |[fill=violet!30]| 4 & |[fill=violet!30]| 8 & 3 &  8 & 9 & 7 \\
+|[fill=violet!30]| 7 & |[fill=violet!30]| 8 & |[fill=violet!30]| 3 & 6 & 6 & 3 & 4 \\
+|[fill=violet!30]| 4 & |[fill=violet!30]| 2 & |[fill=violet!30]| 1 & 8 & 3 & 4 & 6 \\
+3 & 2 & 4 & 1 & 9 & 8 & 3 \\
+0 & 1 & 3 & 9 & 2 & 1 & 4 \\
+};
+\node[below=4.0em of mtr-5-4] {$\mathbf{7 \times 7}$};
+
+% Convolution symbol
+\node[right=0.2em of mtr] (conv) {$*$};
+
+% Filter matrix
+\matrix (K) [2d-arr, right=0.2em of conv, column sep=-\pgflinewidth, row sep=-\pgflinewidth, 
+	nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center, fill=CornflowerBlue!30}] {
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+1 & 0 & -1 \\
+};
+\node[below=0.2em of K-3-2] {$\mathbf{3 \times 3}$};
+
+% Equal sign
+\node[right=0.2em of K] (eq) {$=$};
+
+% Output matrix
+\matrix (O) [2d-arr, right=0.2em of eq, column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw, minimum width=2.0em, minimum height=2.0em, anchor=center}] {
+|[draw=green,fill=green!30]| -13 &  |[draw=brown, fill=brown!30]| 3 & 2 \\
+|[draw=purple, fill=purple!30]| 2 & -5 & 0 \\
+-1 & -6 & 1 \\
+};
+\node[below=-1.0em of O-4-4] {$\mathbf{3 \times 3}$};
+
+% Dashed lines to highlight one operation
+\draw[dashed, teal] (mtr-3-3.north east) -- (K-1-1.north west);
+\draw[dashed, teal] (mtr-5-3.south east) -- (K-3-1.south west);
+
+\draw[dashed, blue!80!black] (K-1-3.north east) -- (O-2-1.north west);
+\draw[dashed, blue!80!black] (K-3-3.south east) -- (O-2-1.south west);
+
+% Place filter numbers on top of image matrix using foreach
+\foreach \i in {1,2,3} { % Rows of the filter
+    \foreach \j in {1,2,3} { % Columns of the filter
+        % Properly compute indices with numerical expression
+        \node[font=\tiny, scale=0.6, blue, shift={(0.3,0.3)}] 
+        at (mtr-\the\numexpr\i+2\relax-\the\numexpr\j\relax) 
+        {$\times \pgfmathparse{int(1*(\j==1) - 1*(\j==3))}\pgfmathresult$};
+    }
+}
+
+\end{tikzpicture}
+
+\subsubsection*{Example Calculation}
+\begin{itemize}[nosep]
+    \item Input size: $7 \times 7$
+    \item Filter size: $3 \times 3$
+    \item Padding: $p = 0$
+    \item Stride: $s = 2$
+\end{itemize}
+
+\[
+\text{Output Size} = \left\lfloor \frac{7 + 2(0) - 3}{2} + 1 \right\rfloor = \left\lfloor \frac{4}{2} + 1 \right\rfloor = \left\lfloor 3 \right\rfloor = 3
+\]
+
+It is important to note that:
+\begin{enumerate}
+    \item If the output size formula results in a fraction, it is rounded down using the floor function.
+    \item A convolution is only performed if the filter lies entirely within the input image (or input + padding). If part of the filter extends beyond the image, that position is skipped.
+\end{enumerate}
+
+\subsubsection*{Convolutions vs. Cross-Correlation}
+\begin{itemize}
+    \item In traditional mathematics, convolutions involve flipping the filter both horizontally and vertically before performing the element-wise product and summation.
+    \item In deep learning, this flipping step is typically skipped. The operation performed is technically \textbf{cross-correlation}, but it is conventionally referred to as \textbf{convolution}.
+\end{itemize}
+
+Omitting the flipping simplifies implementation and does not impact neural network performance. This distinction does not affect the understanding or implementation of CNNs.
+
+In summary:
+\begin{itemize}[nosep]
+    \item Stride controls the step size of the filter’s movement across the input.
+    \item The output size depends on the input dimensions, filter size, padding, and stride.
+    \item In deep learning, convolution is implemented without flipping the filter, which is technically cross-correlation but conventionally referred to as convolution.
+\end{itemize}
+
+% ---------------- Convolutions Over Volume ----------------------%
+\subsection{Convolutions Over Volume}
+You've seen how convolutions work over 2D images. Now, let's explore how to implement convolutions over three-dimensional volumes. 
+
+\subsubsection*{Example: Convolution on an RGB Image}
+
+Suppose you want to detect features in an RGB image. An RGB image can be represented as a $6 \times 6 \times 3$ volume, where:
+\begin{itemize}[nosep]
+    \item The first dimension ($6$) is the \textbf{height}.
+    \item The second dimension ($6$) is the \textbf{width}.
+    \item The third dimension ($3$) is the \textbf{number of channels} (red, green, and blue).
+\end{itemize}
+
+Instead of convolving this with a $3 \times 3$ filter as done with grayscale images, we now use a 3D filter of size $3 \times 3 \times 3$. The filter also has three layers corresponding to the red, green, and blue channels. 
+
+% Figure 24
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Convolution on 3D Image.png}
+	\caption{Convolution on 3D Image}
+	\label{fig:24}
+\end{figure}
+\FloatBarrier
+
+\textbf{Key Condition:} The number of channels in the filter must match the number of channels in the input image.
+
+\subsubsection*{Convolution Operation}
+To compute the output of a $6 \times 6 \times 3$ input convolved with a $3 \times 3 \times 3$ filter:
+\begin{enumerate}
+    \item Place the $3 \times 3 \times 3$ filter at the upper-left corner of the input volume.
+    \item Multiply each of the $27$ parameters of the filter with the corresponding numbers in the input volume covered by the filter.
+    \item Add up the $27$ multiplications to compute a single output value.
+    \item Slide the filter to the next position (e.g., one step to the right) and repeat the operation.
+    \item Continue until all positions are covered.
+\end{enumerate}
+
+The result of this operation is a $4 \times 4 \times 1$ output volume (assuming a stride of $1$ and no padding). Notice that the output now has only one channel because a single filter was applied.
+ 
+% Figure 25
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Convolution Operation.png}
+	\caption{Convolution Operation}
+	\label{fig:25}
+\end{figure}
+\FloatBarrier
+
+\subsection*{Using Multiple Filters}
+If you want to detect multiple features (e.g., vertical edges, horizontal edges, 45-degree edges), you can use multiple filters simultaneously:
+\begin{itemize}
+    \item Each filter produces a separate $4 \times 4$ output.
+    \item These outputs are stacked together to form a $4 \times 4 \times N$ volume, where $N$ is the number of filters.
+\end{itemize}
+
+For example, applying two filters to a $6 \times 6 \times 3$ input results in a $4 \times 4 \times 2$ output.
+
+% Figure 26
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Multiple Filters.png}
+	\caption{Multiple Filters}
+	\label{fig:26}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Summary of Dimensions of Convolution Output}
+Given an input of size $n \times n \times n_C$ (height, width, channels) and a filter of size $f \times f \times n_C$, the output dimensions are:
+\[
+(n - f + 1) \times (n - f + 1) \times n_C'
+\]
+where $n_C'$ is the number of filters applied.
+
+\textbf{Notes:}
+\begin{itemize}
+    \item If stride or padding is used, the formula for the output size is adjusted accordingly.
+    \item The number of channels in the output is equal to the number of filters.
+\end{itemize}
+
+\subsubsection*{Applications and Notation}
+\begin{itemize}[nosep]
+    \item Convolutions over volumes enable feature detection in multi-channel images (e.g., RGB).
+    \item You can detect multiple features simultaneously by using multiple filters.
+    \item The output of the convolution will have as many channels as the number of filters.
+    \item The term \textbf{channels} is commonly used to refer to the third dimension of the input or output volume. Some literature refers to this as the \textbf{depth}, but this term can be ambiguous.
+\end{itemize}
+
+Now that you understand convolutions over volumes, you're ready to implement one layer of a convolutional neural network.
 
 
 % ---------------- Deep Convolutional Models ----------------------%
-\section{Deep Convolutional Models: Case Studeis}
+\section{Deep Convolutional Models: Case Studies}
 
 % ---------------- Case Studies ----------------------%
 \subsection{Case Studies}
