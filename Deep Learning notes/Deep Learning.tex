@@ -3820,6 +3820,246 @@ where $n_C'$ is the number of filters applied.
 
 Now that you understand convolutions over volumes, you're ready to implement one layer of a convolutional neural network.
 
+% ---------------- Building One Layer of a Convolutional Neural Network ----------------------%
+\subsection{Building One Layer of a Convolutional Neural Network}
+To build one layer of a convolutional neural network, we start by convolving a 3D volume with filters. For example:
+\begin{itemize}[nosep]
+    \item Convolve the input with two filters to produce two 4x4 outputs.
+    \item Add biases to these outputs. Each bias is a single number added to all 16 elements in the output matrix using broadcasting.
+    \item Apply a non-linearity (e.g., ReLU) to these outputs.
+\end{itemize}
+
+Finally, stack the resulting matrices to form a 4x4x2 output. This operation represents one layer of a convolutional neural network.
+
+% Figure 27
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/One Layer of a CNN.png}
+	\caption{One Layer of a CNN}
+	\label{fig:27}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Relation to Traditional Neural Networks}
+In a traditional neural network, forward propagation involves:
+\[
+z^{[1]} = W^{[1]} \cdot a^{[0]} + b^{[1]},
+\]
+where \( a^{[0]} = x \). Similarly, in a convolutional neural network:
+\begin{itemize}[nosep]
+    \item The filters play a role similar to \( W^{[1]} \).
+    \item The output of the convolution operation corresponds to \( W^{[1]} \cdot a^{[0]} \).
+    \item Adding biases corresponds to adding \( b^{[1]} \).
+    \item Applying the non-linearity corresponds to obtaining activations \( a^{[1]} \).
+\end{itemize}
+Thus, the convolution operation can be viewed as applying a linear transformation followed by a non-linearity.
+
+\subsubsection*{Number of Parameters in a Convolutional Layer}
+Consider an example with 10 filters, each of size \( 3 \times 3 \times 3 \):
+\begin{itemize}
+    \item Each filter has \( 3 \times 3 \times 3 = 27 \) parameters, plus 1 bias, resulting in \( 28 \) parameters per filter.
+    \item With 10 filters, the total number of parameters is:
+    \[
+    28 \times 10 = 280.
+    \]
+\end{itemize}
+
+This fixed number of parameters makes convolutional neural networks less prone to overfitting, regardless of the input image size.
+
+\subsubsection*{Convolutional Layer Notation}
+To describe one convolutional layer \( l \):
+\begin{itemize}[nosep]
+    \item \( f^{[l]} \): Filter size (e.g., \( f \times f \)).
+    \item \( p^{[l]} \): Padding amount.
+    \item \( s^{[l]} \): Stride.
+    \item Input dimensions: \( n_h^{[l-1]} \times n_w^{[l-1]} \times n_c^{[l-1]} \).
+    \item Output dimensions: \( n_h^{[l]} \times n_w^{[l]} \times n_c^{[l]} \), where:
+    \[
+    n_h^{[l]} = \left\lfloor \frac{n_h^{[l-1]} + 2p^{[l]} - f^{[l]}}{s^{[l]}} + 1 \right\rfloor,
+    \]
+    and similarly for \( n_w^{[l]} \).
+    \item Number of channels in the output \( n_c^{[l]} \) equals the number of filters in the layer.
+\end{itemize}
+
+\subsubsection*{Filter Dimensions and Parameters}
+\begin{itemize}[nosep]
+    \item Each filter has dimensions \( f^{[l]} \times f^{[l]} \times n_c^{[l-1]} \).
+    \item Total number of weights in the layer is:
+    \[
+    f^{[l]} \times f^{[l]} \times n_c^{[l-1]} \times n_c^{[l]}.
+    \]
+    \item Bias parameters form a vector of size \( n_c^{[l]} \), which can also be represented as a \( 1 \times 1 \times 1 \times n_c^{[l]} \) tensor.
+\end{itemize}
+
+\subsubsection*{Output Representation in Batch Processing}
+For \( m \) training examples:
+\begin{itemize}
+    \item Output activations \( A^{[l]} \) have dimensions:
+    \[
+    A^{[l]} = m \times n_h^{[l]} \times n_w^{[l]} \times n_c^{[l]}.
+    \]
+\end{itemize}
+
+The key takeaway is understanding how one layer of a convolutional neural network maps the activations of one layer to the next. This involves:
+\begin{itemize}[nosep]
+    \item Convolution operations (linear transformation),
+    \item Adding biases,
+    \item Applying non-linearities.
+\end{itemize}
+Multiple layers can be stacked together to form deeper convolutional neural networks.
+
+% ---------------- Simple Convolutional Network Example ----------------------%
+\subsection{Simple Convolutional Network Example}
+Here, we explored the building blocks of a convolutional layer in a ConvNet and walked through a concrete example of a deep convolutional neural network. This example demonstrates how to build a ConvNet for image classification tasks, such as recognizing whether an input image is a cat (binary classification problem: 0 or 1).
+
+\subsubsection*{Example ConvNet Architecture}
+Assume we have an \textbf{Input Image} wiuth the following properties:
+\begin{itemize}[nosep]
+    \item Input image dimensions: $39 \times 39 \times 3$ (height $\times$ width $\times$ number of channels).
+    \item $n_H^{[0]} = n_W^{[0]} = 39$, $n_C^{[0]} = 3$.
+\end{itemize}
+
+\subsubsection*{Layer 1: Convolutional Layer}
+\begin{itemize}[nosep]
+    \item Filter size: $f^{[1]} = 3 \times 3$.
+    \item Stride: $s^{[1]} = 1$.
+    \item Padding: No padding (valid convolution).
+    \item Number of filters: 10.
+\end{itemize}
+
+\textbf{Output dimensions:}
+\[
+n_H^{[1]} = n_W^{[1]} = \frac{n_H^{[0]} - f^{[1]}}{s^{[1]}} + 1 = \frac{39 - 3}{1} + 1 = 37
+\]
+\[
+n_C^{[1]} = 10
+\]
+The output volume is $37 \times 37 \times 10$.
+
+\subsubsection*{Layer 2: Convolutional Layer}
+\begin{itemize}[nosep]
+    \item Filter size: $f^{[2]} = 5 \times 5$.
+    \item Stride: $s^{[2]} = 2$.
+    \item Padding: No padding (valid convolution).
+    \item Number of filters: 20.
+\end{itemize}
+
+\textbf{Output dimensions:}
+\[
+n_H^{[2]} = n_W^{[2]} = \frac{n_H^{[1]} - f^{[2]}}{s^{[2]}} + 1 = \frac{37 - 5}{2} + 1 = 17
+\]
+\[
+n_C^{[2]} = 20
+\]
+The output volume is $17 \times 17 \times 20$.
+
+\subsubsection*{Layer 3: Convolutional Layer}
+\begin{itemize}[nosep]
+    \item Filter size: $f^{[3]} = 5 \times 5$.
+    \item Stride: $s^{[3]} = 2$.
+    \item Padding: No padding (valid convolution).
+    \item Number of filters: 40.
+\end{itemize}
+
+\textbf{Output dimensions:}
+\[
+n_H^{[3]} = n_W^{[3]} = \frac{n_H^{[2]} - f^{[3]}}{s^{[3]}} + 1 = \frac{17 - 5}{2} + 1 = 7
+\]
+\[
+n_C^{[3]} = 40
+\]
+The output volume is $7 \times 7 \times 40$.
+
+\subsubsection*{Final Layer - Flattening and Fully Connected Layer}
+In the final layer, we:
+\begin{itemize}[nosep]
+    \item Flatten the output volume of size $7 \times 7 \times 40$ into a vector of size $7 \cdot 7 \cdot 40 = 1960$.
+    \item Feed this vector into a logistic regression or softmax unit for final classification.
+\end{itemize}
+
+The key observations is that:
+\begin{itemize}[nosep]
+    \item As the network deepens, the spatial dimensions (height and width) decrease:
+    \[
+    39 \to 37 \to 17 \to 7
+    \]
+    \item The number of channels generally increases:
+    \[
+    3 \to 10 \to 20 \to 40
+    \]
+    \item Hyperparameters to design: filter size ($f$), stride ($s$), padding ($p$), and the number of filters ($n_C$).
+\end{itemize}
+
+\subsubsection*{Types of Layers in ConvNets}
+\begin{itemize}
+    \item \textbf{Convolutional Layer (Conv):} Applies convolution operations to extract features.
+    \item \textbf{Pooling Layer (Pool):} Reduces spatial dimensions, simpler to define.
+    \item \textbf{Fully Connected Layer (FC):} Connects all input features to output nodes for prediction.
+\end{itemize}
+
+% ---------------- Pooling Layers ----------------------%
+\subsection{Pooling Layers}
+Other than convolutional layers, Convolutional Neural Networks (ConvNets) often use \textbf{pooling layers} to:
+\begin{itemize}
+    \item Reduce the size of the representation.
+    \item Speed up computation.
+    \item Make feature detection more robust.
+\end{itemize}
+
+\subsubsection*{Max Pooling Example}
+Suppose we have a $4 \times 4$ input and apply \textbf{max pooling} with a filter size $f=2$ and stride $s=2$. The output is a $2 \times 2$ representation:
+\[
+\text{Output}[i, j] = \max \text{(elements in the $2 \times 2$ region corresponding to filter location $i, j$)}.
+\]
+For instance:
+\begin{itemize}
+    \item Top-left region: $\max(1, 3, 9, 4) = 9$.
+    \item Top-right region: $\max(2, 1, 0, 2) = 2$.
+    \item Bottom-left region: $\max(6, 5, 2, 1) = 6$.
+    \item Bottom-right region: $\max(0, 3, 3, 3) = 3$.
+\end{itemize}
+
+\subsubsection*{Hyperparameters of Max Pooling}
+The hyperparameters for max pooling are:
+\begin{itemize}
+    \item \textbf{Filter size} $f$: The dimension of the pooling region (e.g., $f = 2$ for $2 \times 2$ regions).
+    \item \textbf{Stride} $s$: The step size for sliding the filter across the input.
+    \item \textbf{Padding} $p$: Usually $p=0$ (no padding) in max pooling.
+\end{itemize}
+
+The output dimensions for an input of size $N_H \times N_W \times N_C$ are:
+\[
+N_H' = \frac{N_H - f}{s} + 1, \quad
+N_W' = \frac{N_W - f}{s} + 1, \quad
+N_C' = N_C.
+\]
+
+\subsubsection*{3D Inputs and Max Pooling}
+For 3D inputs, max pooling is applied independently on each channel. For instance, if the input size is $5 \times 5 \times 2$, the output size will be $3 \times 3 \times 2$.
+
+\subsubsection*{Average Pooling}
+Average pooling computes the average value within each filter region instead of the maximum. For example, with $f=2$ and $s=2$:
+\[
+\text{Output}[i, j] = \frac{\text{Sum of elements in the $2 \times 2$ region}}{4}.
+\]
+
+\subsubsection*{Key Properties of Pooling}
+\begin{itemize}
+    \item No parameters are learned during pooling. It is a fixed operation defined by the hyperparameters $f$, $s$, and $p$.
+    \item Max pooling is more commonly used than average pooling.
+    \item Deep in a neural network, average pooling is occasionally used to collapse dimensions (e.g., $7 \times 7 \times 1000 \to 1 \times 1 \times 1000$).
+\end{itemize}
+
+\subsubsection*{Typical Hyperparameters}
+\begin{itemize}
+    \item Common choices: $f=2$, $s=2$ (reduces height and width by a factor of $2$).
+    \item Occasionally: $f=3$, $s=2$.
+\end{itemize}
+
+Pooling layers are essential components of ConvNets for reducing representation size and computational cost. They do not involve learning parameters and are defined entirely by their hyperparameters. Next, we will discuss fully connected layers and their role in ConvNets.
+
+
+
 
 % ---------------- Deep Convolutional Models ----------------------%
 \section{Deep Convolutional Models: Case Studies}
