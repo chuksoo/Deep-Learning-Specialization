@@ -3877,7 +3877,10 @@ To describe one convolutional layer \( l \):
     \[
     n_h^{[l]} = \left\lfloor \frac{n_h^{[l-1]} + 2p^{[l]} - f^{[l]}}{s^{[l]}} + 1 \right\rfloor,
     \]
-    and similarly for \( n_w^{[l]} \).
+    and similarly for \( n_w^{[l]} \)
+    \[
+    n_w^{[l]} = \left\lfloor \frac{n_w^{[l-1]} + 2p^{[l]} - f^{[l]}}{s^{[l]}} + 1 \right\rfloor,
+    \]
     \item Number of channels in the output \( n_c^{[l]} \) equals the number of filters in the layer.
 \end{itemize}
 
@@ -3997,10 +4000,19 @@ The key observations is that:
     \item \textbf{Fully Connected Layer (FC):} Connects all input features to output nodes for prediction.
 \end{itemize}
 
+% Figure 28
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/ConvNet.png}
+	\caption{Example of Simple Convolution Netwoks}
+	\label{fig:28}
+\end{figure}
+\FloatBarrier
+
 % ---------------- Pooling Layers ----------------------%
 \subsection{Pooling Layers}
 Other than convolutional layers, Convolutional Neural Networks (ConvNets) often use \textbf{pooling layers} to:
-\begin{itemize}
+\begin{itemize}[nosep]
     \item Reduce the size of the representation.
     \item Speed up computation.
     \item Make feature detection more robust.
@@ -4011,12 +4023,41 @@ Suppose we have a $4 \times 4$ input and apply \textbf{max pooling} with a filte
 \[
 \text{Output}[i, j] = \max \text{(elements in the $2 \times 2$ region corresponding to filter location $i, j$)}.
 \]
+
+\begin{tikzpicture}[
+    2d-arr/.style={matrix of nodes, row sep=-\pgflinewidth, column sep=-\pgflinewidth, nodes={draw}}
+  ]
+
+% Original image matrix
+  \matrix (mtr) [2d-arr, nodes={draw, minimum width=3.0em, minimum height=3.0em, anchor=center}] {
+|[fill=violet!30]| 1 &|[fill=violet!30]| 3 & |[fill=CornflowerBlue!30]| 2 & |[fill=CornflowerBlue!30]| 1 \\
+|[fill=violet!30]| 2 &|[fill=violet!30]| 9 & |[fill=CornflowerBlue!30]| 1 & |[fill=CornflowerBlue!30]| 1  \\
+|[fill=green!30]| 1 &|[fill=green!30]| 3 & |[fill=red!30]| 2 & |[fill=red!30]| 3  \\
+|[fill=green!30]| 5 &|[fill=green!30]| 6 & |[fill=red!30]| 1 & |[fill=red!30]| 2  \\
+};
+\node[below=of mtr-4-4] {$\mathbf{4 \times 4}$};
+
+% Arrow symbol
+\node[right=0.6em of mtr] (arrow) {$\Longrightarrow$};
+
+% Max Pooling Filter
+\matrix (K) [2d-arr, right=0.6em of arrow, column sep=-\pgflinewidth, row sep=-\pgflinewidth, 
+	nodes={draw, minimum width=3.0em, minimum height=3.0em, anchor=center}] {
+|[fill=violet!30]| 9 & |[fill=CornflowerBlue!30]| 2  \\
+|[fill=green!30]| 6 & |[fill=red!30]| 3  \\
+};
+\node[below=of K-2-2] {$\mathbf{2 \times 2}$};
+
+\end{tikzpicture}
+
+To compute each of the numbers on the right, we take the  max over a two by two regios i.e., we apply a filter size of 2 and stride by 2.
+
 For instance:
-\begin{itemize}
+\begin{itemize}[nosep]
     \item Top-left region: $\max(1, 3, 9, 4) = 9$.
-    \item Top-right region: $\max(2, 1, 0, 2) = 2$.
+    \item Top-right region: $\max(2, 1, 1, 1) = 2$.
     \item Bottom-left region: $\max(6, 5, 2, 1) = 6$.
-    \item Bottom-right region: $\max(0, 3, 3, 3) = 3$.
+    \item Bottom-right region: $\max(2, 3, 1, 2) = 3$.
 \end{itemize}
 
 \subsubsection*{Hyperparameters of Max Pooling}
@@ -4037,6 +4078,15 @@ N_C' = N_C.
 \subsubsection*{3D Inputs and Max Pooling}
 For 3D inputs, max pooling is applied independently on each channel. For instance, if the input size is $5 \times 5 \times 2$, the output size will be $3 \times 3 \times 2$.
 
+% Figure 29
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/3D Max Pooling.png}
+	\caption{Max pooling for 3D Inputs}
+	\label{fig:29}
+\end{figure}
+\FloatBarrier
+
 \subsubsection*{Average Pooling}
 Average pooling computes the average value within each filter region instead of the maximum. For example, with $f=2$ and $s=2$:
 \[
@@ -4044,22 +4094,267 @@ Average pooling computes the average value within each filter region instead of 
 \]
 
 \subsubsection*{Key Properties of Pooling}
-\begin{itemize}
+\begin{itemize}[nosep]
     \item No parameters are learned during pooling. It is a fixed operation defined by the hyperparameters $f$, $s$, and $p$.
     \item Max pooling is more commonly used than average pooling.
     \item Deep in a neural network, average pooling is occasionally used to collapse dimensions (e.g., $7 \times 7 \times 1000 \to 1 \times 1 \times 1000$).
 \end{itemize}
 
 \subsubsection*{Typical Hyperparameters}
-\begin{itemize}
+\begin{itemize}[nosep]
     \item Common choices: $f=2$, $s=2$ (reduces height and width by a factor of $2$).
     \item Occasionally: $f=3$, $s=2$.
 \end{itemize}
 
-Pooling layers are essential components of ConvNets for reducing representation size and computational cost. They do not involve learning parameters and are defined entirely by their hyperparameters. Next, we will discuss fully connected layers and their role in ConvNets.
+Pooling layers are essential components of ConvNets for reducing representation size and computational cost. They do not involve learning parameters and are defined entirely by their hyperparameters. 
+
+% ---------------- CNN Example ----------------------%
+\subsection{CNN Example}
+Here, we discussed the building blocks of a convolutional neural network (CNN) inspired by LeNet-5 for handwritten digit recognition. The input is a $32 \times 32 \times 3$ RGB image, and the task is to classify digits (0 to 9) using a CNN architecture.
+
+\subsubsection*{Architecture Details}
+\begin{enumerate}[nosep]
+    \item \textbf{Layer 1: Convolutional + Pooling Layer 1}
+    \begin{itemize}
+        \item Input: $32 \times 32 \times 3$ (RGB image).
+        \item Convolutional Layer (Conv1):
+        \begin{itemize}
+            \item Filter size: $5 \times 5$.
+            \item Stride: 1.
+            \item Padding: None.
+            \item Number of filters: 6.
+            \item Output: $28 \times 28 \times 6$.
+        \end{itemize}
+        \item Max Pooling Layer (Pool1):
+        \begin{itemize}
+            \item Filter size: $2 \times 2$.
+            \item Stride: 2.
+            \item Output: $14 \times 14 \times 6$.
+        \end{itemize}
+        \item Combined Layer Output: $14 \times 14 \times 6$.
+    \end{itemize}
+
+    \item \textbf{Layer 2: Convolutional + Pooling Layer 2}
+    \begin{itemize}
+        \item Input: $14 \times 14 \times 6$.
+        \item Convolutional Layer (Conv2):
+        \begin{itemize}
+            \item Filter size: $5 \times 5$.
+            \item Stride: 1.
+            \item Padding: None.
+            \item Number of filters: 16.
+            \item Output: $10 \times 10 \times 16$.
+        \end{itemize}
+        \item Max Pooling Layer (Pool2):
+        \begin{itemize}
+            \item Filter size: $2 \times 2$.
+            \item Stride: 2.
+            \item Output: $5 \times 5 \times 16$.
+        \end{itemize}
+        \item Combined Layer Output: $5 \times 5 \times 16$.
+    \end{itemize}
+
+    \item \textbf{Layer: Fully Connected Layer 1 (FC3)}
+    \begin{itemize}
+        \item Input: Flattened $5 \times 5 \times 16 = 400$ units.
+        \item Output: $120$ units.
+        \item Weights: $W_3$ of size $120 \times 400$.
+        \item Bias: 120-dimensional vector.
+    \end{itemize}
+
+    \item \textbf{Layer: Fully Connected Layer 2 (FC4)}
+    \begin{itemize}
+        \item Input: $120$ units.
+        \item Output: $84$ units.
+    \end{itemize}
+
+    \item \textbf{Output Layer}
+    \begin{itemize}
+        \item Input: $84$ units.
+        \item Output: $10$ units (for classification of digits $0$ to $9$).
+        \item Activation: Softmax.
+    \end{itemize}
+\end{enumerate}
+
+% Figure 30
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.95\textwidth]{Images/CNN Example.png}
+	\caption{CNN Example Architecture}
+	\label{fig:30}
+\end{figure}
+
+% Figure 31
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/CNN Data.png}
+	\caption{CNN Architecture Data}
+	\label{fig:31}
+\end{figure}
+
+\FloatBarrier
 
 
+\subsubsection*{Key Observations}
+\begin{itemize}[nosep]
+    \item \textbf{Pooling Layers:} No weights/parameters; only hyperparameters like filter size and stride.
+    \item \textbf{Parameter Distribution:} Fully connected layers dominate in terms of the number of parameters compared to convolutional layers.
+    \item \textbf{Activation Size:} Decreases progressively through the network, following a pattern:
+    \[
+    \text{Input: } 32 \times 32 \to 28 \times 28 \to 14 \times 14 \to 10 \times 10 \to 5 \times 5.
+    \]
+    \item \textbf{Number of Channels:} Increases as we go deeper in the network:
+    \[
+    3 \to 6 \to 16.
+    \]
+    \item \textbf{Common Architecture Pattern:}
+    \begin{enumerate}
+        \item Convolutional layers followed by pooling layers.
+        \item Fully connected layers at the end.
+        \item Final output: Softmax for classification.
+    \end{enumerate}
+\end{itemize}
 
+\textbf{Question:} \\
+\textbf{Q.1.} Suppose your input is a \( 256 \times 256 \) color (RGB) image, and you use a convolutional layer with 128 filters, each of size \( 7 \times 7 \). How many parameters does this hidden layer have (including the bias parameters)?
+
+\textcolor{blue}{\textit{Solution:}}
+
+The number of parameters in a convolutional layer can be calculated as:
+
+\[
+\text{Parameters} = (f \times f \times c + 1) \times k
+\]
+
+Where:
+\begin{itemize}
+    \item \( f \times f \) is the size of each filter (here, \( 7 \times 7 \)),
+    \item \( c \) is the number of input channels (3 for RGB),
+    \item \( k \) is the number of filters (128),
+    \item The \( +1 \) accounts for the bias term in each filter.
+\end{itemize}
+
+Substituting the values:
+
+\[
+\text{Parameters} = (7 \times 7 \times 3 + 1) \times 128
+\]
+\[
+\text{Parameters} = (147 + 1) \times 128 = 148 \times 128 = 18944
+\]
+
+Thus, the convolutional layer has \textbf{18,944} parameters, including the bias terms.
+
+\textbf{Q.2.} Suppose your input is a \( 128 \times 128 \) grayscale image, and you are not using a convolutional network. If the first hidden layer has 256 neurons, each one fully connected to the input, how many parameters does this hidden layer have (including the bias parameters)?
+
+\textcolor{blue}{\textit{Solution:}}
+
+The number of parameters in a fully connected layer can be calculated as:
+
+\[
+\text{Parameters} = (\text{Number of input features} + 1) \times \text{Number of neurons}
+\]
+
+Where:
+\begin{itemize}
+    \item The number of input features is \( 128 \times 128 = 16384 \) (the total number of pixels in the grayscale image),
+    \item The \( +1 \) accounts for the bias term for each neuron,
+    \item The number of neurons in the hidden layer is 256.
+\end{itemize}
+
+Substituting the values:
+
+\[
+\text{Parameters} = (16384 + 1) \times 256 = 16385 \times 256 = 4194560
+\]
+
+Thus, the hidden layer has 4,194,560 parameters, including the bias terms.
+
+\textbf{Q.3.} You have an input volume that is \( 121 \times 121 \times 16 \), and convolve it with 32 filters of size \( 4 \times 4 \), using a stride of 3 and no padding. What is the output volume?
+
+\textcolor{blue}{\textit{Solution:}}
+
+The output volume dimensions for a convolutional layer can be calculated using the formula:
+
+\[
+\text{Output size} = \left\lfloor \frac{\text{Input size} - \text{Filter size}}{\text{Stride}} \right\rfloor + 1
+\]
+
+Where:
+\begin{itemize}
+    \item \textbf{Input size} = \( 121 \) (for both height and width),
+    \item \textbf{Filter size} = \( 4 \),
+    \item \textbf{Stride} = \( 3 \),
+    \item \textbf{No padding} means there is no additional padding around the input.
+\end{itemize}
+
+For the height and width:
+
+\[
+\text{Output height (or width)} = \left\lfloor \frac{121 - 4}{3} \right\rfloor + 1 = \left\lfloor \frac{117}{3} \right\rfloor + 1 = 39 + 1 = 40
+\]
+
+The depth of the output volume equals the number of filters, which is 32.
+
+Thus, the output volume is:
+
+\[
+40 \times 40 \times 32
+\]
+
+\textbf{Q.4.} You have an input volume that is \( 31 \times 31 \times 32 \), and pad it using \texttt{pad=1}. What is the dimension of the resulting volume (after padding)?
+
+\textcolor{blue}{\textit{Solution:}}
+
+When padding is applied, the padding is added to each side of the height and width. The formula for calculating the dimensions after padding is:
+
+\[
+\text{Output size} = \text{Input size} + 2 \times \text{Padding}
+\]
+
+Where:
+\begin{itemize}
+    \item The \textbf{Input size} is \( 31 \) for both height and width,
+    \item The \textbf{Padding} is \( 1 \).
+\end{itemize}
+
+For the height and width:
+
+\[
+\text{Output height (or width)} = 31 + 2 \times 1 = 33
+\]
+
+The depth remains unchanged as padding only affects the height and width, so the depth remains \( 32 \).
+
+Thus, the resulting volume after padding is:
+
+\[
+33 \times 33 \times 32
+\]
+
+\textbf{Q.5.} You have a volume that is \( 121 \times 121 \times 32 \), and convolve it with 32 filters of size \( 5 \times 5 \), and a stride of 1. You want to use a "same" convolution. What is the padding?
+
+\textcolor{blue}{\textit{Solution:}}
+
+For a "same" convolution, the output size is the same as the input size. The formula for calculating the padding required for a "same" convolution is:
+
+\[
+\text{Padding} = \frac{\text{Filter size} - 1}{2}
+\]
+
+Where:
+\begin{itemize}
+    \item The \textbf{Filter size} is \( 5 \),
+    \item The stride is \( 1 \).
+\end{itemize}
+
+Substituting the values:
+
+\[
+\text{Padding} = \frac{5 - 1}{2} = \frac{4}{2} = 2
+\]
+
+Thus, the padding required is 2.
 
 % ---------------- Deep Convolutional Models ----------------------%
 \section{Deep Convolutional Models: Case Studies}
