@@ -16,7 +16,7 @@
 \usepackage{multirow}
 \usepackage{siunitx} % delete this
 \usepackage{booktabs}
-\usetikzlibrary{matrix,positioning,fit,backgrounds,intersections}
+\usetikzlibrary{matrix,positioning,fit,backgrounds,intersections, calc, decorations.pathreplacing}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -4362,24 +4362,625 @@ Thus, the padding required is 2.
 % ---------------- Case Studies ----------------------%
 \subsection{Case Studies}
 % ---------------- Classic Networks ----------------------%
-\subsection*{Classic Networks}
+\subsection*{Classic Neural Network Architectures}
+\subsubsection{LeNet-5}
+LeNet-5 is one of the earliest convolutional neural network architectures designed to recognize handwritten digits. Below are its key features:
+\begin{itemize}
+    \item \textbf{Input:} $32 \times 32 \times 1$ (grayscale image).
+    \item \textbf{Architecture:}
+    \begin{itemize}
+        \item Sequence: Conv $\Rightarrow$ Pool $\Rightarrow$ Conv $\Rightarrow$ Pool $\Rightarrow$ Fully Connected $\Rightarrow$ Fully Connected  $\Rightarrow$ Output
+        \item \textbf{Convolutional Layer:} 6 filters of size $5 \times 5$, stride 1, no padding. Output: $28 \times 28 \times 6$.
+        \item \textbf{Average Pooling:} Filter size $2 \times 2$, stride 2. Output: $14 \times 14 \times 6$.
+        \item \textbf{Convolutional Layer:} 16 filters of size $5 \times 5$, stride 1, no padding. Output: $10 \times 10 \times 16$.
+        \item \textbf{Average Pooling:} Filter size $2 \times 2$, stride 2. Output: $5 \times 5 \times 16$.
+        \item Fully connected layers: 
+	\begin{itemize}
+	\item First fully connected layer connects each of these 400 nodes with every one of 120 neurons
+	\item Second fully connected layer connects 120 nodes with every one of 84 neurons
+	\item $400 \rightarrow 120 \rightarrow 84 \rightarrow 10$.
+	\end{itemize}
+    \end{itemize}
+    \item \textbf{Output:} 10-way classification for digits (0–9) using a softmax function.
+    \item \textbf{Parameters:} Approximately 60,000.
+    \item \textbf{Key Patterns:} Reduction in spatial dimensions (height \& width) and increase in channels as layers deepen.
+    \item \textbf{Historical Notes:}
+    \begin{itemize}
+        \item Used \textbf{sigmoid} and \textbf{tanh} nonlinearities (ReLU is used in modern networks).
+        \item Complex filter-channel connections due to computational limitations.
+        \item Included a nonlinearity after pooling.
+    \end{itemize}
+\end{itemize}
+
+% Figure 32
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/LeNet-5.png}
+	\caption{LeNet - 5 Architecture}
+	\label{fig:32}
+\end{figure}
+
+\FloatBarrier
+
+\subsubsection{AlexNet}
+AlexNet brought significant advancements in deep learning for computer vision. It was trained on the ImageNet dataset and introduced key improvements.
+\begin{itemize}
+    \item \textbf{Input:} $227 \times 227 \times 3$ (RGB image).
+    \item \textbf{Architecture:}
+    \begin{itemize}
+        \item Convolutional Layer: 96 filters of size $11 \times 11$, stride 4. Output: $55 \times 55 \times 96$.
+        \item Max Pooling: Filter size $3 \times 3$, stride 2. Output: $27 \times 27 \times 96$.
+        \item Convolutional Layer: $5 \times 5$ filters, same padding. Output: $27 \times 27 \times 256$.
+        \item Max Pooling: Output: $13 \times 13 \times 256$.
+        \item Several additional convolutional layers, max-pooling, and fully connected layers follow.
+    \end{itemize}
+    \item \textbf{Output:} 1000-way softmax classification for ImageNet classes.
+    \item \textbf{Parameters:} Approximately 60 million.
+    \item \textbf{Key Improvements:}
+    \begin{itemize}
+        \item Use of \textbf{ReLU} activation instead of sigmoid/tanh.
+        \item Trained on two GPUs with layer-wise distribution of computations.
+        \item Introduced \textbf{Local Response Normalization} (not commonly used today).
+    \end{itemize}
+    \item \textbf{Impact:} Demonstrated the power of deep learning for computer vision.
+\end{itemize}
+
+% Figure 33
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/AlexNet.png}
+	\caption{AlexNet Architecture}
+	\label{fig:33}
+\end{figure}
+
+\subsubsection{VGG-16}
+VGG-16 emphasized simplicity and uniformity in architecture design.
+\begin{itemize}
+    \item \textbf{Input:} $224 \times 224 \times 3$ (RGB image).
+    \item \textbf{Architecture:}
+    \begin{itemize}[nosep]
+        \item All convolutional layers use $3 \times 3$ filters, stride 1, and same padding.
+        \item Max-pooling layers use $2 \times 2$ filters, stride 2.
+        \item Convolutional layers increase the number of filters:
+        \begin{itemize}
+            \item First two layers: 64 filters.
+            \item Next two layers: 128 filters.
+            \item Next three layers: 256 filters.
+            \item Next three layers: 512 filters.
+        \end{itemize}
+        \item Fully connected layers: 4096 units followed by a softmax layer.
+    \end{itemize}
+    \item \textbf{Output:} 1000-way classification for ImageNet classes.
+    \item \textbf{Parameters:} Approximately 138 million.
+    \item \textbf{Key Features:}
+    \begin{itemize}
+        \item Simplicity: Fixed filter sizes and strides.
+        \item Doubling of filters in successive stages (up to 512).
+        \item Uniform architecture design.
+    \end{itemize}
+    \item \textbf{Variants:} VGG-19 (deeper but similar performance).
+\end{itemize}
+
+% Figure 34
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/VGG-16.png}
+	\caption{VGG-16 Architecture}
+	\label{fig:34}
+\end{figure}
+
+\subsubsection{Comparison of Architectures}
+\begin{itemize}[nosep]
+    \item \textbf{LeNet-5:} Small network with $\sim$60,000 parameters, designed for grayscale digit recognition.
+    \item \textbf{AlexNet:} Introduced ReLU, GPU training, and scaled up to 60M parameters.
+    \item \textbf{VGG-16:} Uniform design with 138M parameters, using $3 \times 3$ filters throughout.
+\end{itemize}
 
 % ---------------- ResNets ----------------------%
 \subsection*{ResNets}
+Very deep neural networks are challenging to train due to \textbf{vanishing} and \textbf{exploding gradient} problems. To address this, \textbf{skip connections} (or \textbf{shortcuts}) were introduced. Skip connections allow activations from one layer to directly feed into another, bypassing intermediate layers. This concept is central to the architecture of \textbf{ResNets (Residual Networks)}, enabling training of networks with over 100 layers.
+
+\subsubsection{Residual Blocks}
+A \textbf{residual block} forms the building block of ResNets. Here's how it works:
+\begin{itemize}[nosep]
+    \item Start with activations from layer $a^{[l]}$.
+    \item Compute $z^{[l+1]}$ using the linear operation:
+    \[
+    z^{[l+1]} = W^{[l+1]}a^{[l]} + b^{[l+1]}.
+    \]
+    \item Apply a ReLU non-linearity:
+    \[
+    a^{[l+1]} = g(z^{[l+1]}),
+    \]
+    where $g$ is the ReLU function.
+    \item Repeat for the next layer to compute $z^{[l+2]}$ and $a^{[l+2]}$.
+\end{itemize}
+In a \textbf{plain network}, information must pass through these layers sequentially. However, in a \textbf{residual network}, a shortcut connection adds $a^{[l]}$ directly to $z^{[l+2]}$:
+\[
+a^{[l+2]} = g(z^{[l+2]} + a^{[l]}).
+\]
+This shortcut bypasses the main path, allowing information to flow more effectively.
+
+% Figure 35
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Residual Block.png}
+	\caption{Residual Block}
+	\label{fig:35}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+
+  \node[fill=orange!50] (l1) {layer 1};
+  \node[blue!50!black, right=of l1, label={below:activation}] (act1) {$a(\vec x)$};
+  \node[fill=teal!50, right=of act1] (l2) {layer 2};
+  \node[right=of l2, font=\Large, label={below:add}, inner sep=0, pin={60:$\mathcal F(\vec x) + \vec x$}] (add) {$\oplus$};
+  \node[blue!50!black, right=of add, label={below:activation}] (act2) {$a(\vec x)$};
+
+  \draw[->] (l1) -- (act1);
+  \draw[->] (act1) -- (l2);
+  \draw[<-] (l1) -- ++(-2,0) node[below, pos=0.8] {$\vec x$};
+  \draw[->] (l2) -- (act2) node[above, pos=0.8] {};
+  \draw[->] ($(l1)-(1.5,0)$) to[out=90, in=90] node[below=1ex, midway, align=center] {skip connection\\(identity)} node[above, midway] {$\vec x$} (add);
+  \draw[decorate, decoration={brace, amplitude=1ex, raise=1cm}] (l2.east) -- node[midway, below=1.2cm] {$\mathcal F(\vec x)$} (l1.west);
+\end{tikzpicture}
+  \caption{Illustration of skip connection in a residual block}
+  \label{fig:36}
+\end{figure}
+\FloatBarrier
+
+\subsubsection{Key Features of Residual Networks}
+\begin{itemize}
+    \item \textbf{Skip Connections:} Enable direct flow of information from earlier to deeper layers, addressing the vanishing/exploding gradient problem.
+    \item \textbf{Residual Learning:} Instead of learning the full transformation, residual blocks learn a residual function, simplifying optimization.
+    \item \textbf{Stacking Residual Blocks:} ResNets are built by stacking multiple residual blocks. For example, a ResNet with 5 residual blocks might look like shown in \textbf{Fig. \ref{fig:37}}:
+    \begin{itemize}
+        \item Each block adds a skip connection to a pair of layers.
+    \end{itemize}
+
+	% Figure 37
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\textwidth]{Images/Residual Networks.png}
+		\caption{Residual Networks}
+		\label{fig:37}
+	\end{figure}
+	\FloatBarrier
+
+    \item \textbf{Training Behavior:} 
+    \begin{itemize}
+        \item In plain networks, training error increases as the number of layers grows due to optimization challenges.
+        \item ResNets enable the training error to decrease even with very deep networks.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Practical Impact of ResNets}
+\begin{itemize}
+    \item ResNets have been successfully trained with over 100 layers, and experimental setups include networks with over 1000 layers.
+    \item By addressing gradient problems, ResNets ensure better performance without significant loss in training efficiency.
+    \item While deeper networks may plateau in performance gains, ResNets remain highly effective for training deep architectures.
+\end{itemize}
+
+ResNets revolutionized deep learning by enabling the training of very deep neural networks through skip connections and residual learning. These ideas have addressed critical challenges in optimization, such as vanishing gradients, and have paved the way for efficient training of deep architectures. Experimenting with ResNets will further solidify your understanding of these concepts.
+
+% ---------------- Inception Network ----------------------%
+\subsection*{Inception Network}
+When designing a convolutional layer, you might face the challenge of choosing the filter size: one-by-one, three-by-three, five-by-five, or even deciding whether to use a pooling layer. The inception network proposes to solve this dilemma by doing all of them. This approach makes the architecture more complex but is highly effective.
+
+\subsubsection*{Overview of the Inception Module}
+Given an input volume of size $28 \times 28 \times 192$, the inception module applies:
+
+\begin{itemize}[nosep]
+    \item A $1 \times 1$ convolution producing $28 \times 28 \times 64$.
+    \item A $3 \times 3$ convolution producing $28 \times 28 \times 128$.
+    \item A $5 \times 5$ convolution producing $28 \times 28 \times 32$.
+    \item A pooling layer producing $28 \times 28 \times 32$.
+\end{itemize}
+
+To maintain consistent spatial dimensions ($28 \times 28$), padding and strides are carefully chosen:
+\begin{itemize}[nosep]
+    \item Padding is used for both convolutions and pooling.
+    \item Stride is set to 1 for pooling.
+\end{itemize}
+
+The outputs are concatenated along the channel dimension, resulting in a volume of size $28 \times 28 \times 256$.
+
+\subsubsection*{Computational Cost of the Inception Module}
+One limitation of the inception module is its computational cost. Let us consider the $5 \times 5$ convolution:
+
+\subsubsection*{Original Design}
+For an input volume of $28 \times 28 \times 192$, a $5 \times 5$ convolution with 32 filters produces an output of $28 \times 28 \times 32$. The computational cost is:
+\begin{align*}
+\text{Computational cost} &= \text{ \#filter params * \# filter positions * \# of filters}  \\
+ & = 28 \times 28 \times 32 \times (5 \times 5 \times 192) = 120 \text{ million multiplications}.
+\end{align*}
+
+\subsubsection*{Using Bottleneck Layers}
+To reduce computational cost, the inception module incorporates $1 \times 1$ convolutions, known as \textbf{bottleneck layers}. This technique reduces the number of channels before applying the $5 \times 5$ convolution:
+\begin{enumerate}
+    \item Apply a $1 \times 1$ convolution to shrink the input volume to $28 \times 28 \times 16$:
+    \[
+    28 \times 28 \times 16 \times (1 \times 1 \times 192) = 2.4 \text{ million multiplications}.
+    \]
+    \item Apply the $5 \times 5$ convolution to the reduced volume:
+    \[
+    28 \times 28 \times 32 \times (5 \times 5 \times 16) = 10 \text{ million multiplications}.
+    \]
+\end{enumerate}
+
+The total cost is:
+\[
+2.4 + 10 = 12.4 \text{ million multiplications}.
+\]
+
+This is approximately one-tenth the cost of the original design.
+
+\subsubsection*{Effectiveness of Bottleneck Layers}
+Shrinking the representation size dramatically might seem harmful, but experiments show that as long as the bottleneck layer is implemented within reasonable limits, the performance of the neural network remains unaffected while computation costs are significantly reduced.
+
+The inception module allows the network to combine multiple filter sizes ($1 \times 1$, $3 \times 3$, $5 \times 5$) and pooling, avoiding the need to choose a specific filter size. By using bottleneck layers, the computational cost is significantly reduced without sacrificing performance. These ideas form the core of the inception network.
+
+% Figure 38
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Inception Network.png}
+	\caption{Inception Network}
+	\label{fig:38}
+\end{figure}
+\FloatBarrier
+
 % ---------------- MobileNet ----------------------%
-\subsection*{MobileNet}
+\subsection*{MobileNets and Depthwise Separable Convolution}
+\textbf{MobileNets} is a foundational convolutional neural network architecture used in computer vision. MobileNets are specifically designed for low-compute environments, such as mobile phones, enabling efficient deployment of neural networks. 
+
+\subsubsection*{Why MobileNets?}
+Many neural networks, such as ResNet and InceptionNet, are computationally expensive. If your deployment device has limited computational resources (e.g., less powerful CPU or GPU), MobileNet's architecture, with \textbf{depthwise separable convolutions}, can provide significant computational savings while maintaining performance.
+
+\subsubsection*{Normal Convolution}
+Consider an input image of size $n \times n \times n_c$, where $n_c$ is the number of channels (e.g., $6 \times 6 \times 3$). A filter of size $f \times f \times n_c$ (e.g., $3 \times 3 \times 3$) is convolved across the image. The steps include:
+\begin{itemize}[nosep]
+    \item Place the filter at each position on the image.
+    \item Perform $f \times f \times n_c$ multiplications (e.g., $3 \times 3 \times 3 = 27$).
+    \item Sum the results to produce one output value.
+    \item Repeat for all positions to compute the output of size $n_{\text{out}} \times n_{\text{out}} \times n_c'$, where $n_{\text{out}}$ is smaller due to no padding (e.g., $4 \times 4 \times 5$).
+\end{itemize}
+
+\subsubsection*{Computational Cost}
+The total cost is:
+\[
+f \times f \times n_c \times n_{\text{out}} \times n_{\text{out}} \times n_c'
+\]
+For example, with $f = 3$, $n_c = 3$, $n_{\text{out}} = 4$, and $n_c' = 5$, the cost is:
+\[
+3 \times 3 \times 3 \times 4 \times 4 \times 5 = 2160 \text{ multiplications.}
+\]
+
+% Figure 39
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Normal Convolution.png}
+	\caption{Normal Convolution}
+	\label{fig:39}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Depthwise Separable Convolution}
+In contrast to the normal convolution, the depthwise separable convolution has two steps. The first step is to use a depthwise convolution, followed by a pointwise convolution. It is these two steps which together make up this depthwise separable convolution. 
+
+Depthwise separable convolution splits the normal convolution into two steps:
+\begin{enumerate}[nosep]
+    \item \textbf{Depthwise Convolution}
+    \item \textbf{Pointwise Convolution}
+\end{enumerate}
+
+\subsubsection*{Step 1: Depthwise Convolution}
+\begin{itemize}[nosep]
+    \item Instead of $f \times f \times n_c$ filters, use $f \times f$ filters (one per channel).
+    \item Apply each filter to its corresponding channel.
+    \item Output size: $n_{\text{out}} \times n_{\text{out}} \times n_c$.
+\end{itemize}
+
+\subsubsection*{Computational Cost}
+\[
+f \times f \times n_{\text{out}} \times n_{\text{out}} \times n_c
+\]
+For $f = 3$, $n_{\text{out}} = 4$, and $n_c = 3$, the cost is:
+\[
+3 \times 3 \times 4 \times 4 \times 3 = 432 \text{ multiplications.}
+\]
+
+% Figure 40
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Depthwise Convolution.png}
+	\caption{Depthwise Convolution}
+	\label{fig:40}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Step 2: Pointwise Convolution}
+In the Pointwise Convolution, we take the intermediate set of values.i.e., output of Depthwise Convolution ($n_{\text{out}} \times n_{\text{out}} \times n_c'$) and convolve it with a filter that is $1 \times 1 \times n_c$, 1 by 1 by 3 in this case.
+\begin{itemize}[nosep]
+    \item Use $1 \times 1 \times n_c$ filters.
+    \item Convolve each filter across all positions to produce $n_c'$ output channels.
+    \item Output size: $n_{\text{out}} \times n_{\text{out}} \times n_c'$.
+\end{itemize}
+
+\subsubsection*{Computational Cost}
+\[
+1 \times 1 \times n_c \times n_{\text{out}} \times n_{\text{out}} \times n_c'
+\]
+For $n_c = 3$, $n_{\text{out}} = 4$, and $n_c' = 5$, the cost is:
+\[
+1 \times 1 \times 3 \times 4 \times 4 \times 5 = 240 \text{ multiplications.}
+\]
+
+% Figure 41
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/Pointwise Convolution.png}
+	\caption{Pointwise Convolution}
+	\label{fig:41}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Total Computational Cost}
+\[
+\text{Depthwise: } 432, \quad \text{Pointwise: } 240, \quad \text{Total: } 432 + 240 = 672 \text{ multiplications.}
+\]
+This is significantly less than the normal convolution cost of 2160 multiplications:
+\[
+\frac{672}{2160} \approx 0.31 \, (31\% \text{ of the original cost}).
+\]
+
+\subsubsection*{General Formula}
+The computational cost ratio between depthwise separable and normal convolution is:
+\[
+\frac{1}{n_c'} + \frac{1}{f^2}
+\]
+
+Depthwise separable convolution reduces computational cost while maintaining the same input-output dimensions as normal convolution. It is a core building block of MobileNets, enabling efficient inference on low-compute devices.
+
+
 % ---------------- EfficientNet ----------------------%
 \subsection*{EfficientNet}
+MobileNet V1 and V2 introduced a way to implement neural networks that are more computationally efficient. However, in practical applications, the challenge arises in tuning these architectures to fit specific devices. For instance, one might implement a computer vision algorithm for:
+\begin{itemize}[nosep]
+    \item Different brands of mobile phones with varying compute resources.
+    \item Different edge devices with distinct computational constraints.
+\end{itemize}
 
+Depending on the available computational budget, you may need a larger network for higher accuracy or a smaller network for faster execution at the cost of some accuracy. The question is: \textit{How can neural networks be automatically scaled up or down for a particular device?}
+
+\subsubsection*{EfficientNet: A Solution for Scalable Neural Networks}
+EfficientNet provides a method to systematically scale a baseline neural network architecture to meet specific computational requirements. Let’s assume the baseline architecture includes:
+\begin{itemize}[nosep]
+    \item \textbf{Input resolution} denoted as \(r\),
+    \item \textbf{Network depth} denoted as \(d\),
+    \item \textbf{Layer width} denoted as \(w\).
+\end{itemize}
+
+The authors of EfficientNet, Mingxing Tan and Quoc Le, identified three primary ways to scale a neural network:
+\begin{enumerate}[nosep]
+    \item Use higher resolution input images (\(r\)).
+    \item Increase the depth of the neural network (\(d\)).
+    \item Increase the width of the layers (\(w\)).
+\end{enumerate}
+
+The challenge is determining the best combination of \(r\), \(d\), and \(w\) for a given computational budget. EfficientNet introduces \textbf{compound scaling}, which allows simultaneous scaling of resolution, depth, and width. The key question is: \textit{At what rates should \(r\), \(d\), and \(w\) be scaled?}
+
+\subsubsection*{Compound Scaling Trade-Offs}
+When scaling up or down \(r\), \(d\), and \(w\), there are multiple trade-offs to consider:
+\begin{itemize}[nosep]
+    \item Should the resolution (\(r\)) be doubled while keeping depth (\(d\)) and width (\(w\)) constant?
+    \item Should the depth (\(d\)) be doubled while keeping resolution and width constant?
+    \item Should all three parameters (\(r\), \(d\), \(w\)) be scaled simultaneously, and if so, by what proportions?
+\end{itemize}
+
+EfficientNet helps determine the optimal trade-offs between these parameters to achieve the best performance within the computational budget. EfficientNet can adapt neural networks to specific devices by leveraging open-source implementations. These implementations enable practitioners to:
+\begin{itemize}[nosep]
+    \item Choose suitable trade-offs between \(r\), \(d\), and \(w\).
+    \item Build scalable neural networks for mobile devices, embedded systems, and other resource-constrained environments.
+\end{itemize}
+
+With MobileNet, one can design computationally efficient layers, and with EfficientNet, these architectures can be scaled to fit device-specific requirements. These tools empower developers to build neural networks for a wide range of applications, including mobile and embedded devices where computational and memory resources are limited.
 
 % ---------------- Practical Advice for Using ConvNets ----------------------%
 \subsection{Practical Advice for Using ConvNets}
 % ---------------- Using Open-Source Implementation ----------------------%
 \subsection*{Using Open-Source Implementation}
-% ---------------- Transfer Leraning ----------------------%
-\subsection*{Transfer Leraning}
+If you encounter a research paper with results you want to build upon, it is highly recommended to look online for an open-source implementation. This approach can save significant time compared to reimplementing the architecture from scratch. While reimplementation can be a valuable learning exercise, starting with open-source code can help you get started on a project much faster.
+
+\subsubsection*{Advantages of Using Open-Source Code}
+\begin{itemize}
+    \item \textbf{Pretrained Models:} Many open-source implementations include pretrained models, which can save you the time and computational resources required to train from scratch. These models are often trained on large datasets using multiple GPUs.
+    \item \textbf{Transfer Learning:} Pretrained models can be used for transfer learning, allowing you to adapt a pretrained network to your specific application. Transfer learning will be discussed in more detail in the next section.
+    \item \textbf{Time Efficiency:} Starting with open-source code significantly accelerates the development process for new projects.
+\end{itemize}
+
+\subsubsection*{Common Workflow for Computer Vision Applications}
+When developing a computer vision application, the following steps are common:
+\begin{enumerate}
+    \item Select an architecture that fits your needs. This could be one learned in a course, from literature, or recommended by a colleague.
+    \item Search for an open-source implementation of the architecture and download it from GitHub.
+    \item Utilize the pretrained weights, if available, to perform transfer learning or fine-tuning for your specific task.
+\end{enumerate}
+
+% ---------------- Transfer Learning ----------------------%
+\subsection*{Transfer Learning}
+When building computer vision applications, training a neural network from scratch using random initialization is often inefficient. Instead, you can make much faster progress by using pre-trained weights from networks trained on large datasets. This approach is known as \textbf{transfer learning}. 
+
+The computer vision research community has made numerous datasets such as ImageNet, MS COCO, and Pascal VOC publicly available. These datasets have been used to train various models, often taking weeks or months on high-performance GPUs. By leveraging these pre-trained weights, you can initialize your own models effectively, saving significant computational time and effort.
+
+To apply transfer learning, follow these steps:
+
+\subsubsection*{Example: Building a Cat Detector}
+Consider building a classifier to identify three classes: \textit{Tigger}, \textit{Misty}, or \textit{Neither}. If you have a small training set, transfer learning becomes invaluable:
+\begin{itemize}[nosep]
+    \item Download a pre-trained network and its weights (e.g., a model trained on ImageNet).
+    \item Replace the original softmax layer with a new one that outputs the desired three classes.
+    \item Freeze all layers except the softmax layer. This means the parameters in the frozen layers will not be updated during training.
+    \item Train only the softmax layer using your small dataset.
+\end{itemize}
+
+Most deep learning frameworks support freezing layers through parameters like \texttt{trainable=false} or \texttt{freeze=true}. This allows you to specify which layers remain unchanged during training.
+
+\subsubsection*{Pre-computation of Activations}
+Because the earlier layers are frozen, they act as a fixed function mapping input images to feature representations. To speed up training:
+\begin{itemize}[nosep]
+    \item Pre-compute activations from the frozen layers for all training images.
+    \item Save these activations to disk.
+    \item Train the softmax layer using these pre-computed features, avoiding the need to recompute them during each training epoch.
+\end{itemize}
+
+\subsubsection*{Larger Training Sets}
+If you have a larger labeled dataset:
+\begin{itemize}[nosep]
+    \item Freeze fewer layers and train more layers closer to the output. 
+    \item Replace the final layers with new ones tailored to your problem.
+    \item Use the pre-trained weights of the unfrozen layers as initialization and fine-tune them with gradient descent.
+\end{itemize}
+
+\subsubsection*{Extremely Large Training Sets}
+If you have a very large labeled dataset and a significant computational budget:
+\begin{itemize}[nosep]
+    \item Use the pre-trained weights as initialization for the entire network.
+    \item Train the entire network (including all layers) using your dataset.
+    \item Replace the original softmax layer with one that matches your output classes.
+\end{itemize}
+
+\subsubsection*{Advantages of Transfer Learning}
+\begin{itemize}[nosep]
+    \item Pre-trained weights have learned rich feature representations from massive datasets.
+    \item Reduces training time and computational resources required.
+    \item Improves performance, especially when the task-specific dataset is small.
+\end{itemize}
+
+\subsubsection*{Applications in Computer Vision}
+In computer vision, transfer learning is almost always recommended unless:
+\begin{itemize}[nosep]
+    \item You have an exceptionally large dataset.
+    \item You have a substantial computational budget to train a network from scratch.
+\end{itemize}
+For most practical applications, transfer learning offers a faster, more efficient path to high-performance models.
+
+
+\textbf{Question:} \\
+\textbf{Q.1.} Suppose that in a MobileNet v2 Bottleneck block we have an $n \times n \times 5$ input volume. We use $30$ filters for the expansion, in the depthwise convolutions we use $3 \times 3$ filters, and $20$ filters for the projection. How many parameters are used in the complete block, assuming no bias is used?
+
+\textcolor{blue}{\textit{Solution:}} 
+
+To compute the total number of parameters, we consider the following components of the MobileNet v2 Bottleneck block:
+
+\textbf{1. Expansion Convolution} \\
+The expansion step increases the number of channels in the input volume. The number of parameters is given by:
+\[
+\text{Parameters for Expansion} = k_1 \times k_2 \times c_{\text{in}} \times c_{\text{out}}
+\]
+where:
+\begin{itemize}
+    \item $k_1 \times k_2$ is the filter size, which is $1 \times 1$,
+    \item $c_{\text{in}}$ is the number of input channels, which is $5$,
+    \item $c_{\text{out}}$ is the number of filters, which is $30$.
+\end{itemize}
+Substituting the values:
+\[
+\text{Parameters for Expansion} = 1 \times 1 \times 5 \times 30 = 150
+\]
+
+\textbf{2. Depthwise Convolution} \\
+In the depthwise convolution, each filter operates on a single input channel. The number of parameters is given by:
+\[
+\text{Parameters for Depthwise Convolution} = k_1 \times k_2 \times c_{\text{in}}
+\]
+where:
+\begin{itemize}
+    \item $k_1 \times k_2$ is the filter size, which is $3 \times 3$,
+    \item $c_{\text{in}}$ is the number of input channels after expansion, which is $30$.
+\end{itemize}
+Substituting the values:
+\[
+\text{Parameters for Depthwise Convolution} = 3 \times 3 \times 30 = 270
+\]
+
+\textbf{3. Projection Convolution} \\
+The projection step reduces the number of channels to the desired output. The number of parameters is given by:
+\[
+\text{Parameters for Projection} = k_1 \times k_2 \times c_{\text{in}} \times c_{\text{out}}
+\]
+where:
+\begin{itemize}
+    \item $k_1 \times k_2$ is the filter size, which is $1 \times 1$,
+    \item $c_{\text{in}}$ is the number of input channels after depthwise convolution, which is $30$,
+    \item $c_{\text{out}}$ is the number of output channels, which is $20$.
+\end{itemize}
+Substituting the values:
+\[
+\text{Parameters for Projection} = 1 \times 1 \times 30 \times 20 = 600
+\]
+
+\textbf{Total Parameters} \\
+The total number of parameters in the block is the sum of the parameters from the three components:
+\[
+\text{Total Parameters} = 150 + 270 + 600 = 1020
+\]
+
+The total number of parameters in the MobileNet v2 Bottleneck block is \textbf{1020}.
+
 % ---------------- Data Augmentation ----------------------%
 \subsection*{Data Augmentation}
+Most computer vision tasks could benefit from more data. Data augmentation is one of the techniques frequently used to improve the performance of computer vision systems. 
+
+Computer vision is a complex task, requiring the input of an image, with all its pixels, and the determination of what is present in the picture. In practice, for almost all computer vision tasks, having more data will help. This is unlike other domains where it is possible to gather sufficient data, alleviating the pressure to collect more. However, in computer vision, it often feels like there is never enough data. 
+
+As a result, when training a computer vision model, data augmentation is often helpful. This is true whether you are using transfer learning (pre-trained weights) or training a model from scratch.
+
+\subsubsection*{Common Data Augmentation Techniques}
+\subsubsection*{1. Mirroring}
+Perhaps the simplest data augmentation method is mirroring along the vertical axis. For example, given an image of a cat, flipping it horizontally still results in an image of a cat. If the mirroring operation preserves the properties you are trying to recognize, this is an effective data augmentation technique.
+
+\subsubsection*{2. Random Cropping}
+Random cropping involves taking random sections of an image as input for training. For instance, given an image, you can extract various random crops from it. While this technique isn't perfect (e.g., some crops may not capture meaningful features of the object), it works well if the random crops are reasonably large subsets of the image.
+
+\subsubsection*{3. Additional Techniques}
+Other augmentation techniques include:
+\begin{itemize}
+    \item \textbf{Rotation}: Rotating the image at various angles.
+    \item \textbf{Shearing and Local Warping}: Distorting the image to simulate perspective changes.
+    \item \textbf{Color Shifting}: Altering the RGB channels to simulate changes in lighting or environment. For example, adding values to the red and blue channels while subtracting from the green channel might make the image appear more purple.
+\end{itemize}
+
+These techniques help create variations in the training data, making the model more robust to real-world scenarios.
+
+\subsubsection*{PCA Color Augmentation}
+An advanced form of color shifting involves PCA (Principal Component Analysis) Color Augmentation. As detailed in the AlexNet paper, this method adjusts the RGB channels based on the principal components of the dataset. While the technical details are complex, the goal is to introduce realistic color variations while preserving the overall color balance of the image.
+
+For those interested, the AlexNet paper and various open-source implementations provide further details.
+
+\subsection*{Implementing Data Augmentation}
+\subsubsection*{Data Pipeline}
+A common implementation of data augmentation involves the following steps:
+\begin{enumerate}
+    \item Load images from a hard disk using a CPU thread.
+    \item Apply augmentations such as random cropping, mirroring, or color shifting.
+    \item Pass the augmented data to another thread or process for training. Training is often performed on a GPU for large neural networks.
+\end{enumerate}
+This parallelized approach ensures efficient training with augmented data.
+
+\subsubsection*{Hyperparameters}
+Data augmentation also has hyperparameters, such as:
+\begin{itemize}
+    \item The extent of color shifting (e.g., how much to add/subtract from RGB channels).
+    \item The parameters for random cropping (e.g., crop size and position).
+\end{itemize}
+It is often useful to start with open-source implementations for data augmentation and tweak hyperparameters as needed to capture additional invariances.
+
+\subsubsection*{Conclusion}
+Data augmentation is a powerful technique to improve the performance of computer vision applications. By incorporating augmentations such as mirroring, random cropping, and color shifting, you can enhance your model's robustness and generalization capabilities. 
+
+When applying data augmentation, consider using open-source implementations or fine-tuning hyperparameters to suit your specific application. With these techniques, your computer vision applications will perform better and be more robust to variations in data.
 
 \end{document}
 
