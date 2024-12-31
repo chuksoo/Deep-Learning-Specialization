@@ -162,6 +162,6 @@ cython_debug/
 #.idea/
 
 # Directory
-C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A1/models/
-C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A1/resnet50.h5
-C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A2/dataset
+C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A1 - Building a very deep Convolutional Network using Residual Networks/models/
+C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A1 - Building a very deep Convolutional Network using Residual Networks/resnet50.h5
+C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A2 - Transfer Learning with MobileNetV2/dataset
