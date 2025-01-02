@@ -4332,11 +4332,11 @@ Thus, the resulting volume after padding is:
 33 \times 33 \times 32
 \]
 
-\textbf{Q.5.} You have a volume that is \( 121 \times 121 \times 32 \), and convolve it with 32 filters of size \( 5 \times 5 \), and a stride of 1. You want to use a "same" convolution. What is the padding?
+\textbf{Q.5.} You have a volume that is \( 121 \times 121 \times 32 \), and convolve it with 32 filters of size \( 5 \times 5 \), and a stride of 1. You want to use a ``same'' convolution. What is the padding?
 
 \textcolor{blue}{\textit{Solution:}}
 
-For a "same" convolution, the output size is the same as the input size. The formula for calculating the padding required for a "same" convolution is:
+For a ``same'' convolution, the output size is the same as the input size. The formula for calculating the padding required for a ``same'' convolution is:
 
 \[
 \text{Padding} = \frac{\text{Filter size} - 1}{2}
@@ -4981,6 +4981,909 @@ It is often useful to start with open-source implementations for data augmentati
 Data augmentation is a powerful technique to improve the performance of computer vision applications. By incorporating augmentations such as mirroring, random cropping, and color shifting, you can enhance your model's robustness and generalization capabilities. 
 
 When applying data augmentation, consider using open-source implementations or fine-tuning hyperparameters to suit your specific application. With these techniques, your computer vision applications will perform better and be more robust to variations in data.
+
+% ---------------- Detection Algorithms ----------------------%
+\section{Detection Algorithms}
+
+% ---------------- Object Localization ----------------------%
+\subsection{Object Localization}
+Image classification involves identifying the main object in an image, e.g., labeling it as a car. Classification with localization extends this by adding the task of locating the object with a bounding box around it.
+
+\begin{itemize}
+    \item \textbf{Classification with Localization Problem:} Involves recognizing the object and drawing a bounding box (red rectangle) around its position in the image.
+    \item \textbf{Detection Problem:} Involves recognizing and localizing multiple objects in an image. For example, in autonomous driving, objects like cars, pedestrians, and motorcycles must be detected and localized.
+\end{itemize}
+
+The differences between classification with localization and detection is that:
+\begin{itemize}
+    \item Classification/localization generally involves one object, usually centered in the image.
+    \item Detection involves multiple objects, potentially of different categories, within the same image.
+\end{itemize}
+
+\subsubsection*{Neural Network for Classification with Localization}
+A typical Convolutional Neural Network (CNN) for image classification outputs a class label using softmax. To localize objects, the network is modified to output four additional numbers:
+\begin{itemize}
+    \item \textbf{bx, by:} Midpoint coordinates of the bounding box.
+    \item \textbf{bh, bw:} Height and width of the bounding box.
+\end{itemize}
+
+Bounding box coordinates are normalized between $(0,0)$ (top-left) and $(1,1)$ (bottom-right).
+
+\textbf{Example:} If a bounding box is halfway across the image horizontally and 70\% down vertically, then $b_x = 0.5$, $b_y = 0.7$. If the box occupies 30\% of the image height and 40\% of the image width, then $b_h = 0.3$, $b_w = 0.4$.
+
+\subsubsection*{Target Label Definition (\textit{y})}
+The target label $y$ consists of:
+\begin{itemize}[nosep]
+    \item \textbf{pc:} A binary value ($1$ if an object exists, $0$ if no object exists).
+    \item \textbf{Bounding box parameters:} $b_x$, $b_y$, $b_h$, $b_w$ (defined if $p_c = 1$).
+    \item \textbf{Class labels:} $c_1$, $c_2$, $c_3$ (indicating the object class: pedestrian, car, motorcycle).
+\end{itemize}
+
+For Examples: 
+\begin{itemize}[nosep]
+    \item If an image contains a car, the label includes $p_c = 1$, the bounding box parameters, and $c_2 = 1$ (indicating a car).
+    \item If an image contains no object, $p_c = 0$, and other parameters are ``don't care.''
+\end{itemize}
+
+\subsubsection*{Loss Function}
+\begin{itemize}
+    \item If $p_c = 1$ (object present):
+    \begin{itemize}
+        \item Loss includes the squared error for all eight outputs ($p_c$, $b_x$, $b_y$, $b_h$, $b_w$, $c_1$, $c_2$, $c_3$).
+    \end{itemize}
+    \item If $p_c = 0$ (no object):
+    \begin{itemize}
+        \item Loss considers only the squared error for $p_c$, ignoring the other parameters.
+    \end{itemize}
+\end{itemize}
+
+\textbf{In practice:}
+\begin{itemize}[nosep]
+    \item A logistic regression loss can be used for $p_c$.
+    \item Softmax cross-entropy is typically used for class labels ($c_1$, $c_2$, $c_3$).
+    \item Squared error or a similar loss can be used for bounding box parameters.
+\end{itemize}
+
+% ---------------- Landmark Detection ----------------------%
+\subsection{Landmark Detection}
+
+Previously, we saw how a neural network can output four numbers (\(b_x\), \(b_y\), \(b_h\), and \(b_w\)) to specify the bounding box of an object. In more general cases, a neural network can output \(X\) and \(Y\) coordinates of important points in an image, often referred to as \textbf{landmarks}, which the network is trained to recognize. Below, we explore several examples and use cases of this concept:
+
+\subsubsection*{Landmarks for Face Detection}
+\begin{itemize}
+    \item Suppose you're building a face recognition application and want the algorithm to locate the corner of someone's eye. This location has an \(X\) and \(Y\) coordinate, which can be output by the neural network as \(l_x\) and \(l_y\).
+    \item If you need the network to identify all four corners of both eyes, you can modify the neural network to output \((l_{1x}, l_{1y}), (l_{2x}, l_{2y}), \dots, (l_{4x}, l_{4y})\), corresponding to the four points.
+    \item Beyond these four points, the network can detect additional key points:
+    \begin{itemize}
+        \item Points along the eyes to capture their shape.
+        \item Key points along the mouth to analyze expressions (e.g., smiling or frowning).
+        \item Key points along the edges of the nose and jawline.
+    \end{itemize}
+    \item For example, the network can output coordinates for 64 landmarks (or key points) across the face. For each landmark, the network outputs \(X\) and \(Y\) coordinates, resulting in \(2 \times 64 = 128\) output units, plus one unit for detecting if there is a face or not.
+\end{itemize}
+
+\subsubsection*{Applications of Landmark Detection}
+\begin{itemize}
+    \item Detecting facial landmarks is foundational for applications like:
+    \begin{itemize}
+        \item Emotion recognition (e.g., detecting smiles or frowns).
+        \item Augmented reality (AR) filters, such as drawing crowns, hats, or other special effects on a face.
+        \item Generating computer graphics effects by warping or overlaying facial features.
+    \end{itemize}
+    \item Training a neural network for landmark detection requires a labeled training dataset where landmarks are manually annotated for consistency across images. For example:
+    \begin{itemize}
+        \item Landmark \(1\) could consistently represent the left corner of the left eye across all training images.
+        \item Landmark \(2\) could consistently represent the right corner of the left eye, and so on.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Pose Detection}
+\begin{itemize}
+    \item Landmark detection is not limited to facial recognition. For example, in human pose detection, a neural network can output key points such as:
+    \begin{itemize}
+        \item The midpoint of the chest.
+        \item The left shoulder, left elbow, wrist, etc.
+    \end{itemize}
+    \item To detect poses, you could define 32 key points and have the neural network output \((l_{1x}, l_{1y}), \dots, (l_{32x}, l_{32y})\), where each coordinate corresponds to a specific body part.
+\end{itemize}
+
+\subsubsection*{Key Considerations in Landmark labeling}
+\begin{itemize}
+    \item Consistency in landmark labeling is crucial. For example:
+    \begin{itemize}
+        \item Landmark \(1\) should always correspond to the left corner of the left eye across all images.
+        \item Landmark \(2\) should always correspond to the right corner of the left eye, and so on.
+    \end{itemize}
+    \item If a sufficiently large labeled dataset is available, a neural network can learn to output these landmarks and enable interesting applications like pose estimation, emotion recognition, or augmented reality effects.
+\end{itemize}
+
+In conclusion, the idea of adding output units to predict \(X, Y\) coordinates of landmarks is simple but powerful. With consistent labeling and a large annotated dataset, neural networks can detect landmarks to enable a variety of tasks in computer vision, such as facial recognition, pose estimation, and more. 
+
+% ---------------- Object Detection ----------------------%
+\subsection{Object Detection}
+The \textbf{Sliding Windows Detection Algorithm} is an early approach for object detection. Suppose you want to build a car detection algorithm. Here's the general process:
+\begin{enumerate}
+    \item Create a labeled training set \((x, y)\):
+    \begin{itemize}
+        \item \(x\): Closely cropped images of cars (positive examples) and non-cars (negative examples).
+        \item \(y\): Labels where \(y = 1\) for cars and \(y = 0\) for non-cars.
+        \item The training set should consist of images where the car is centered and fills the majority of the frame.
+    \end{itemize}
+    \item Train a ConvNet to classify the images:
+    \begin{itemize}
+        \item Input: An image \(x\).
+        \item Output: A prediction \(y \in \{0, 1\}\), where \(y = 1\) indicates the presence of a car.
+    \end{itemize}
+\end{enumerate}
+
+In \textbf{Sliding Windows Detection Algorithm}, once the ConvNet is trained, it can be used to perform object detection as follows:
+\begin{enumerate}
+    \item Take a test image.
+    \item Define a fixed window size and slide it across the image:
+    \begin{itemize}
+        \item Extract a small rectangular region (window) of the image.
+        \item Resize the region to match the input size of the ConvNet.
+        \item Pass the resized region through the ConvNet and predict \(y \in \{0, 1\}\).
+        \item Slide the window horizontally and vertically across the image using a certain stride.
+    \end{itemize}
+    \item Repeat the process with larger window sizes:
+    \begin{itemize}
+        \item Increase the window size to cover larger areas of the image.
+        \item Pass these resized windows through the ConvNet.
+        \item Use strides to slide the larger windows across the image.
+    \end{itemize}
+    \item If the ConvNet predicts \(y = 1\) for a window, a car is detected in that region.
+\end{enumerate}
+
+\subsubsection*{Limitations of Sliding Windows Detection}
+While the Sliding Windows Detection Algorithm is conceptually straightforward, it suffers from several significant drawbacks:
+\begin{enumerate}
+    \item \textbf{High Computational Cost:}
+    \begin{itemize}
+        \item Cropping out many regions and passing each through the ConvNet is computationally expensive.
+        \item Using fine-grained strides improves accuracy but increases computational cost significantly.
+    \end{itemize}
+    \item \textbf{Granularity vs. Accuracy:}
+    \begin{itemize}
+        \item Coarse strides reduce the number of windows but hurt detection accuracy.
+        \item Fine strides improve accuracy but dramatically increase computation time.
+    \end{itemize}
+\end{enumerate}
+
+Before the rise of neural networks, simpler classifiers such as linear classifiers over hand-engineered features were used for object detection. During that era, the Sliding Windows Algorithm was computationally feasible. However, with the advent of ConvNets, which are more computationally intensive, the Sliding Windows Algorithm became impractical.
+
+Fortunately, the computational inefficiencies of the Sliding Windows Detection Algorithm can be addressed by implementing it convolutionally, which is significantly more efficient. 
+
+% ---------------- Convolutional Implementation of Sliding Windows----------------------%
+\subsection{Convolutional Implementation of Sliding Windows}
+We noted that Sliding Windows Object Detection Algorithm using a ConvNet was computationally expensive and slow. One way to make it more efficient is to implement the Sliding Windows algorithm convolutionally, which makes the process significantly more efficient.
+
+\subsubsection*{Converting Fully Connected Layers to Convolutional Layers}
+
+To implement the Sliding Windows algorithm convolutionally, we need to replace fully connected layers with convolutional layers. Here's how this transformation works:
+
+\begin{enumerate}
+    \item Suppose the input image size is $14 \times 14 \times 3$ (a small size for illustration purposes).
+    \item A ConvNet processes the input as follows:
+    \begin{itemize}
+        \item Apply $5 \times 5$ filters with 16 channels, mapping the input to $10 \times 10 \times 16$.
+        \item Apply $2 \times 2$ max pooling to reduce the dimensions to $5 \times 5 \times 16$.
+        \item Use a fully connected layer to connect the features to 400 units.
+        \item Add another fully connected layer before the softmax output, which predicts the class probabilities (e.g., pedestrian, car, motorcycle, background).
+    \end{itemize}
+    \item Convert the fully connected layers into convolutional layers:
+    \begin{itemize}
+        \item Replace the first fully connected layer with $400$ $5 \times 5 \times 16$ convolutional filters. This results in a $1 \times 1 \times 400$ output.
+        \item Replace the second fully connected layer with $400$ $1 \times 1$ convolutional filters, maintaining the $1 \times 1 \times 400$ output.
+        \item Use a $1 \times 1$ convolution followed by a softmax activation to produce a $1 \times 1 \times 4$ output for class probabilities.
+    \end{itemize}
+\end{enumerate}
+
+This conversion maintains the same mathematical operations while transforming the network into a convolutional format, allowing for efficient computation.
+
+% Figure 42
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{Images/FC to Convolution.png}
+	\caption{Converting Fully Connected Layers to Convolutional Layers}
+	\label{fig:42}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Convolutional Implementation of Sliding Windows Detection}
+
+Let us now see how this approach improves the Sliding Windows algorithm:
+\begin{enumerate}
+    \item Suppose your test image is $16 \times 16 \times 3$:
+    \begin{itemize}
+        \item In the standard Sliding Windows algorithm, you would crop regions of size $14 \times 14 \times 3$, process each through the ConvNet, and predict class labels.
+        \item This requires running the ConvNet multiple times, once for each region, leading to redundant computations.
+    \end{itemize}
+    \item Instead, in the convolutional implementation:
+    \begin{itemize}
+        \item Pass the entire image ($16 \times 16 \times 3$) through the ConvNet in one forward pass.
+        \item Perform convolutions with shared computations to generate a $2 \times 2 \times 4$ output volume, where each $1 \times 1 \times 4$ region corresponds to the prediction for a $14 \times 14$ patch of the input image.
+        \item Each $1 \times 1 \times 4$ section in the output volume maps to a specific region of the input image (e.g., top-left, top-right, bottom-left, bottom-right).
+    \end{itemize}
+\end{enumerate}
+
+The Advantages of the Convolutional Approach is:
+\begin{itemize}
+    \item \textbf{Efficiency:} By sharing computations across overlapping regions, the convolutional implementation significantly reduces the computational cost.
+    \item \textbf{Scalability:} The approach works seamlessly for larger images. For example, processing a $28 \times 28 \times 3$ image results in an $8 \times 8 \times 4$ output volume, corresponding to predictions for each $14 \times 14$ region with a stride of 2.
+\end{itemize}
+
+While the convolutional implementation of Sliding Windows is more efficient, it still has one key limitation:
+\begin{itemize}
+    \item \textbf{Bounding Box Accuracy:} The positions of the bounding boxes may not be very accurate.
+\end{itemize}
+
+% ---------------- Bounding Box Predictions ----------------------%
+\subsection{Improving Bounding Box Predictions: The YOLO Algorithm}
+The YOLO (You Only Look Once) algorithm, addresses the limitations in producing accurate bounding boxes encountered by the convolutional implementation of Sliding Windows and provides more precise bounding box predictions.
+
+YOLO, developed by Joseph Redmon, Santosh Divvala, Ross Girshick, and Ali Farhadi, transforms object detection into a regression problem that predicts bounding boxes and class probabilities directly from the image. 
+
+\subsubsection*{Grid-Based Detection}
+\begin{itemize}
+    \item Divide the input image into a grid. For simplicity, consider a $3 \times 3$ grid (in practice, grids such as $19 \times 19$ are used for finer granularity).
+    \item Each grid cell is responsible for detecting objects whose midpoint falls within that cell.
+    \item For each grid cell, the algorithm predicts:
+    \begin{itemize}
+        \item $p_c$: Probability that an object exists in the grid cell.
+        \item $b_x$, $b_y$, $b_h$, $b_w$: Bounding box parameters relative to the grid cell.
+        \item $c_1$, $c_2$, $c_3$: Class probabilities (e.g., pedestrian, car, motorcycle).
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Target Label Representation}
+\begin{itemize}
+    \item For each grid cell, the label $y$ is an 8-dimensional vector:
+    \[
+    y = \begin{bmatrix}
+    p_c & b_x & b_y & b_h & b_w & c_1 & c_2 & c_3
+    \end{bmatrix}
+    \]
+    \item If no object exists in the grid cell, $p_c = 0$, and the remaining components are ``don't care.''
+    \item For a grid cell with an object:
+    \begin{itemize}
+        \item $p_c = 1$.
+        \item $b_x$, $b_y$: Coordinates of the object's midpoint, normalized to the grid cell.
+        \item $b_h$, $b_w$: Height and width of the bounding box, normalized to the grid cell dimensions.
+        \item $c_1, c_2, c_3$: Class labels as one-hot vectors.
+    \end{itemize}
+    \item The output for a $3 \times 3$ grid is a $3 \times 3 \times 8$ volume, where each $1 \times 1 \times 8$ vector corresponds to one grid cell.
+\end{itemize}
+
+\subsubsection*{Training the Neural Network}
+\begin{itemize}
+    \item The input to the network is an image (e.g., $100 \times 100 \times 3$).
+    \item The network consists of convolutional layers, max-pooling layers, and fully connected layers, designed to map the input image to a $3 \times 3 \times 8$ output volume.
+    \item During training:
+    \begin{itemize}
+        \item Use labeled data with input images and target labels $y$ (e.g., $3 \times 3 \times 8$).
+        \item Train the network using backpropagation to minimize the loss between predicted and target outputs.
+    \end{itemize}
+\end{itemize}
+
+The Advantages of YOLO algorithms is:
+\begin{itemize}[nosep]
+    \item \textbf{Precision:} Outputs bounding boxes with precise coordinates and aspect ratios.
+    \item \textbf{Efficiency:} YOLO uses a convolutional implementation, sharing computation across grid cells, making it highly efficient for real-time detection.
+    \item \textbf{Scalability:} Finer grids (e.g., $19 \times 19$) reduce the likelihood of multiple objects being assigned to the same grid cell.
+\end{itemize}
+
+\subsubsection*{Bounding Box Encoding}
+\begin{itemize}
+    \item Bounding box parameters ($b_x$, $b_y$, $b_h$, $b_w$) are defined relative to the grid cell:
+    \begin{itemize}
+        \item $(0, 0)$: Upper-left corner of the grid cell.
+        \item $(1, 1)$: Lower-right corner of the grid cell.
+    \end{itemize}
+    \item For example, if the midpoint of a bounding box is at $(0.4, 0.3)$ within the grid cell, $b_x = 0.4$ and $b_y = 0.3$.
+    \item $b_h$ and $b_w$ represent the height and width of the bounding box, normalized to the grid cell dimensions.
+\end{itemize}
+
+\subsubsection*{Challenges and Refinements}
+\begin{itemize}
+    \item Handling multiple objects within the same grid cell is a challenge addressed in later refinements.
+    \item Advanced parametrizations (e.g., using sigmoid functions) ensure values like $b_x, b_y \in [0, 1]$ and $b_h, b_w \geq 0$ for improved stability.
+\end{itemize}
+
+The YOLO algorithm efficiently predicts bounding boxes and class probabilities for objects in an image, making it suitable for real-time object detection. While the algorithm has some complexities, its convolutional implementation and performance have made it a popular choice in computer vision. 
+
+% ---------------- Intersection Over Union ----------------------%
+\subsection*{Intersection Over Union (IoU)}
+
+To evaluate the performance of an object detection algorithm, we use a metric called \textbf{Intersection Over Union (IoU)}. This metric helps to determine how well your algorithm localizes objects. IoU is used both for evaluation and as a component in improving the algorithm. Let us explore how it works.
+
+\begin{itemize}
+    \item In object detection, the goal is to localize objects by predicting bounding boxes.
+    \item IoU measures the overlap between the \textit{predicted bounding box} and the \textit{ground-truth bounding box}.
+    \item The \textbf{intersection} is the area of overlap between the predicted and ground-truth bounding boxes.
+    \item The \textbf{union} is the total area covered by both the predicted and ground-truth bounding boxes.
+    \item IoU is computed as:
+    \[
+    \text{IoU} = \frac{\text{Area of Intersection}}{\text{Area of Union}}
+    \]
+\end{itemize}
+
+\subsubsection*{Interpreting IoU Values}
+\begin{itemize}
+    \item If the predicted and ground-truth bounding boxes overlap perfectly, IoU = 1.
+    \item By convention, a predicted bounding box is considered \textit{correct} if:
+    \[
+    \text{IoU} \geq 0.5
+    \]
+    \item Thresholds can vary depending on the application:
+    \begin{itemize}
+        \item \textbf{More stringent criteria:} Use thresholds like 0.6 or 0.7 to demand higher accuracy.
+        \item \textbf{Less stringent criteria:} Lower thresholds are rarely used (e.g., below 0.5).
+    \end{itemize}
+\end{itemize}
+
+% ---------------- Non-Max Suppression ----------------------%
+\subsection*{Non-Max Suppression}
+One of the challenges in object detection is that an algorithm may detect the same object multiple times, resulting in overlapping bounding boxes. \textbf{Non-Max Suppression (NMS)} is a technique used to ensure that each object is detected only once. Let us go through an example and the steps of the algorithm.
+
+\subsubsection*{Example of Non-Max Suppression}
+\begin{itemize}[nosep]
+    \item Suppose we want to detect pedestrians, cars, and motorcycles in an image.
+    \item A grid (e.g., a $19 \times 19$ grid) is placed over the image, and an object classification and localization algorithm is run for every grid cell.
+    \item It is common for multiple grid cells to predict the same object, resulting in overlapping bounding boxes.
+    \item For instance, multiple grid cells might predict the presence of a car with different bounding boxes and probabilities.
+\end{itemize}
+
+% Figure 43
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{Images/Non-Max Suppression Example.png}
+	\caption{Example of Non-Max Suppression}
+	\label{fig:43}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{How Non-Max Suppression Works}
+\begin{itemize}
+    \item Non-Max Suppression eliminates redundant predictions and retains only the most confident ones.
+    \item \textbf{Steps:}
+    \begin{enumerate}
+        \item Identify the bounding box with the highest confidence score ($p_c$).
+        \item Commit to this bounding box as a prediction.
+        \item Suppress all other bounding boxes that have a high overlap (\textbf{IoU}) with the selected bounding box.
+        \item Repeat the process for the next highest confidence score until all boxes are processed.
+    \end{enumerate}
+    \item This ensures that only one bounding box per object is retained.
+\end{itemize}
+
+% Figure 44
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{Images/Non-Max Suppression Working.png}
+	\caption{Non-Max Suppression}
+	\label{fig:44}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Algorithm Steps}
+\begin{enumerate}[nosep]
+    \item Start with a $19 \times 19 \times 8$ output volume (e.g., for detecting a single object, this simplifies to $19 \times 19 \times 5$, which includes $p_c$ and bounding box parameters).
+    \item \textbf{Step 1:} Discard all bounding boxes with $p_c \leq \text{threshold}$ (e.g., $p_c \leq 0.6$).
+    \item \textbf{Step 2:} While there are remaining bounding boxes:
+    \begin{itemize}
+        \item Select the box with the highest $p_c$ and output it as a prediction.
+        \item Suppress (discard) all other boxes with a high \textbf{IoU} with the selected box.
+    \end{itemize}
+    \item Repeat until all boxes are either processed or discarded.
+\end{enumerate}
+
+\subsubsection*{Multiple Object Classes}
+\begin{itemize}[nosep]
+    \item If detecting multiple classes (e.g., pedestrians, cars, and motorcycles), the algorithm needs to be run separately for each class.
+    \item Perform Non-Max Suppression independently for each class' output vector.
+    \item This ensures that predictions for different classes are handled correctly.
+\end{itemize}
+
+\subsubsection*{Benefits of Non-Max Suppression}
+\begin{itemize}[nosep]
+    \item Ensures that each object is detected only once.
+    \item Reduces the number of redundant predictions.
+    \item Improves the clarity and accuracy of object detection results.
+\end{itemize}
+
+% ---------------- Anchor boxes ----------------------%
+\subsection*{Anchor Boxes}
+Anchor boxes further improve the YOLO algorithm's ability to detect objects with varying shapes and sizes.
+One of the limitations of object detection, as introduced so far, is that each grid cell can detect only one object. However, what happens if multiple objects share the same grid cell? \textbf{Anchor Boxes} provide a solution by enabling multiple detections per grid cell.
+
+Consider a $3 \times 3$ grid over an image containing a pedestrian and a car.
+\begin{itemize}[nosep]
+    \item The midpoints of both objects may fall into the same grid cell.
+    \item Without anchor boxes, the grid cell can only detect one object, requiring a choice between the pedestrian or the car.
+    \item \textbf{Anchor Boxes:} Pre-define shapes called \textit{anchor boxes}, allowing each grid cell to associate multiple predictions with multiple anchor boxes.
+\end{itemize}
+
+\subsubsection*{Structure of the Output Vector}
+\begin{itemize}
+    \item Instead of a single output vector, each grid cell now predicts multiple vectors, one for each anchor box.
+    \item For two anchor boxes:
+    \[
+    Y = \big[\text{Anchor Box 1: } p_c, b_x, b_y, b_h, b_w, c_1, c_2, c_3; \text{Anchor Box 2: } p_c, b_x, b_y, b_h, b_w, c_1, c_2, c_3\big]
+    \]
+    \item For $k$ anchor boxes, the output becomes $3 \times 3 \times k \times 8$, where $8$ represents the number of parameters (e.g., $p_c$, bounding box, class probabilities).
+\end{itemize}
+
+\subsubsection*{Assignment of Objects to Anchor Boxes}
+\begin{itemize}
+    \item Each object is assigned to the grid cell containing its midpoint, as before.
+    \item Additionally, the object is assigned to the anchor box with the highest \textbf{Intersection over Union (IoU)} with its bounding box.
+    \item Example:
+    \begin{itemize}
+        \item If the pedestrian's bounding box matches Anchor Box 1, it is assigned to that anchor box.
+        \item If the car's bounding box matches Anchor Box 2, it is assigned to that anchor box.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Output Dimensions}
+\begin{itemize}
+    \item Without anchor boxes, $Y$ is $3 \times 3 \times 8$.
+    \item With two anchor boxes, $Y$ becomes $3 \times 3 \times 16$, or equivalently $3 \times 3 \times 2 \times 8$.
+    \item For a $19 \times 19$ grid with $k$ anchor boxes, $Y$ becomes $19 \times 19 \times k \times 8$.
+\end{itemize}
+
+\subsubsection*{Handling Special Cases}
+\begin{itemize}
+    \item \textbf{Two Objects with the Same Anchor Box:} If two objects in the same grid cell are assigned to the same anchor box, a tie-breaking rule is needed.
+    \item \textbf{Three Objects in One Grid Cell:} If more objects exist than anchor boxes, a tie-breaking mechanism must be applied.
+\end{itemize}
+
+\subsubsection*{Advantages of Anchor Boxes}
+\begin{itemize}
+    \item \textbf{Supports Multiple Detections:} Allows each grid cell to detect multiple objects.
+    \item \textbf{Specialization:} Anchor boxes enable the network to specialize in detecting objects of different shapes and sizes (e.g., tall, skinny pedestrians vs. wide, fat cars).
+\end{itemize}
+
+\subsubsection*{Choosing Anchor Boxes}
+There are several ways to choose Anchor boxes. They include:
+\begin{itemize}
+    \item \textbf{Manual Selection:} Choose shapes that span a variety of object sizes (e.g., tall, skinny, wide, fat).
+    \item \textbf{K-Means Clustering:} A more advanced method is to use K-means clustering to group object shapes in the dataset and determine anchor boxes representative of these clusters.
+\end{itemize}
+
+In Summary:
+\begin{itemize}[nosep]
+    \item Anchor boxes allow each grid cell to detect multiple objects by associating objects with anchor boxes based on IoU.
+    \item This results in more flexible and accurate object detection.
+    \item In the next section, these concepts will be tied back to the YOLO algorithm for efficient object detection.
+\end{itemize}
+
+
+% ---------------- YOLO Algorithm ----------------------%
+\subsection{YOLO Object Detection Algorithm}
+The YOLO (\textbf{You Only Look Once}) object detection algorithm integrates many key components of object detection into a unified framework. This section outlines the process of training, prediction, and post-processing for YOLO.
+
+\subsubsection*{Training the Neural Network}
+
+\paragraph{Training Set Construction:}
+\begin{itemize}
+    \item Suppose you are detecting three classes: \textbf{pedestrians}, \textbf{cars}, and \textbf{motorcycles}.
+    \item You also include the \textbf{background class}.
+    \item Using a $3 \times 3$ grid and $2$ anchor boxes, the output $y$ for each grid cell is $3 \times 3 \times 2 \times 8$, where:
+    \begin{itemize}
+        \item $8 = 5 + 3$: 
+        \begin{itemize}
+            \item $5$ consists of $p_c$, $b_x$, $b_y$, $b_h$, and $b_w$ (confidence and bounding box parameters).
+            \item $3$ corresponds to the class probabilities $c_1$, $c_2$, and $c_3$.
+        \end{itemize}
+        \item Alternatively, $y$ can be viewed as $3 \times 3 \times 16$ (flattened representation).
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Label Encoding:}
+\begin{itemize}
+    \item For each grid cell:
+    \begin{itemize}
+        \item If no object exists in the cell, $p_c = 0$ and the rest of the vector contains ``don't care'' values.
+        \item If an object exists:
+        \begin{itemize}
+            \item Assign the object to the anchor box with the highest \textbf{IoU} (Intersection over Union).
+            \item Encode the bounding box parameters and class label in the corresponding anchor box vector.
+        \end{itemize}
+    \end{itemize}
+    \item Example:
+    \begin{itemize}
+        \item For a car with a bounding box aligned to \textbf{Anchor Box 2}, $p_c = 1$, the bounding box parameters are encoded, and $c_2 = 1$ (car class).
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Final Output Volume:}
+\begin{itemize}
+    \item For a $3 \times 3$ grid with $2$ anchor boxes, the output volume is $3 \times 3 \times 16$.
+    \item In practice, larger grids (e.g., $19 \times 19$) and more anchor boxes (e.g., $5$) are used:
+    \[
+    y = 19 \times 19 \times 40 \quad \text{(if using 5 anchor boxes and 3 classes)}.
+    \]
+\end{itemize}
+
+\subsubsection*{Making Predictions}
+
+\paragraph{Neural Network Output:}
+\begin{itemize}
+    \item Input image: $100 \times 100 \times 3$.
+    \item Output volume: $3 \times 3 \times 16$ (or more in practice).
+    \item For each grid cell:
+    \begin{itemize}
+        \item If $p_c = 0$, the other values are ignored as noise.
+        \item If $p_c = 1$, the bounding box parameters and class probabilities specify the detection.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Post-Processing: Non-Max Suppression}
+\paragraph{Steps:}
+\begin{enumerate}[nosep]
+    \item For each grid cell, two bounding boxes (for two anchor boxes) are predicted.
+    \item Discard predictions with low probabilities ($p_c \leq 0.6$).
+    \item For each class (\textbf{pedestrians}, \textbf{cars}, \textbf{motorcycles}):
+    \begin{itemize}
+        \item Apply \textbf{non-max suppression} to remove duplicate detections of the same object.
+    \end{itemize}
+    \item Final output: One bounding box per detected object.
+\end{enumerate}
+
+In Summary:
+\begin{itemize}[nosep]
+    \item The YOLO algorithm is one of the most effective object detection methods.
+    \item You train a ConvNet to predict bounding boxes and class probabilities for each grid cell and anchor box.
+    \item Post-processing with non-max suppression refines the predictions to ensure accurate detections.
+\end{itemize}
+
+% ---------------- Semantic Segmentation with U-Net ----------------------%
+\subsection{Semantic Segmentation with U-Net}
+In this section, we explore \textbf{semantic segmentation}, an advanced computer vision technique that goes beyond object recognition and object detection. The goal of semantic segmentation is to assign a class label to every pixel in an image, thereby outlining objects with pixel-level precision.
+
+% Figure 45
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Object Detection vs Semantic Segmentation.png}
+	\caption{Object Detection vs Semantic Segmentation}
+	\label{fig:45}
+\end{figure}
+\FloatBarrier
+
+\paragraph{Definition:} Semantic segmentation involves labeling every pixel in an image with its corresponding class. Semantic Segmentation finds application in:
+\begin{itemize}
+    \item \textbf{Autonomous Vehicles:} Detecting drivable roads, vehicles, and pedestrians with pixel-level accuracy.
+    \item \textbf{Medical Imaging:} 
+    \begin{itemize}
+        \item Segmenting lungs, heart, and clavicles from chest X-rays for diagnostic purposes.
+        \item Automatically identifying brain tumors in MRI scans to assist radiologists and surgeons.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Per-Pixel Classification:}
+Imagine we are segmenting out a car from some background. Let's say for now that the only thing you care about is segmenting out the car in this image. In that case, you may decide to have two class labels. One for a car and zero for not car. 
+
+\begin{itemize}
+    \item Each pixel is assigned a label:
+    \begin{itemize}
+        \item Example: $1$ for car pixels, $0$ for non-car pixels.
+        \item Alternatively, multiple classes can be defined:
+        \begin{itemize}
+            \item $1$: Car
+            \item $2$: Building
+            \item $3$: Ground/Road
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Output:}
+\begin{itemize}
+    \item Instead of outputting a single class label or bounding box, the network generates a \textbf{segmentation map}, a matrix where each element corresponds to the class label of a pixel.
+    \item Example output:
+    \[
+    \text{Segmentation Map} =
+    \begin{bmatrix}
+        1 & 1 & 3 & 3 \\
+        1 & 2 & 3 & 3 \\
+        2 & 2 & 3 & 3
+    \end{bmatrix}
+    \]
+\end{itemize}
+
+\subsubsection*{Neural Network Architecture}
+
+\paragraph{Modification of a CNN:}
+\begin{itemize}
+    \item Start with a standard \textbf{Convolutional Neural Network (CNN)}.
+    \item Remove the final fully connected layers.
+    \item Gradually increase the spatial dimensions of the intermediate activations to match the original image size.
+\end{itemize}
+
+\paragraph{U-Net Architecture:}
+\begin{itemize}
+    \item \textbf{Encoder:} Reduces the spatial dimensions while increasing the number of channels.
+    \item \textbf{Decoder:} Gradually increases the spatial dimensions to match the original image size while reducing the number of channels.
+    \item The architecture forms a ``U'' shape, hence the name \textbf{U-Net}.
+\end{itemize}
+
+\paragraph{Key Operation in the U-Net Architecture: Transpose Convolution}
+\begin{itemize}
+    \item Used to ``blow up'' small sets of activations to match the original image size.
+    \item Essential for generating full-size segmentation maps in the decoder phase of U-Net.
+\end{itemize}
+
+Semantic segmentation is a powerful tool in computer vision, enabling pixel-level classification for applications such as autonomous driving and medical imaging. The key idea is to use a network like \textbf{U-Net}, which combines encoding and decoding stages to produce a segmentation map. The next step in understanding this architecture is to learn about \textbf{transpose convolutions}, an essential operation in the decoder. 
+
+% ---------------- Transpose Convolutions ----------------------%
+\subsubsection*{Transpose Convolutions}
+The \textbf{transpose convolution} is a critical operation used in the U-Net architecture for semantic segmentation. It allows you to take smaller input dimensions and ``blow them up'' into larger output dimensions, effectively reversing the dimensionality reduction performed by regular convolutions.
+
+\paragraph{Purpose:} A transpose convolution enables you to expand the spatial dimensions of the input while maintaining the learned relationships through filters. For example:
+\begin{itemize}
+    \item Input: $2 \times 2$
+    \item Output: $4 \times 4$
+\end{itemize}
+
+\paragraph{Comparison with Regular Convolution:}
+\begin{itemize}
+    \item Regular convolution reduces spatial dimensions.
+    \item Transpose convolution increases spatial dimensions.
+\end{itemize}
+
+\subsubsection*{Details of Transpose Convolution}
+\paragraph{Example Setup:} Consider a $2 \times 2$ input and the goal is to obtain a $4 \times 4$ output. Parameters:
+\begin{itemize}[nosep]
+    \item \textbf{Filter size:} $3 \times 3$
+    \item \textbf{Padding:} $p = 1$
+    \item \textbf{Stride:} $s = 2$
+\end{itemize}
+
+\paragraph{Steps:}
+\begin{enumerate}
+    \item \textbf{For each input value:}
+    \begin{itemize}
+        \item Multiply the input value by each element of the filter.
+        \item Copy the resulting $3 \times 3$ values into the corresponding positions of the output matrix.
+    \end{itemize}
+    \item \textbf{Handle overlaps:}
+    \begin{itemize}
+        \item Where multiple filters contribute to the same output position, their values are summed.
+    \end{itemize}
+    \item \textbf{Padding and stride:}
+    \begin{itemize}
+        \item Padding determines how much "empty space" surrounds the input.
+        \item Stride determines the step size for positioning the filter over the output matrix.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Illustrative Example}
+
+\paragraph{Setup:} 
+\begin{itemize}[nosep]
+    \item Input: $2 \times 2$
+    \item Filter: $3 \times 3$
+    \item Padding: $p = 1$
+    \item Stride: $s = 2$
+\end{itemize}
+
+\paragraph{Step-by-Step Process:}
+\begin{enumerate}
+    \item \textbf{Input value: $2$ (top-left corner):}
+    \begin{itemize}
+        \item Multiply the filter by $2$ and copy the $3 \times 3$ values to the corresponding output positions.
+    \end{itemize}
+	% Figure 46
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Step 1.png}
+		\label{fig:46}
+	\end{figure}
+	\FloatBarrier
+
+    \item \textbf{Input value: $1$ (top-right corner):}
+    \begin{itemize}
+        \item Multiply the filter by $1$ and shift the copied values by two steps (stride of 2).
+    \end{itemize}
+	% Figure 47
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Step 2.png}
+		\label{fig:47}
+	\end{figure}
+	\FloatBarrier
+
+    \item \textbf{Input value: $3$ (bottom-left corner):}
+    \begin{itemize}
+        \item Multiply the filter by $3$ and copy values into the next block of the output matrix.
+    \end{itemize}
+	% Figure 48
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Step 3.png}
+		\label{fig:48}
+	\end{figure}
+	\FloatBarrier
+
+    \item \textbf{Input value: $2$ (bottom-right corner):}
+    \begin{itemize}
+        \item Multiply the filter by $2$ and copy values into the final block.
+    \end{itemize}
+
+	% Figure 49
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Step 4.png}
+		\label{fig:49}
+	\end{figure}
+	\FloatBarrier
+
+    \item \textbf{Combine overlapping regions:}
+    \begin{itemize}
+        \item Sum the values where the contributions from multiple filters overlap.
+    \end{itemize}
+	% Figure 50
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Final Step.png}
+		\label{fig:50}
+	\end{figure}
+	\FloatBarrier
+\end{enumerate}
+
+\paragraph{Final Output:} The resulting $4 \times 4$ matrix contains the summed contributions from all input values and their corresponding filter multiplications.
+
+The key insights is:
+\begin{itemize}[nosep]
+    \item \textbf{Flexibility:} The transpose convolution allows for controlled expansion of spatial dimensions.
+    \item \textbf{Learning:} The filter parameters are learned during training, enabling the network to effectively "blow up" activations in a meaningful way.
+    \item \textbf{Applications:} Transpose convolutions are a key building block of the U-Net architecture used for semantic segmentation.
+\end{itemize}
+
+The transpose convolution is essential for increasing spatial dimensions in networks like U-Net. By understanding how it works step by step, you can effectively implement and use it in semantic segmentation tasks. 
+
+% ---------------- U-Net Architecture Intuition ----------------------%
+\subsection{U-Net Architecture Intuition}
+The U-Net is a neural network architecture specifically designed for \textbf{semantic segmentation}. It processes an image through two main stages:
+\begin{itemize}
+    \item \textbf{Compression:} Reduces the spatial dimensions while capturing high-level contextual information.
+    \item \textbf{Expansion:} Increases the spatial dimensions back to the original size for pixel-wise predictions.
+\end{itemize}
+
+\paragraph{Key Features:}
+\begin{itemize}
+    \item Uses regular convolutions for the compression stage.
+    \item Uses transpose convolutions for the expansion stage.
+    \item Incorporates \textbf{skip connections} to enhance performance by combining high-resolution, low-level features with low-resolution, high-level contextual information.
+\end{itemize}
+
+\subsubsection*{Compression Stage}
+
+The first half of the U-Net architecture:
+\begin{itemize}
+    \item \textbf{Purpose:} Reduces the spatial dimensions (height and width) of the input image.
+    \item \textbf{Effect:} Compresses spatial information while increasing the depth (number of channels).
+    \item \textbf{Outcome:} Captures high-level contextual information but loses fine-grained spatial details.
+\end{itemize}
+
+For example:
+\begin{itemize}
+    \item The middle layer might represent a general understanding that there is a cat in the lower right-hand corner of the image.
+    \item However, the precise spatial details (e.g., the exact shape or boundaries of the cat) are lost due to the reduced resolution.
+\end{itemize}
+
+\subsubsection*{Expansion Stage}
+
+The second half of the U-Net architecture:
+\begin{itemize}
+    \item \textbf{Purpose:} Expands the spatial dimensions back to the size of the original input image.
+    \item \textbf{Method:} Uses \textbf{transpose convolutions} to achieve this expansion.
+    \item \textbf{Outcome:} Produces an output with the same resolution as the input image, allowing for pixel-wise predictions.
+\end{itemize}
+
+\subsubsection*{Skip Connections}
+
+To improve the performance of the U-Net, \textbf{skip connections} are added between the compression and expansion stages:
+\begin{itemize}
+    \item \textbf{Mechanism:} Connect earlier layers (from the compression stage) directly to later layers (in the expansion stage).
+    \item \textbf{Purpose:} Provides the network with detailed, high-resolution, low-level feature information.
+\end{itemize}
+
+\paragraph{Why Skip Connections Are Useful:}
+\begin{itemize}
+    \item The expansion layers rely on low-resolution, high-level contextual information from the compression stage to make predictions.
+    \item However, this information alone is insufficient for precise pixel-wise classification.
+    \item Skip connections allow the network to access:
+    \begin{itemize}
+        \item High-level contextual information (from compressed activations).
+        \item Fine-grained, high-resolution spatial information (from earlier layers).
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Example:}
+For a layer making the decision about whether a pixel belongs to a cat:
+\begin{itemize}
+    \item The compressed activations may provide high-level information (e.g., the general location of the cat in the image).
+    \item The skip connections provide detailed, low-level information (e.g., texture or fur patterns at specific pixel positions).
+\end{itemize}
+
+By combining these two types of information, the network can make more accurate predictions for semantic segmentation.
+
+% ---------------- U-Net Architecture: Detailed Explanation ----------------------%
+\subsection*{U-Net Architecture: Detailed Explanation}
+The U-Net architecture is one of the foundational neural network architectures in computer vision, particularly for semantic segmentation. Initially developed by Olaf Ronneberger, Philipp Fischer, and Thomas Brox for biomedical image segmentation, it has since found applications in many other areas of computer vision. Below, we break down the U-Net architecture step-by-step.
+
+\subsubsection*{Overview of the U-Net Architecture}
+
+\begin{itemize}
+    \item \textbf{Input:} An image of dimensions \( H \times W \times 3 \), where the three channels represent the RGB components.
+    \item \textbf{Output:} A segmentation map of dimensions \( H \times W \times \text{num\_classes} \), where each pixel is classified into one of the possible classes.
+    \item \textbf{Key Feature:} Skip connections that transfer detailed spatial information from earlier layers to later layers during the up-sampling process.
+\end{itemize}
+
+The architecture has a U-shaped structure, hence the name "U-Net."
+
+\subsubsection*{Compression Stage (Downsampling)}
+
+The first half of the U-Net involves progressively reducing the spatial dimensions while increasing the depth (number of channels):
+\begin{enumerate}
+    \item \textbf{Convolutional Layers:} Each step involves a convolutional layer followed by a ReLU activation function.
+    \item \textbf{Max Pooling:} After a couple of convolutional layers, max pooling is applied to reduce the spatial dimensions. This operation decreases the height and width while increasing the number of channels.
+    \item This process is repeated several times, resulting in smaller spatial dimensions and deeper feature representations.
+\end{enumerate}
+
+\subsubsection*{Expansion Stage (Upsampling)}
+
+The second half of the U-Net involves increasing the spatial dimensions back to the original size:
+\begin{enumerate}
+    \item \textbf{Transpose Convolutions:} Used to upsample the feature maps. This increases the height and width of the activations while reducing the depth.
+    \item \textbf{Skip Connections:} 
+    \begin{itemize}
+        \item Feature maps from the corresponding layers in the compression stage are directly copied and concatenated with the upsampled activations.
+        \item This provides fine-grained, high-resolution information to the later layers.
+    \end{itemize}
+    \item \textbf{Convolutional Layers:} After concatenation, more convolutional layers are applied to refine the activations.
+    \item This process is repeated until the spatial dimensions are restored to match the input image.
+\end{enumerate}
+
+\subsubsection*{Final Output Layer}
+
+\begin{itemize}
+    \item After the last upsampling step, a \( 1 \times 1 \) convolution is applied to map the activations to the required number of classes (\textit{num\_classes}).
+    \item The final output has dimensions \( H \times W \times \text{num\_classes} \), where:
+    \begin{itemize}
+        \item \( H \) and \( W \): Height and width of the original input image.
+        \item \textit{num\_classes}: Number of classes for segmentation.
+    \end{itemize}
+    \item \textbf{Pixel Classification:} For each pixel, the network outputs a vector of probabilities (one per class). Taking the \texttt{argmax} over this vector yields the final class label for each pixel.
+\end{itemize}
+
+\subsubsection*{Example Dimensions Throughout the U-Net}
+
+\begin{enumerate}
+    \item \textbf{Input:} \( H \times W \times 3 \) (e.g., \( 256 \times 256 \times 3 \)).
+    \item \textbf{Compression Stage:} Gradually decreases to smaller dimensions like \( H/2 \times W/2 \times \text{more\_channels} \), \( H/4 \times W/4 \times \text{even\_more\_channels} \), and so on.
+    \item \textbf{Expansion Stage:} Gradually increases back to \( H \times W \times \text{fewer\_channels} \).
+    \item \textbf{Output:} \( H \times W \times \text{num\_classes} \).
+\end{enumerate}
+
+\subsubsection*{Intuition Behind Skip Connections}
+
+\begin{itemize}
+    \item \textbf{High-Level Context:} The compressed activations provide high-level contextual information, e.g., "a cat exists in the lower-right corner."
+    \item \textbf{Fine-Grained Details:} The skip connections pass detailed spatial features, e.g., "this pixel is part of the cat's fur," from the early layers to the later layers.
+    \item Combining these two types of information improves the segmentation accuracy.
+\end{itemize}
+
+The U-Net is a powerful architecture for semantic segmentation, combining high-level contextual understanding with fine-grained spatial details. Through its U-shaped design and skip connections, it achieves high accuracy across a variety of applications. You have now learned how the U-Net works, step-by-step, and can begin exploring its implementation in practice.
+
+% Figure 51
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/U-Net.png}
+	\caption{U-Net Architecture}
+	\label{fig:51}
+\end{figure}
+\FloatBarrier
 
 \end{document}
 
