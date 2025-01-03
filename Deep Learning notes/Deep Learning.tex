@@ -5569,9 +5569,9 @@ Imagine we are segmenting out a car from some background. Let's say for now that
         \item Example: $1$ for car pixels, $0$ for non-car pixels.
         \item Alternatively, multiple classes can be defined:
         \begin{itemize}
-            \item $1$: Car
-            \item $2$: Building
-            \item $3$: Ground/Road
+            \item Class $1$: Car
+            \item Class $2$: Building
+            \item Class $3$: Ground/Road
         \end{itemize}
     \end{itemize}
 \end{itemize}
@@ -5579,25 +5579,16 @@ Imagine we are segmenting out a car from some background. Let's say for now that
 \paragraph{Output:}
 \begin{itemize}
     \item Instead of outputting a single class label or bounding box, the network generates a \textbf{segmentation map}, a matrix where each element corresponds to the class label of a pixel.
-    \item Example output:
-    \[
-    \text{Segmentation Map} =
-    \begin{bmatrix}
-        1 & 1 & 3 & 3 \\
-        1 & 2 & 3 & 3 \\
-        2 & 2 & 3 & 3
-    \end{bmatrix}
-    \]
 \end{itemize}
 
-\subsubsection*{Neural Network Architecture}
-
-\paragraph{Modification of a CNN:}
-\begin{itemize}
-    \item Start with a standard \textbf{Convolutional Neural Network (CNN)}.
-    \item Remove the final fully connected layers.
-    \item Gradually increase the spatial dimensions of the intermediate activations to match the original image size.
-\end{itemize}
+% Figure 46
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Segmentation Map.png}
+	\caption{Per-pixel class labels on a segmentation map}
+	\label{fig:46}
+\end{figure}
+\FloatBarrier
 
 \paragraph{U-Net Architecture:}
 \begin{itemize}
@@ -5651,7 +5642,7 @@ The \textbf{transpose convolution} is a critical operation used in the U-Net arc
     \end{itemize}
     \item \textbf{Padding and stride:}
     \begin{itemize}
-        \item Padding determines how much "empty space" surrounds the input.
+        \item Padding determines how much ``empty space'' surrounds the input.
         \item Stride determines the step size for positioning the filter over the output matrix.
     \end{itemize}
 \end{enumerate}
@@ -5672,11 +5663,11 @@ The \textbf{transpose convolution} is a critical operation used in the U-Net arc
     \begin{itemize}
         \item Multiply the filter by $2$ and copy the $3 \times 3$ values to the corresponding output positions.
     \end{itemize}
-	% Figure 46
+	% Figure 47
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Step 1.png}
-		\label{fig:46}
+		\label{fig:47}
 	\end{figure}
 	\FloatBarrier
 
@@ -5684,11 +5675,11 @@ The \textbf{transpose convolution} is a critical operation used in the U-Net arc
     \begin{itemize}
         \item Multiply the filter by $1$ and shift the copied values by two steps (stride of 2).
     \end{itemize}
-	% Figure 47
+	% Figure 48
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Step 2.png}
-		\label{fig:47}
+		\label{fig:48}
 	\end{figure}
 	\FloatBarrier
 
@@ -5696,11 +5687,11 @@ The \textbf{transpose convolution} is a critical operation used in the U-Net arc
     \begin{itemize}
         \item Multiply the filter by $3$ and copy values into the next block of the output matrix.
     \end{itemize}
-	% Figure 48
+	% Figure 49
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Step 3.png}
-		\label{fig:48}
+		\label{fig:49}
 	\end{figure}
 	\FloatBarrier
 
@@ -5709,11 +5700,11 @@ The \textbf{transpose convolution} is a critical operation used in the U-Net arc
         \item Multiply the filter by $2$ and copy values into the final block.
     \end{itemize}
 
-	% Figure 49
+	% Figure 50
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Step 4.png}
-		\label{fig:49}
+		\label{fig:50}
 	\end{figure}
 	\FloatBarrier
 
@@ -5721,11 +5712,11 @@ The \textbf{transpose convolution} is a critical operation used in the U-Net arc
     \begin{itemize}
         \item Sum the values where the contributions from multiple filters overlap.
     \end{itemize}
-	% Figure 50
+	% Figure 51
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=0.85\textwidth]{Images/Transpose Convolution - Final Step.png}
-		\label{fig:50}
+		\label{fig:51}
 	\end{figure}
 	\FloatBarrier
 \end{enumerate}
@@ -5735,7 +5726,7 @@ The \textbf{transpose convolution} is a critical operation used in the U-Net arc
 The key insights is:
 \begin{itemize}[nosep]
     \item \textbf{Flexibility:} The transpose convolution allows for controlled expansion of spatial dimensions.
-    \item \textbf{Learning:} The filter parameters are learned during training, enabling the network to effectively "blow up" activations in a meaningful way.
+    \item \textbf{Learning:} The filter parameters are learned during training, enabling the network to effectively ``blow up'' activations in a meaningful way.
     \item \textbf{Applications:} Transpose convolutions are a key building block of the U-Net architecture used for semantic segmentation.
 \end{itemize}
 
@@ -5815,12 +5806,12 @@ The U-Net architecture is one of the foundational neural network architectures i
 \subsubsection*{Overview of the U-Net Architecture}
 
 \begin{itemize}
-    \item \textbf{Input:} An image of dimensions \( H \times W \times 3 \), where the three channels represent the RGB components.
-    \item \textbf{Output:} A segmentation map of dimensions \( H \times W \times \text{num\_classes} \), where each pixel is classified into one of the possible classes.
+    \item \textbf{Input:} An image of dimensions \( h \times w \times 3 \), where the three channels represent the RGB components.
+    \item \textbf{Output:} A segmentation map of dimensions \( h \times w \times n_{classes} \), where each pixel is classified into one of the possible classes.
     \item \textbf{Key Feature:} Skip connections that transfer detailed spatial information from earlier layers to later layers during the up-sampling process.
 \end{itemize}
 
-The architecture has a U-shaped structure, hence the name "U-Net."
+The architecture has a U-shaped structure, hence the name ``U-Net.''
 
 \subsubsection*{Compression Stage (Downsampling)}
 
@@ -5848,11 +5839,11 @@ The second half of the U-Net involves increasing the spatial dimensions back to 
 \subsubsection*{Final Output Layer}
 
 \begin{itemize}
-    \item After the last upsampling step, a \( 1 \times 1 \) convolution is applied to map the activations to the required number of classes (\textit{num\_classes}).
-    \item The final output has dimensions \( H \times W \times \text{num\_classes} \), where:
+    \item After the last upsampling step, a \( 1 \times 1 \) convolution is applied to map the activations to the required number of classes ($n_{classes}$).
+    \item The final output has dimensions \( h \times w \times n_{classes} \), where:
     \begin{itemize}
-        \item \( H \) and \( W \): Height and width of the original input image.
-        \item \textit{num\_classes}: Number of classes for segmentation.
+        \item \( h \) and \( w \): Height and width of the original input image.
+        \item $n_{classes}$: Number of classes for segmentation.
     \end{itemize}
     \item \textbf{Pixel Classification:} For each pixel, the network outputs a vector of probabilities (one per class). Taking the \texttt{argmax} over this vector yields the final class label for each pixel.
 \end{itemize}
@@ -5860,28 +5851,28 @@ The second half of the U-Net involves increasing the spatial dimensions back to 
 \subsubsection*{Example Dimensions Throughout the U-Net}
 
 \begin{enumerate}
-    \item \textbf{Input:} \( H \times W \times 3 \) (e.g., \( 256 \times 256 \times 3 \)).
-    \item \textbf{Compression Stage:} Gradually decreases to smaller dimensions like \( H/2 \times W/2 \times \text{more\_channels} \), \( H/4 \times W/4 \times \text{even\_more\_channels} \), and so on.
-    \item \textbf{Expansion Stage:} Gradually increases back to \( H \times W \times \text{fewer\_channels} \).
-    \item \textbf{Output:} \( H \times W \times \text{num\_classes} \).
+    \item \textbf{Input:} \( h \times w \times 3 \) (e.g., \( 256 \times 256 \times 3 \)).
+    \item \textbf{Compression Stage:} Gradually decreases to smaller dimensions like \( h/2 \times w/2 \times \text{more\_channels} \), \( h/4 \times w/4 \times \text{even\_more\_channels} \), and so on.
+    \item \textbf{Expansion Stage:} Gradually increases back to \( h \times w \times \text{fewer\_channels} \).
+    \item \textbf{Output:} \( h \times w \times n_{classes} \).
 \end{enumerate}
 
 \subsubsection*{Intuition Behind Skip Connections}
 
 \begin{itemize}
-    \item \textbf{High-Level Context:} The compressed activations provide high-level contextual information, e.g., "a cat exists in the lower-right corner."
-    \item \textbf{Fine-Grained Details:} The skip connections pass detailed spatial features, e.g., "this pixel is part of the cat's fur," from the early layers to the later layers.
+    \item \textbf{High-Level Context:} The compressed activations provide high-level contextual information, e.g., ``a cat exists in the lower-right corner.''
+    \item \textbf{Fine-Grained Details:} The skip connections pass detailed spatial features, e.g., ``this pixel is part of the cat's fur,'' from the early layers to the later layers.
     \item Combining these two types of information improves the segmentation accuracy.
 \end{itemize}
 
 The U-Net is a powerful architecture for semantic segmentation, combining high-level contextual understanding with fine-grained spatial details. Through its U-shaped design and skip connections, it achieves high accuracy across a variety of applications. You have now learned how the U-Net works, step-by-step, and can begin exploring its implementation in practice.
 
-% Figure 51
+% Figure 52
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{Images/U-Net.png}
 	\caption{U-Net Architecture}
-	\label{fig:51}
+	\label{fig:52}
 \end{figure}
 \FloatBarrier
 
