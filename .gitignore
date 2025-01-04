@@ -165,3 +165,5 @@ cython_debug/
 C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A1 - Building a very deep Convolutional Network using Residual Networks/models/
 C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A1 - Building a very deep Convolutional Network using Residual Networks/resnet50.h5
 C4 - Convolutional Neural Networks/Wk 2 - Deep Convolutional Models - Case Studies/W2A2 - Transfer Learning with MobileNetV2/dataset
+C4 - Convolutional Neural Networks/Wk 3 - Detection Algorithms/W3A1 - Autonomous Driving - Car Detection/model_data
+C4 - Convolutional Neural Networks/Wk 3 - Detection Algorithms/W3A1 - Autonomous Driving - Car Detection/nb_images
